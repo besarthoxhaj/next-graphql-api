@@ -1,7 +1,9 @@
 {
   "name": "ft-next-graphql-api",
+  "private": true,
   "version": "0.0.1",
   "description": "GraphQL API endpoint for Next FT",
+  "main": "server/app.js",
   "scripts": {
     "test": "make test"
   },
