@@ -193,7 +193,7 @@ const ContentV1 = new GraphQLObjectType({
 				from: { type: GraphQLInt },
 				limit: { type: GraphQLInt }
 			},
-			resolve: (content, {from, limit}, {backend}) => {
+			resolve: (content, {from, limit}, {rootValue: {backend}}) => {
 				let ids = content.item.package.map(it => it.id);
 				if(ids.length < 1) { return []; }
 
@@ -292,7 +292,7 @@ const LiveBlog = new GraphQLObjectType({
 				from: { type: GraphQLInt },
 				limit: { type: GraphQLInt }
 			},
-			resolve: (content, {from, limit}, {backend}) => {
+			resolve: (content, {from, limit}, {rootValue: {backend}}) => {
 				let ids = content.item.package.map(it => it.id);
 				if(ids.length < 1) { return []; }
 
@@ -301,7 +301,7 @@ const LiveBlog = new GraphQLObjectType({
 		},
 		status: {
 			type: LiveBlogStatus,
-			resolve: (content, _, {backend}) => {
+			resolve: (content, _, {rootValue: {backend}}) => {
 				const uri = content.item.location.uri;
 
 				return backend.liveblogExtras(uri, {}).then(it => it.status);
@@ -312,7 +312,7 @@ const LiveBlog = new GraphQLObjectType({
 			args: {
 				limit: { type: GraphQLInt }
 			},
-			resolve: (content, {limit}, {backend}) => {
+			resolve: (content, {limit}, {rootValue: {backend}}) => {
 				const uri = content.item.location.uri;
 
 				return backend.liveblogExtras(uri, {limit}).then(it => it.updates);
@@ -377,7 +377,7 @@ const ContentV2 = new GraphQLObjectType({
 				from: { type: GraphQLInt },
 				limit: { type: GraphQLInt }
 			},
-			resolve: (content, {from, limit}, {backend}) => {
+			resolve: (content, {from, limit}, {rootValue: {backend}}) => {
 				let ids = content.item.package.map(it => it.id);
 				if(ids.length < 1) { return []; }
 

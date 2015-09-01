@@ -2,7 +2,7 @@ import { graphql } from 'graphql';
 import { printSchema } from 'graphql/utilities';
 
 import schema from './schema';
-import backend from './backend';
+import {factory as backendFactory} from './backend';
 
 const query = (backend) => {
 	return (queryText) => {
@@ -17,8 +17,8 @@ const query = (backend) => {
 	};
 };
 
-const fetchEs = query(backend(true));
-const fetchCapi = query(backend(false));
+const fetchEs = query(backendFactory(true));
+const fetchCapi = query(backendFactory(false));
 
 // FIXME figure out a more globally applicable mocking strategy
 // const fetchMock = fetch(backend(true, true));

@@ -19,7 +19,7 @@ import query from './routes/query';
 import schema from './routes/schema';
 
 app.get('/__graphql', index);
-// app.post('/__graphql', query);
+app.post('/__graphql', query);
 
 app.get('/__graphql/schema', schema);
 

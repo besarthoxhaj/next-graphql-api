@@ -24,7 +24,7 @@ const queryType = new GraphQLObjectType({
 			args: {
 				region: { type: new GraphQLNonNull(Region) }
 			},
-			resolve: (root, {region}, {backend}) => {
+			resolve: (root, {region}, {rootValue: {backend}}) => {
 				let uuid = sources[`${region}Top`].uuid;
 
 				return backend.page(uuid);
@@ -32,13 +32,13 @@ const queryType = new GraphQLObjectType({
 		},
 		fastFT: {
 			type: Collection,
-			resolve: (root, _, {backend}) => {
+			resolve: (root, _, {rootValue: {backend}}) => {
 				return backend.fastFT();
 			}
 		},
 		editorsPicks: {
 			type: Collection,
-			resolve: (root, _, {backend}) => {
+			resolve: (root, _, {rootValue: {backend}}) => {
 				// HACK this is waiting for editorial to start managing an Editor's picks list
 				let config = ['bigRead', 'lunch', 'management', 'frontPageSkyline', 'personInNews', 'lex'];
 
@@ -75,7 +75,7 @@ const queryType = new GraphQLObjectType({
 		},
 		opinion: {
 			type: Collection,
-			resolve: (root, _, {backend}) => {
+			resolve: (root, _, {rootValue: {backend}}) => {
 				let {uuid, sectionsId} = sources.opinion;
 
 				return backend.page(uuid, sectionsId);
@@ -83,7 +83,7 @@ const queryType = new GraphQLObjectType({
 		},
 		lifestyle: {
 			type: Collection,
-			resolve: (root, _, {backend}) => {
+			resolve: (root, _, {rootValue: {backend}}) => {
 				let {uuid, sectionsId} = sources.lifestyle;
 
 				return backend.page(uuid, sectionsId);
@@ -91,7 +91,7 @@ const queryType = new GraphQLObjectType({
 		},
 		markets: {
 			type: Collection,
-			resolve: (root, _, {backend}) => {
+			resolve: (root, _, {rootValue: {backend}}) => {
 				let {uuid, sectionsId} = sources.markets;
 
 				return backend.page(uuid, sectionsId);
@@ -99,7 +99,7 @@ const queryType = new GraphQLObjectType({
 		},
 		technology: {
 			type: Collection,
-			resolve: (root, _, {backend}) => {
+			resolve: (root, _, {rootValue: {backend}}) => {
 				let {uuid, sectionsId} = sources.technology;
 
 				return backend.page(uuid, sectionsId);
@@ -107,7 +107,7 @@ const queryType = new GraphQLObjectType({
 		},
 		popular: {
 			type: Collection,
-			resolve: (root, _, {backend}) => {
+			resolve: (root, _, {rootValue: {backend}}) => {
 				let url = sources.popular.url;
 
 				return backend.popular(url, 'Popular');
@@ -118,14 +118,14 @@ const queryType = new GraphQLObjectType({
 			args: {
 				query: { type: new GraphQLNonNull(GraphQLString) }
 			},
-			resolve: (_, {query}, {backend}) => {
+			resolve: (_, {query}, {rootValue: {backend}}) => {
 				return backend.search(query)
 					.then(ids => ({ items: ids }));
 			}
     },
     videos: {
       type: new GraphQLList(Video),
-      resolve: (root, _, {backend}) => {
+      resolve: (root, _, {rootValue: {backend}}) => {
         let {id} = sources.videos;
 
         return backend.videos(id);

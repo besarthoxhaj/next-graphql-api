@@ -51,7 +51,7 @@ const Page = new GraphQLObjectType({
 				genres: { type: new GraphQLList(GraphQLString) },
 				type: { type: ContentType }
 			},
-			resolve: (page, {from, limit, genres, type}, {backend}) => {
+			resolve: (page, {from, limit, genres, type}, {rootValue: {backend}}) => {
 				if(!page.items || page.items.length < 1) { return []; }
 
 				return backend.contentv1(page.items, {from, limit, genres, type});
@@ -81,7 +81,7 @@ const ContentByConcept = new GraphQLObjectType({
 				genres: { type: new GraphQLList(GraphQLString) },
 				type: { type: ContentType }
 			},
-			resolve: (result, args, {backend}) => {
+			resolve: (result, args, {rootValue: {backend}}) => {
 				if(!result.items || result.items.length < 1) { return []; }
 
 				return backend.contentv2(result.items, args);

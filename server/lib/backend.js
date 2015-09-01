@@ -15,7 +15,7 @@ import articleGenres from 'ft-next-article-genre';
 const filterContent = ({from, limit, genres, type}, resolveType) => {
 	return (items) => {
 		if(genres && genres.length) {
-			items = items.filter(it => genres.indexOf(articleGenres(it.item.metadata)) > -1);
+			items = items.filter(it => genres.indexOf(articleGenres(it.item.metadata, {requestedProp: 'editorialTone'})) > -1);
 		}
 
 		if(type) {
@@ -167,6 +167,9 @@ const capiBackend = new Backend({fastFT: capiFastFT, capi: directCAPI, popular: 
 // Mock backend
 const mockBackend = new Backend({fastFT: esFastFT, capi: mockedCAPI, popular: popular, liveblog: mockLiveblog, videos: playlist});
 
-export default (elasticSearch, mock) => {
-	return (mock ? mockBackend : (elasticSearch ? esBackend : capiBackend));
+export default {
+	Backend: Backend,
+	factory: (elasticSearch, mock) => {
+		return (mock ? mockBackend : (elasticSearch ? esBackend : capiBackend));
+	}
 };
