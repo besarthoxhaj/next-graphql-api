@@ -3,8 +3,8 @@
 install:
 	origami-build-tools install --verbose
 
-verify:
-	obt verify --esLintPath=./.eslintrc
+test:
+	mocha --compilers js:babel/register --recursive --reporter spec test/server/
 
 run:
 	nbt run
