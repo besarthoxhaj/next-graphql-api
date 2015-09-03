@@ -15,6 +15,9 @@ run-local:
 build:
 	webpack
 
+watch:
+	webpack --watch
+
 build-production:
 	NODE_ENV=production webpack --bail
 	nbt about

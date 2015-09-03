@@ -5,10 +5,8 @@ import schema from './schema';
 import {factory as backendFactory} from './backend';
 
 const query = (backend) => {
-	return (queryText) => {
-		return graphql(schema, queryText, {
-			backend: backend
-		})
+	return (queryText, variables) => {
+		return graphql(schema, queryText, { backend: backend }, variables)
 		.then(it => {
 			if(it.data) { return it.data; }
 
