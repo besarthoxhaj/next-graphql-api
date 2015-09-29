@@ -1,6 +1,4 @@
-/* globals describe it */
 import fetch from 'isomorphic-fetch';
-import {Promise} from 'es6-promise';
 global.fetch = fetch;
 
 import chai from 'chai';

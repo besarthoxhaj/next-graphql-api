@@ -1,0 +1,10 @@
+{
+  "extends": "./node_modules/next-build-tools/config/eslint.json",
+  "ecmaFeatures": {
+    "jsx": true,
+    "modules": true
+  },
+  "plugins": [
+    "react"
+  ]
+}

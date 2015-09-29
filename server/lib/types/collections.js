@@ -25,7 +25,7 @@ const Collection = new GraphQLInterfaceType({
 			}
 		}
 	},
-	resolveType: (value) => (value.conceptId == null ? Page : ContentByConcept)
+	resolveType: (value) => (!value.conceptId ? Page : ContentByConcept)
 });
 
 const Page = new GraphQLObjectType({

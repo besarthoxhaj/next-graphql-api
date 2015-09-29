@@ -1,7 +1,7 @@
 import bodyParser from 'body-parser';
 import express from 'ft-next-express';
 
-var app = express({
+const app = express({
 	layoutsDir: 'views/layouts'
 });
 
@@ -26,7 +26,7 @@ app.post('/__graphql', query);
 app.get('/__graphql/schema', schema);
 app.get('/__graphql/playground', playground);
 
-var port = process.env.PORT || 3001;
+const port = process.env.PORT || 3001;
 
 export default app;
 export let listen = app.listen(port, () => {

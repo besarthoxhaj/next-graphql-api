@@ -9,7 +9,7 @@ import {
 } from 'graphql';
 
 import {Region} from './types/basic';
-import {Collection, VideoCollection} from './types/collections';
+import {Collection} from './types/collections';
 import {Video} from './types/content';
 
 import sources from './config/sources';

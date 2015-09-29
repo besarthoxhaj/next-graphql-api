@@ -78,8 +78,8 @@ class Backend {
 		return this.adapters.popular.fetch(url, ttl)
 		.then((data) => {
 			return data.mostRead.pages.map(function (page) {
-				var index = page.url.lastIndexOf('/');
-				var id = page.url.substr(index + 1).replace('.html', '');
+				const index = page.url.lastIndexOf('/');
+				const id = page.url.substr(index + 1).replace('.html', '');
 				return id;
 			});
 		})
@@ -101,7 +101,7 @@ class Backend {
 			if((first && first.data.datemodified) < (second && second.data.datemodified)) { json.reverse(); }
 
 			// dedupe updates and only keep messages, decide on status
-			let [_, updates, status] = json.reduce(([skip, updates, status], event) => {
+			let [, updates, status] = json.reduce(([skip, updates, status], event) => {
 				if (event.event === 'end') { return [skip, updates, 'closed']; }
 
 				if (event.event === 'msg' && event.data.mid && !skip[event.data.mid]) {

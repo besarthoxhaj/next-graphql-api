@@ -2,7 +2,7 @@ import fetch from 'isomorphic-fetch';
 import React from 'react';
 
 import GraphiQL from 'graphiql';
-import styles from 'graphiql/graphiql.css';
+import 'graphiql/graphiql.css';
 
 const fetcher = (params) => {
 	console.log('GraphiQL submitted', params);

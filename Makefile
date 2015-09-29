@@ -9,7 +9,7 @@ install:
 	obt install --verbose
 
 verify:
-	nbt verify
+	obt verify --esLintPath=./.eslintrc
 
 unit-test:
 	mocha --compilers js:babel/register --recursive --reporter spec test/server/
