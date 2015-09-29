@@ -1,23 +1,35 @@
-.PHONY: test build
+TEST_APP := "ft-graphql-branch-${CIRCLE_BUILD_NUM}"
+
+.PHONY: test
+
+clean:
+	git clean -fxd
 
 install:
-	origami-build-tools install --verbose
+	obt install --verbose
 
-test:
+verify:
+	nbt verify
+
+unit-test:
 	mocha --compilers js:babel/register --recursive --reporter spec test/server/
 
-run:
-	nbt run
-
-run-local:
-	nbt run --local
-
-build:
-	webpack
-
-watch:
-	webpack --watch
+test: verify unit-test
 
 build-production:
-	NODE_ENV=production webpack --bail
 	nbt about
+
+run:
+	nbt run --local
+
+provision:
+	nbt provision ${TEST_APP}
+	nbt configure ft-next-article ${TEST_APP} --overrides "NODE_ENV=branch"
+	nbt deploy ${TEST_APP} --skip-enable-preboot --skip-logging
+
+tidy:
+	nbt destroy ${TEST_APP}
+
+deploy:
+	nbt configure
+	nbt deploy
