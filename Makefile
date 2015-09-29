@@ -24,7 +24,7 @@ run:
 
 provision:
 	nbt provision ${TEST_APP}
-	nbt configure ft-next-article ${TEST_APP} --overrides "NODE_ENV=branch"
+	nbt configure ft-next-graphql-api ${TEST_APP} --overrides "NODE_ENV=branch"
 	nbt deploy ${TEST_APP} --skip-enable-preboot --skip-logging
 
 tidy:
