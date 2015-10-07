@@ -1,7 +1,5 @@
 import liveblogs from '../fixtures/liveblogs';
-import express from 'ft-next-express';
-
-const logger = express.logger;
+import { logger } from 'ft-next-express';
 
 class MockLiveblog {
 	constructor(realBackend) {

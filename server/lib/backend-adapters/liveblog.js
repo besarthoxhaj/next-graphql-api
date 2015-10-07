@@ -1,6 +1,4 @@
-import express from 'ft-next-express';
-
-const logger = express.logger;
+import { logger } from 'ft-next-express';
 
 class Liveblog {
 	constructor(cache) {

@@ -11,9 +11,8 @@ import MockCAPI from './backend-adapters/mock-capi';
 import MockLiveblog from './backend-adapters/mock-liveblog';
 
 import articleGenres from 'ft-next-article-genre';
-import express from 'ft-next-express';
+import { logger } from 'ft-next-express';
 
-const logger = express.logger;
 const sliceList = (items, {from, limit}) => {
 	items = (from ? items.slice(from) : items);
 	items = (limit ? items.slice(0, limit) : items);
