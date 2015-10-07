@@ -55,6 +55,10 @@ const sources = {
 	},
 	videos: {
 		id: '69917354001' // BrightCove ID
+	},
+	editorsPicks: {
+		type: 'list',
+		uuid: '73667f46-1a55-11e5-a130-2e7db721f996'
 	}
 };
 

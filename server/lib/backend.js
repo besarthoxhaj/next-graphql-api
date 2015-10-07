@@ -5,15 +5,25 @@ import CAPI from './backend-adapters/capi';
 import Popular from './backend-adapters/popular';
 import Liveblog from './backend-adapters/liveblog';
 import Playlist from './backend-adapters/playlist';
+import PopularAPI from './backend-adapters/popular-api';
 
 import MockCAPI from './backend-adapters/mock-capi';
 import MockLiveblog from './backend-adapters/mock-liveblog';
 
 import articleGenres from 'ft-next-article-genre';
+import express from 'ft-next-express';
+
+const logger = express.logger;
+const sliceList = (items, {from, limit}) => {
+	items = (from ? items.slice(from) : items);
+	items = (limit ? items.slice(0, limit) : items);
+
+	return items;
+}
 
 // internal content filtering logic shared for ContentV1 and ContentV2
 const filterContent = ({from, limit, genres, type}, resolveType) => {
-	return (items) => {
+	return (items = []) => {
 		if(genres && genres.length) {
 			items = items.filter(it => genres.indexOf(articleGenres(it.item.metadata, {requestedProp: 'editorialTone'})) > -1);
 		}
@@ -26,10 +36,7 @@ const filterContent = ({from, limit, genres, type}, resolveType) => {
 			}
 		}
 
-		items = (from ? items.slice(from) : items);
-		items = (limit ? items.slice(0, limit) : items);
-
-		return items;
+		return sliceList(items, {from, limit});
 	};
 };
 
@@ -47,7 +54,9 @@ class Backend {
 			sectionId: sectionsId,
 			items: it.slice()
 		}))
-		.catch(e => console.log(e));
+		.catch(e => {
+			logger.error(`Error getting page ${uuid}`, e)
+		});
 	}
 
 	byConcept(uuid, title, ttl = 50) {
@@ -137,11 +146,23 @@ class Backend {
 	videos(id, ttl = 50) {
 		return this.adapters.videos.fetch(id, ttl);
 	}
+
+	list(uuid, ttl = 50) {
+		return this.adapters.capi.list(uuid, ttl)
+			// return 'fake' list, so Collection can resolveType correctly
+			.catch(() => ({ apiUrl: `http://api.ft.com/lists/${uuid}` }));
+	}
+
+	popularTopics({from, limit}, ttl = 50) {
+		return this.adapters.popularApi.topics(ttl)
+		.then(topics => sliceList(topics, {from, limit}));
+	}
 }
 
 // Assemble the beast
 
-const memCache = new Cache(10 * 60);
+// serve stale cache for 12 hours
+const memCache = new Cache(12 * 60 * 60);
 
 // Adapters
 const esFastFT = new FastFtFeed(true);
@@ -151,6 +172,7 @@ const esCAPI = new CAPI(true, memCache);
 const directCAPI = new CAPI(false, memCache);
 
 const popular = new Popular(memCache);
+const popularApi = new PopularAPI(memCache);
 
 const playlist = new Playlist(memCache);
 
@@ -161,11 +183,33 @@ const mockedCAPI = new MockCAPI(esCAPI);
 const mockLiveblog = new MockLiveblog(liveblog);
 
 // Elasticsearch & direct CAPI Backends
-const esBackend = new Backend({fastFT: esFastFT, capi: esCAPI, popular: popular, liveblog: liveblog, videos: playlist}, 'elasticsearch');
-const capiBackend = new Backend({fastFT: capiFastFT, capi: directCAPI, popular: popular, liveblog: liveblog, videos: playlist}, 'direct');
+const esBackend = new Backend({
+	fastFT: esFastFT,
+	capi: esCAPI,
+	popular: popular,
+	liveblog: liveblog,
+	videos: playlist,
+	popularApi: popularApi
+}, 'elasticsearch');
+
+const capiBackend = new Backend({
+	fastFT: capiFastFT,
+	capi: directCAPI,
+	popular: popular,
+	liveblog: liveblog,
+	videos: playlist,
+	popularApi: popularApi
+}, 'direct');
 
 // Mock backend
-const mockBackend = new Backend({fastFT: esFastFT, capi: mockedCAPI, popular: popular, liveblog: mockLiveblog, videos: playlist});
+const mockBackend = new Backend({
+	fastFT: esFastFT,
+	capi: mockedCAPI,
+	popular: popular,
+	liveblog: mockLiveblog,
+	videos: playlist,
+	popularApi: popularApi
+}, 'mocked');
 
 export default {
 	Backend: Backend,

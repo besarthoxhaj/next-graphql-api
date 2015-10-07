@@ -33,7 +33,7 @@ class CAPI {
 	}
 
 	contentv1(uuids) {
-		return this.cache.cached(`${this.type}.contentv1.${uuids.join('_')}`, 50, () => {
+		return this.cache.cached(`${this.type}.contentv1.${Array.isArray(uuids) ? uuids.join('_') : uuids}`, 50, () => {
 			return ApiClient.contentLegacy({
 				uuid: uuids,
 				useElasticSearch: this.elasticSearch
@@ -48,6 +48,11 @@ class CAPI {
 				useElasticSearch: this.elasticSearch
 			});
 		});
+	}
+
+	list(uuid, ttl = 50) {
+		// NOTE: for now, list api is bronze, so handle errors
+		return this.cache.cached(`${this.type}.lists.${uuid}`, ttl, () => ApiClient.lists({uuid: uuid}));
 	}
 }
 

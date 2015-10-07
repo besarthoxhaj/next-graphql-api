@@ -1,4 +1,7 @@
 import liveblogs from '../fixtures/liveblogs';
+import express from 'ft-next-express';
+
+const logger = express.logger;
 
 class MockLiveblog {
 	constructor(realBackend) {
@@ -14,7 +17,7 @@ class MockLiveblog {
 
 		return this.realBackend.fetch(uri, ttl)
 		.then(json => {
-			console.log(`Mock backend asked for live updates for blog: ${uri}. Add this to liveblogs.js to use current real response: \n'${uri}': ${JSON.stringify(json, null, 2)}`);
+			logger.info(`Mock backend asked for live updates for blog: ${uri}. Add this to liveblogs.js to use current real response: \n'${uri}': ${JSON.stringify(json, null, 2)}`);
 			return json;
 		});
 	}
