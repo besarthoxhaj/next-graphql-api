@@ -1,6 +1,8 @@
 import playground from './playground';
 
-window.onload = function() {
-	let graphiql = document.getElementById('graphiql');
-	playground.init(graphiql)
+window.onload = () => {
+	if (window.location.pathname === '/playground') {
+		let graphiql = document.getElementById('graphiql');
+		playground.init(graphiql)
+	}
 }
