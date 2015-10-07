@@ -1,6 +1,11 @@
 import pages from '../fixtures/pages';
 import byConcept from '../fixtures/by-concept';
 import searches from '../fixtures/searches';
+import lists from '../fixtures/lists';
+import contentV1 from '../fixtures/contentV1';
+import express from 'ft-next-express';
+
+const logger = express.logger;
 
 class MockCAPI {
 	constructor(realBackend) {
@@ -18,7 +23,7 @@ class MockCAPI {
 		return this.realBackend.page(uuid, ttl)
 		.then(it => {
 			const resp = { title: it.title, items: it.slice() };
-			console.log(`Mock backend asked for a missing page: ${uuid}. Add this to pages.js to use current real response: \n'${uuid}': ${JSON.stringify(resp, null, 2)}`);
+			logger.info(`Mock backend asked for a missing page: ${uuid}. Add this to pages.js to use current real response: \n'${uuid}': ${JSON.stringify(resp, null, 2)}`);
 
 			return it;
 		});
@@ -36,7 +41,7 @@ class MockCAPI {
 		.then(it => {
 			const resp = { title: it.title, items: it.slice() };
 
-			console.log(`Mock backend asked for a missing content by concept: ${uuid}. Add this to by-concept.js to use current real response: \n'${uuid}': ${JSON.stringify(resp, null, 2)}`);
+			logger.info(`Mock backend asked for a missing content by concept: ${uuid}. Add this to by-concept.js to use current real response: \n'${uuid}': ${JSON.stringify(resp, null, 2)}`);
 			return it;
 		});
 	}
@@ -48,15 +53,32 @@ class MockCAPI {
 
 		return this.realBackend.search(query, ttl)
 		.then(it => {
-			console.log(`Mock backend asked for a search: '${query}'. Add this to searches.js to use current real response: \n'${query}': ${JSON.stringify(it, null, 2)}`);
+			logger.info(`Mock backend asked for a search: '${query}'. Add this to searches.js to use current real response: \n'${query}': ${JSON.stringify(it, null, 2)}`);
 			return it;
 		});
+	}
+
+	list(uuid, opts) {
+		let list = lists[uuid];
+
+		if (list) {
+			return Promise.resolve(list);
+		}
+
+		return this.realBackend.list(uuid, opts)
+			.then(it => {
+				logger.info(`Mock backend asked for a list: '${uuid}'. Add this to lists.js to use current real response: \n'${uuid}': ${JSON.stringify(it, null, 2)}`);
+				return it;
+			});
 	}
 
 	// Content endpoints are not mocked because the responses are massive.
 
 	contentv1(uuids, opts) {
-		return this.realBackend.contentv1(uuids, opts);
+		const contentPromises = uuids.map(uuid =>
+			contentV1[uuid] ? Promise.resolve(contentV1[uuid]) : this.realBackend.contentv1(uuid, opts)
+		);
+		return Promise.all(contentPromises);
 	}
 
 	contentv2(uuids, opts) {

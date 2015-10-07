@@ -1,28 +1,39 @@
-import { graphql } from 'graphql';
-import { printSchema } from 'graphql/utilities';
+import {graphql} from 'graphql';
+import {printSchema} from 'graphql/utilities';
 
 import schema from './schema';
-import {factory as backendFactory} from './backend';
+import {factory as backend} from './backend';
+import express from 'ft-next-express';
 
-const query = (backend) => {
-	return (queryText, variables) => {
-		return graphql(schema, queryText, { backend: backend }, variables)
-		.then(it => {
-			if(it.data) { return it.data; }
+const logger = express.logger;
 
-			throw it.errors;
-		});
+const fetch = (backend, opts = {}) => {
+	return (query, vars) => {
+		const then = new Date().getTime();
+
+		return graphql(schema, query, Object.assign({}, opts, { backend: backend }), vars)
+			.then(it => {
+				const now = new Date().getTime();
+
+				logger.info(`Graphql (${backend.type}) responded in ${now - then} ms`);
+
+				if (it.errors) {
+					throw it.errors;
+				}
+
+				if(it.data) { return it.data; }
+			});
 	};
 };
 
-const fetchEs = query(backendFactory(true));
-const fetchCapi = query(backendFactory(false));
+export default (elastic, mock, opts = {}) => {
+	const fetchEs = fetch(backend(true), opts);
+	const fetchCapi = fetch(backend(false), opts);
 
-// FIXME figure out a more globally applicable mocking strategy
-// const fetchMock = fetch(backend(true, true));
+	const fetchMock = fetch(backend(true, true), opts);
 
-export default (elastic) => ({
-	schema: schema,
-	printSchema: () => printSchema(schema),
-	query: (elastic ? fetchEs : fetchCapi)
-});
+	return {
+		fetch: (mock ? fetchMock : (elastic ? fetchEs : fetchCapi)),
+		printSchema: () => printSchema(schema)
+	}
+};

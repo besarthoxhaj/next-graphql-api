@@ -2,7 +2,7 @@ import ApiClient from 'next-ft-api-client';
 
 // FIXME sources shouldn't be necessary here
 // we should be able to pass the fastFT uuid from the top
-import sources from '../config/sources';
+import sources from '../../config/sources';
 
 // Polls for changes on the notification api to determine whether a fetch should
 // be made for new content. Hopefully this is a little nicer to the content api

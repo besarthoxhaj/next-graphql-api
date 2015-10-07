@@ -1,3 +1,7 @@
+import express from 'ft-next-express';
+
+const logger = express.logger;
+
 class Liveblog {
 	constructor(cache) {
 		this.cache = cache;
@@ -10,7 +14,7 @@ class Liveblog {
 			return fetch(`${uri}?action=catchup&format=json`)
 			.then(res => {
 				const now = new Date();
-				console.log('Fetching live blog updates from %s?action=catchup&format=json took %d ms', uri, now - then);
+				logger.log('info', 'Fetching live blog updates from %s?action=catchup&format=json took %d ms', uri, now - then);
 
 				return res;
 			})

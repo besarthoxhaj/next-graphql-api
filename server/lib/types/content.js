@@ -162,7 +162,9 @@ const ContentV1 = new GraphQLObjectType({
 		},
 		summary: {
 			type: GraphQLString,
-			resolve: (content) => content.item.summary.excerpt
+			resolve: (content) => {
+				return content.item.summary ? content.item.summary.excerpt : '';
+			}
 		},
 		primaryTag: {
 			type: Concept,

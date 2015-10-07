@@ -25,7 +25,15 @@ const Collection = new GraphQLInterfaceType({
 			}
 		}
 	},
-	resolveType: (value) => (!value.conceptId ? Page : ContentByConcept)
+	resolveType: (value) => {
+		if (value.apiUrl && /lists\/[a-z\d\-]{36}$/.test(value.apiUrl)) {
+			return List;
+		} else if (!value.conceptId) {
+			return Page;
+		} else {
+			return ContentByConcept;
+		}
+	}
 });
 
 const Page = new GraphQLObjectType({
@@ -90,8 +98,40 @@ const ContentByConcept = new GraphQLObjectType({
 	}
 });
 
+const List = new GraphQLObjectType({
+	name: 'List',
+	description: 'Items contained in a list',
+	interfaces: [Collection],
+	fields: {
+		title: {
+			type: GraphQLString,
+			resolve: list => list.title
+		},
+		url: {
+			type: GraphQLString,
+			resolve: () => (null)
+		},
+		items: {
+			type: new GraphQLList(Content),
+			description: 'Content items',
+			args: {
+				from: { type: GraphQLInt },
+				limit: { type: GraphQLInt },
+				genres: { type: new GraphQLList(GraphQLString) },
+				type: { type: ContentType }
+			},
+			resolve: (result, args, {rootValue: {backend}}) => {
+				if(!result.items || result.items.length < 1) { return []; }
+
+				return backend.contentv1(result.items.map(result => result.id.replace(/http:\/\/api\.ft\.com\/things?\//, '')), args);
+			}
+		}
+	}
+});
+
 export default {
 	Collection,
 	Page,
-	ContentByConcept
+	ContentByConcept,
+	List
 };

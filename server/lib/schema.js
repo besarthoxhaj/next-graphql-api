@@ -1,18 +1,17 @@
-import directly from 'directly';
-
 import {
 	GraphQLSchema,
 	GraphQLObjectType,
 	GraphQLNonNull,
 	GraphQLString,
+	GraphQLInt,
 	GraphQLList,
 } from 'graphql';
 
 import {Region} from './types/basic';
 import {Collection} from './types/collections';
-import {Video} from './types/content';
+import {Video, Concept} from './types/content';
 
-import sources from './config/sources';
+import sources from '../config/sources';
 
 const queryType = new GraphQLObjectType({
 	name: 'Query',
@@ -37,39 +36,12 @@ const queryType = new GraphQLObjectType({
 		},
 		editorsPicks: {
 			type: Collection,
-			resolve: (root, _, {rootValue: {backend}}) => {
-				// HACK this is waiting for editorial to start managing an Editor's picks list
-				let config = ['bigRead', 'lunch', 'management', 'frontPageSkyline', 'personInNews', 'lex'];
-
-				let fetchers = config
-				.map((it) => ({
-					type: sources[it].type,
-					uuid: sources[it].uuid
-				}))
-				.map((it) => {
-					switch(it.type) {
-						case 'page':
-							return () => {
- 								return backend.page(it.uuid)
-								.then(page => page.items[0]);
-							};
-						case 'search':
-							return () => {
-								return backend.search(it.uuid)
-								.then(ids => ids[0]);
-							};
-						default:
-							throw 'Unknown type: ' + it.type;
-					}
-				});
-
-				return directly(3, fetchers)
-				.then(ids => ({
-					title: 'Editor\'s picks',
-					conceptId: null,
-					sectionId: null,
-					items: ids
-				}));
+			resolve: (root, _, {rootValue: {backend, flags}}) => {
+				if (flags && flags.editorsPicksFromList) {
+					return backend.list(sources['editorsPicks'].uuid);
+				} else {
+					return [];
+				}
 			}
 		},
 		opinion: {
@@ -121,16 +93,25 @@ const queryType = new GraphQLObjectType({
 				return backend.search(query)
 					.then(ids => ({ items: ids }));
 			}
-    },
-    videos: {
-      type: new GraphQLList(Video),
-      resolve: (root, _, {rootValue: {backend}}) => {
-        let {id} = sources.videos;
-
-        return backend.videos(id);
-      }
-    }
-  }
+		},
+		videos: {
+			type: new GraphQLList(Video),
+			resolve: (root, _, {rootValue: {backend}}) => {
+				let {id} = sources.videos;
+				return backend.videos(id);
+			}
+		},
+		popularTopics: {
+			type: new GraphQLList(Concept),
+			args: {
+				from: { type: GraphQLInt },
+				limit: { type: GraphQLInt },
+			},
+			resolve: (root, {from, limit}, {rootValue: {backend}}) => {
+				return backend.popularTopics({from, limit})
+			}
+		}
+	}
 });
 
 export default new GraphQLSchema({
