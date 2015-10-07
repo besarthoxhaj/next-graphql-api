@@ -1,34 +1,10 @@
 {
-	env: {
-		node: true,
-		es6: true
-	},
-	ecmaFeatures: {
-		jsx: true,
-		modules: true
-	},
-	rules: {
-		eqeqeq: 2,
-		no-underscore-dangle: 0,
-		guard-for-in: 2,
-		no-extend-native: 2,
-		wrap-iife: 2,
-		new-cap: 2,
-		no-caller: 2,
-		strict: 0,
-		quotes: [
-			1,
-			"single"
-		],
-		no-loop-func: 2,
-		no-irregular-whitespace: 1,
-		no-multi-spaces: 2,
-		one-var: [
-			2,
-			"never"
-		]
-	},
-	globals: {
-		fetch: true
-	}
+  "extends": "./node_modules/next-build-tools/config/eslint.json",
+  "ecmaFeatures": {
+    "jsx": true,
+    "modules": true
+  },
+  "plugins": [
+    "react"
+  ]
 }

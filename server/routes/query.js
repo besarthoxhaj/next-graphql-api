@@ -6,8 +6,6 @@ export default (req, res) => {
 	const query = req.body.query || req.body;
 	const vars = JSON.parse(req.body.variables || '{}');
 
-	const graph = graphql(useElasticSearch);
-
 	graphql(useElasticSearch).query(query, vars)
 	.then(data => {
 		res.json(data);

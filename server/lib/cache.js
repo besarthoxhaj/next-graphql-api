@@ -1,5 +1,3 @@
-import {Promise} from 'es6-promise';
-
 class Cache {
 	constructor(staleTtl) {
 		// in-memory content cache
@@ -60,7 +58,7 @@ class Cache {
 
 			return it;
 		})
-		.catch((e) => {
+		.catch(() => {
 			delete this.requestMap[key];
 		});
 

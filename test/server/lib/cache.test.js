@@ -1,5 +1,4 @@
 import fetch from 'isomorphic-fetch';
-import {Promise} from 'es6-promise';
 global.fetch = fetch;
 
 import chai from 'chai';
@@ -47,7 +46,7 @@ describe('GraphQL Cache', () => {
 
 		it('fetches new data when cache expires', () => {
 			return cache.cached('test-key-4', -10, () => Promise.resolve('stale'))
-			.then((it) => {
+			.then(() => {
 				return cache.cached('test-key-4', 10, fetcher);
 			})
 			.then((it) => {
