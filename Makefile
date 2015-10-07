@@ -42,3 +42,4 @@ deploy:
 	nbt configure
 	nbt deploy-hashed-assets
 	nbt deploy --skip-logging
+	nbt scale
