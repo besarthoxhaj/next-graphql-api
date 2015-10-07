@@ -3,9 +3,7 @@ import byConcept from '../fixtures/by-concept';
 import searches from '../fixtures/searches';
 import lists from '../fixtures/lists';
 import contentV1 from '../fixtures/contentV1';
-import express from 'ft-next-express';
-
-const logger = express.logger;
+import { logger } from 'ft-next-express';
 
 class MockCAPI {
 	constructor(realBackend) {

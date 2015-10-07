@@ -1,4 +1,5 @@
 import graphql from '../lib/graphql';
+import { logger } from 'ft-next-express';
 
 export default (req, res) => {
 	const flags = res.locals.flags;
@@ -13,8 +14,9 @@ export default (req, res) => {
 		.then(data => {
 			res.json(data);
 		})
-		.catch(errors => {
+		.catch(err => {
+			logger.error('Error querying data', err)
 			res.status(400);
-			res.json(errors);
+			res.json(err);
 		});
 };

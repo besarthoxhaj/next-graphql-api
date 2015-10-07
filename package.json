@@ -27,7 +27,8 @@
     "mocha": "^2.3.0",
     "next-build-tools": "^4.2.0",
     "nodemon": "^1.7.1",
-    "origami-build-tools": "^4.0.1"
+    "origami-build-tools": "^4.0.1",
+    "sinon": "^1.17.1"
   },
   "engines": {
     "node": "4.1.2"

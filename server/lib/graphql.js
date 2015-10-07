@@ -3,9 +3,7 @@ import {printSchema} from 'graphql/utilities';
 
 import schema from './schema';
 import {factory as backend} from './backend';
-import express from 'ft-next-express';
-
-const logger = express.logger;
+import { logger } from 'ft-next-express';
 
 const fetch = (backend, opts = {}) => {
 	return (query, vars) => {
