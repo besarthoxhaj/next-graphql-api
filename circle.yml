@@ -1,3 +1,9 @@
 machine:
   node:
     version: 4.1.2
+
+deployment:
+  production:
+    branch: master
+    commands:
+      - make deploy
