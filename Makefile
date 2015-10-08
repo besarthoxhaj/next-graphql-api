@@ -1,4 +1,4 @@
-TEST_APP := "ft-graphql-branch-${CIRCLE_BUILD_NUM}"
+TEST_APP := "ft-next-graphql-api-${CIRCLE_BUILD_NUM}"
 
 .PHONY: test
 
