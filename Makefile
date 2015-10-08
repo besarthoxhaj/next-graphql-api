@@ -30,16 +30,10 @@ run:
 	nbt run
 
 provision:
-	nbt provision ${TEST_APP}
-	nbt configure ft-next-graphql-api ${TEST_APP} --overrides "NODE_ENV=branch"
-	nbt deploy-hashed-assets
-	nbt deploy ${TEST_APP} --skip-enable-preboot --skip-logging
+	nbt float
 
 tidy:
 	nbt destroy ${TEST_APP}
 
 deploy:
-	nbt configure
-	nbt deploy-hashed-assets
-	nbt deploy --skip-logging
-	nbt scale
+	nbt ship -m
