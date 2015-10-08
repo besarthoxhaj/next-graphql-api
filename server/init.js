@@ -2,7 +2,8 @@ import bodyParser from 'body-parser';
 import express from 'ft-next-express';
 
 const app = express({
-	layoutsDir: 'views/layouts'
+	layoutsDir: 'views/layouts',
+	withBackendAuthentication: false
 });
 const logger = express.logger;
 
