@@ -33,7 +33,7 @@ provision:
 	nbt deploy-hashed-assets
 
 tidy:
-	nbt destroy ${TEST_APP}
+	# `nbt float` now tidys up after itself
 
 deploy:
 	nbt ship -m
