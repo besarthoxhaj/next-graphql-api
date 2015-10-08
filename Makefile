@@ -21,7 +21,6 @@ build:
 
 build-production:
 	nbt build
-	nbt about
 
 watch:
 	nbt build --dev --watch
@@ -31,9 +30,11 @@ run:
 
 provision:
 	nbt float
+	nbt deploy-hashed-assets
 
 tidy:
 	nbt destroy ${TEST_APP}
 
 deploy:
 	nbt ship -m
+	nbt deploy-hashed-assets
