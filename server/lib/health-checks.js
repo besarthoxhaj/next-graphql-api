@@ -3,13 +3,15 @@ const api = require('next-ft-api-client');
 const articleUuid = 'd0377096-f290-11e4-b914-00144feab7de';
 const listUuid = '73667f46-1a55-11e5-a130-2e7db721f996';
 const pageUuid = 'fcdae4e8-cd25-11de-a748-00144feabdc0';
+const fastFtUuid = 'fcdae4e8-cd25-11de-a748-00144feabdc0';
+const playlistId = '69917354001';
 const searchQuery = 'brand:"Person in the news"';
 
 const checkInterval = 60 * 1000;
 
 const healthChecks = [
     {
-        name: 'Elasticsearch: Article (CAPI v2)',
+        name: 'Elasticsearch: Article (CAPIv2)',
         status: false,
         businessImpact: 'API may not be able to serve articles',
         severity: 2,
@@ -24,7 +26,7 @@ const healthChecks = [
         }
     },
     {
-        name: 'Elasticsearch: Article (CAPI v1)',
+        name: 'Elasticsearch: Article (CAPIv1)',
         status: false,
         businessImpact: 'API may not be able to serve articles',
         severity: 2,
@@ -69,7 +71,7 @@ const healthChecks = [
         }
     },
     {
-        name: 'CAPI v2: Article',
+        name: 'CAPIv2: Article',
         status: false,
         businessImpact: 'API may not be able to serve articles',
         severity: 2,
@@ -84,7 +86,7 @@ const healthChecks = [
         }
     },
     {
-        name: 'CAPI v2: By Concept',
+        name: 'CAPIv2: By Concept',
         status: false,
         businessImpact: 'API may not be able to serve related articles',
         severity: 2,
@@ -99,7 +101,7 @@ const healthChecks = [
         }
     },
     {
-        name: 'CAPI v2: List',
+        name: 'CAPIv2: List',
         status: false,
         businessImpact: 'API may not be able to serve lists',
         severity: 2,
@@ -113,7 +115,7 @@ const healthChecks = [
         }
     },
     {
-        name: 'CAPI v2: Page',
+        name: 'CAPIv2: Page',
         status: false,
         businessImpact: 'API may not be able to serve pages',
         severity: 2,
@@ -127,7 +129,20 @@ const healthChecks = [
         }
     },
     {
-        name: 'CAPI v1: Article',
+        name: 'CAPIv2: Notifications',
+        status: false,
+        businessImpact: 'API may not know when new articles are created',
+        severity: 2,
+        technicalSummary: 'Tries to fetch notifications for fastFt',
+        check: function () {
+            const since = new Date().toISOString();
+            fetch(`http://api.ft.com/content/notifications?since=${since}&apiKey=${process.env.FAST_FT_KEY}`)
+                .then(() => this.status = true)
+                .catch(() => this.status = false);
+        }
+    },
+    {
+        name: 'CAPIv1: Article',
         status: false,
         businessImpact: 'API may not be able to serve articles',
         severity: 2,
@@ -142,7 +157,7 @@ const healthChecks = [
         }
     },
     {
-        name: 'CAPI v1: Search',
+        name: 'CAPIv1: Search',
         status: false,
         businessImpact: 'API may not be able to serve searched articles',
         severity: 2,
@@ -152,6 +167,42 @@ const healthChecks = [
                 query: searchQuery,
                 useElasticSearch: false
             })
+                .then(() => this.status = true)
+                .catch(() => this.status = false);
+        }
+    },
+    {
+        name: 'Playlist',
+        status: false,
+        businessImpact: 'API may not be able to serve video playlists',
+        severity: 2,
+        technicalSummary: 'Tries to fetch a playlist from Brightcove',
+        check: function () {
+            fetch(`https://next-video.ft.com/api/playlist/${playlistId}`)
+                .then(() => this.status = true)
+                .catch(() => this.status = false);
+        }
+    },
+    {
+        name: 'Popular Topics',
+        status: false,
+        businessImpact: 'API may not be able to serve popular topics',
+        severity: 2,
+        technicalSummary: 'Tries to fetch popular topics from the popular-api',
+        check: function () {
+            fetch(`https://ft-next-popular-api.herokuapp.com/topics?apiKey=${process.env.POPULAR_API_KEY}`)
+                .then(() => this.status = true)
+                .catch(() => this.status = false);
+        }
+    },
+    {
+        name: 'Popular Articles',
+        status: false,
+        businessImpact: 'API may not be able to serve popular articles',
+        severity: 2,
+        technicalSummary: 'Tries to fetch popular articles from the mostpopular api',
+        check: function () {
+            fetch('http://mostpopular.sp.ft-static.com/v1/mostPopular?source=nextArticle')
                 .then(() => this.status = true)
                 .catch(() => this.status = false);
         }
