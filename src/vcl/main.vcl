@@ -78,41 +78,6 @@ sub vcl_recv {
 	set req.http.X-EU-Host = "ft-next-graphql-api-eu.herokuapp.com";
 	set req.http.X-US-Host = "ft-next-graphql-api-us.herokuapp.com";
 
-
-
-	# Support Legacy header
-	if(!req.http.FT-Session-Token && req.http.X-FT-Session-Token){
-		set req.http.FT-Session-Token = req.http.X-FT-Session-Token;
-	}
-
-	if(!req.http.FT-Session-Token && req.http.Cookie ~ "FTSession"){
-		set req.http.FT-Session-Token = regsub(req.http.Cookie, "^.*FTSession=([^;]+).*$", "\1");
-	}
-
-	# ensure this is never (null)
-	if(!req.http.FT-Session-Token){
-		set req.http.FT-Session-Token = "";
-	}
-
-	#get query string
-	if(req.url ~ "\?") {
-		set req.http.Query-String = regsub(req.url, "^.*(\?.*$)", "\1");
-        set req.url = regsub(req.url, "\?.*$", "");
-	}
-
-
-	# ensure trailing slash
-	if(req.url !~ "/$"){
-		set req.url = req.url "/";
-	}
-
-	if(!req.http.Query-String || req.http.Query-String !~ "\?"){
-    		set req.http.Query-String = "";
-    	}
-
-	set req.url = req.url req.http.FT-Session-Token req.http.Query-String;
-	set req.http.Authorization = "${AUTH_KEY}";
-
 	if (req.http.X-Geoip-Continent ~ "(NA|SA|OC)") {
 		set req.backend = graphql_api_us;
 		set req.http.Backend = "graphql_api_us";
@@ -196,29 +161,18 @@ sub vcl_miss {
 sub vcl_deliver {
 	#FASTLY deliver
 
-	if(req.http.Error-Message){
+	if (req.http.Error-Message) {
 		set resp.http.Error-Message = req.http.Error-Message;
 	}
 
-	if(req.http.FT-Session-Token){
+	if (req.http.FT-Session-Token) {
 		set resp.http.FT-Session-Token = req.http.FT-Session-Token;
-	}else{
+	} else {
 		set resp.http.X-FT-Session-Token = "";
-	}
-
-	set resp.http.Cookie-String = req.http.Cookie;
-	set resp.http.Query-String = req.http.Query-String;
-
-	if(req.http.Origin && !resp.http.Access-Control-Allow-Origin){
-		set resp.http.Access-Control-Allow-Origin = req.http.Origin;
 	}
 
 	set resp.http.X-Geoip-Continent = req.http.X-Geoip-Continent;
 	set resp.http.Backend = req.http.Backend;
-
-	set resp.http.CDN-Cache-Control = resp.http.Cache-Control;
-	set resp.http.Cache-Control = "private, no-cache, max-age=0";
-
 
 	return(deliver);
 }
