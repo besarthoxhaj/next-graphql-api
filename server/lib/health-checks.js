@@ -3,7 +3,6 @@ const api = require('next-ft-api-client');
 const articleUuid = 'd0377096-f290-11e4-b914-00144feab7de';
 const listUuid = '73667f46-1a55-11e5-a130-2e7db721f996';
 const pageUuid = 'fcdae4e8-cd25-11de-a748-00144feabdc0';
-const fastFtUuid = 'fcdae4e8-cd25-11de-a748-00144feabdc0';
 const playlistId = '69917354001';
 const searchQuery = 'brand:"Person in the news"';
 
