@@ -1,25 +1,3 @@
-backend graphql_api {
-	.connect_timeout = 1s;
-	.dynamic = true;
-	.port = "80";
-	.host = "ft-next-graphql-api.herokuapp.com";
-	.host_header = "ft-next-graphql-api.herokuapp.com";
-	.first_byte_timeout = 15s;
-	.max_connections = 200;
-	.between_bytes_timeout = 10s;
-	.share_key = "f8585BOxnGQDMbnkJoM1e";
-
-	.probe = {
-		.request = "HEAD /__gtg HTTP/1.1" "Host: ft-next-graphql-api.herokuapp.com" "Connection: close" "User-Agent: Varnish/fastly (healthcheck)";
-		.threshold = 1;
-		.window = 2;
-		.timeout = 5s;
-		.initial = 1;
-		.expected_response = 200;
-		.interval = 30s;
-	}
-}
-
 backend graphql_api_eu {
 	.connect_timeout = 1s;
 	.dynamic = true;
@@ -67,10 +45,6 @@ backend graphql_api_us {
 sub vcl_recv {
 	#FASTLY recv
 
-	if (req.request != "HEAD" && req.request != "GET" && req.request != "FASTLYPURGE") {
-		return(pass);
-	}
-
 	if (!req.http.X-Geoip-Continent) {
 		set req.http.X-Geoip-Continent = geoip.continent_code;
 	}
@@ -100,7 +74,11 @@ sub vcl_recv {
 
 	log {"syslog ${SERVICEID} ft-next-syslog-server :: "} {" event=SESSION_REQUEST url="} req.url {" token="} req.http.FT-Session-Token;
 
-	return(lookup);
+	if (req.request != "HEAD" && req.request != "GET" && req.request != "FASTLYPURGE") {
+		return(pass);
+	} else {
+		return(lookup);
+	}
 }
 
 sub vcl_fetch {
