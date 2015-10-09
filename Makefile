@@ -1,4 +1,4 @@
-TEST_APP := "ft-graphql-branch-${CIRCLE_BUILD_NUM}"
+TEST_APP := "ft-next-graphql-api-${CIRCLE_BUILD_NUM}"
 
 .PHONY: test
 
@@ -21,7 +21,6 @@ build:
 
 build-production:
 	nbt build
-	nbt about
 
 watch:
 	nbt build --dev --watch
@@ -30,16 +29,12 @@ run:
 	nbt run
 
 provision:
-	nbt provision ${TEST_APP}
-	nbt configure ft-next-graphql-api ${TEST_APP} --overrides "NODE_ENV=branch"
+	nbt float
 	nbt deploy-hashed-assets
-	nbt deploy ${TEST_APP} --skip-enable-preboot --skip-logging
 
 tidy:
-	nbt destroy ${TEST_APP}
+	# `nbt float` now tidys up after itself
 
 deploy:
-	nbt configure
+	nbt ship -m
 	nbt deploy-hashed-assets
-	nbt deploy --skip-logging
-	nbt scale

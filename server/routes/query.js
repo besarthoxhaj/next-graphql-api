@@ -15,7 +15,7 @@ export default (req, res) => {
 			res.json(data);
 		})
 		.catch(err => {
-			logger.error('Error querying data', err)
+			logger.error('Error querying data', err);
 			res.status(400);
 			res.json(err);
 		});
