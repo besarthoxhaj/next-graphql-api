@@ -1,9 +1,14 @@
 import bodyParser from 'body-parser';
 import express from 'ft-next-express';
+import healthChecks from './lib/health-checks.js';
+
+// starts polling the health checks
+healthChecks.init();
 
 const app = express({
 	layoutsDir: 'views/layouts',
-	withBackendAuthentication: false
+	withBackendAuthentication: false,
+	healthChecks: healthChecks.healthChecks
 });
 const logger = express.logger;
 
