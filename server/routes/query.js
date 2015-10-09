@@ -1,7 +1,7 @@
 import graphql from '../lib/graphql';
 import { logger } from 'ft-next-express';
 
-export default (req, res) => {
+export default (req, res, next) => {
 	const flags = res.locals.flags;
 	const useElasticSearch = flags.elasticSearchItemGet;
 	const useMockBackend = flags.mockFrontPage;
@@ -16,7 +16,6 @@ export default (req, res) => {
 		})
 		.catch(err => {
 			logger.error('Error querying data', err);
-			res.status(400);
-			res.json(err);
+			next(err);
 		});
 };
