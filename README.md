@@ -35,7 +35,7 @@ explore the available GraphQL schema in the <a href="/playground">playground</a>
 which uses GraphQL's introspection capabilities to suggest possible queries.
 
 For an example of running a query, see the [next-front-page](http://github.com/Financial-Times/next-front-page)
-- it's a simple HTTP POST request returning a JSON of the same shape of the query.
+– it's a simple HTTP POST request returning a JSON of the same shape of the query.
 
 ## Status monitoring
 
