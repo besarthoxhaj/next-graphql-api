@@ -205,6 +205,18 @@ const healthChecks = [
                 .then(() => this.status = true)
                 .catch(() => this.status = false);
         }
+    },
+    {
+        name: 'Live Blog',
+        status: false,
+        businessImpact: 'API may not be able to serve live blog articles',
+        severity: 2,
+        technicalSummary: 'Tries to fetch live blog data',
+        check: function () {
+            fetch('http://ftalphaville.ft.com/marketslive/2015-07-30?action=catchup&format=json')
+                .then(() => this.status = true)
+                .catch(() => this.status = false);
+        }
     }
 ];
 
