@@ -164,11 +164,11 @@ class Backend {
 const memCache = new Cache(12 * 60 * 60);
 
 // Adapters
-const esFastFT = new FastFtFeed(true);
-const capiFastFT = new FastFtFeed(false);
+const fastFT = new FastFtFeed();
 
-const esCAPI = new CAPI(true, memCache);
-const directCAPI = new CAPI(false, memCache);
+const esCAPI = new CAPI(memCache, { elasticSearch: true });
+const esAwsCAPI = new CAPI(memCache, { elasticSearch: true, elasticSearchAws: true });
+const directCAPI = new CAPI(memCache);
 
 const popular = new Popular(memCache);
 const popularApi = new PopularAPI(memCache);
@@ -181,9 +181,9 @@ const liveblog = new Liveblog(memCache);
 const mockedCAPI = new MockCAPI(esCAPI);
 const mockLiveblog = new MockLiveblog(liveblog);
 
-// Elasticsearch & direct CAPI Backends
+// Elasticsearch (and AWS version) & direct CAPI Backends
 const esBackend = new Backend({
-	fastFT: esFastFT,
+	fastFT: fastFT,
 	capi: esCAPI,
 	popular: popular,
 	liveblog: liveblog,
@@ -191,8 +191,17 @@ const esBackend = new Backend({
 	popularApi: popularApi
 }, 'elasticsearch');
 
+const esAwsBackend = new Backend({
+	fastFT: fastFT,
+	capi: esAwsCAPI,
+	popular: popular,
+	liveblog: liveblog,
+	videos: playlist,
+	popularApi: popularApi
+}, 'elasticsearch-aws');
+
 const capiBackend = new Backend({
-	fastFT: capiFastFT,
+	fastFT: fastFT,
 	capi: directCAPI,
 	popular: popular,
 	liveblog: liveblog,
@@ -202,7 +211,7 @@ const capiBackend = new Backend({
 
 // Mock backend
 const mockBackend = new Backend({
-	fastFT: esFastFT,
+	fastFT: fastFT,
 	capi: mockedCAPI,
 	popular: popular,
 	liveblog: mockLiveblog,
@@ -212,7 +221,17 @@ const mockBackend = new Backend({
 
 export default {
 	Backend: Backend,
-	factory: (elasticSearch, mock) => {
-		return (mock ? mockBackend : (elasticSearch ? esBackend : capiBackend));
+	factory: (opts = {}) => {
+		if (opts.mock) {
+			return mockBackend;
+		} else if (opts.elasticSearch) {
+			if (opts.elasticSearchAws) {
+				return esAwsBackend;
+			} else {
+				return esBackend;
+			}
+		} else {
+			return capiBackend;
+		}
 	}
 };

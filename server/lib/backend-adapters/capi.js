@@ -1,9 +1,10 @@
 import ApiClient from 'next-ft-api-client';
 
 class CAPI {
-	constructor(elasticSearch, cache) {
-		this.elasticSearch = elasticSearch;
-		this.type = (elasticSearch ? 'elasticsearch' : 'capi');
+	constructor(cache, opts = {}) {
+		this.elasticSearch = opts.elasticSearch;
+		this.elasticSearchAws = opts.elasticSearchAws;
+		this.type = this.elasticSearch ? (this.elasticSearchAws ? 'elasticsearch-aws' : 'elasticsearch') : 'capi';
 		this.cache = cache;
 	}
 
@@ -15,10 +16,7 @@ class CAPI {
 
 	byConcept(uuid, ttl = 50) {
 		return this.cache.cached(`${this.type}.byconcept.${uuid}`, ttl, () => {
-			return ApiClient.contentAnnotatedBy({
-				uuid: uuid,
-				useElasticSearch: this.elasticSearch
-			});
+			return ApiClient.contentAnnotatedBy({ uuid: uuid });
 		});
 	}
 
@@ -26,8 +24,8 @@ class CAPI {
 		return this.cache.cached(`${this.type}.search.${query}`, ttl, () => {
 			return ApiClient.searchLegacy({
 				query: query,
-				useLegacyContent: true,
-				useElasticSearch: this.elasticSearch
+				useElasticSearch: this.elasticSearch,
+				useElasticSearchOnAws: this.elasticSearchAws
 			});
 		});
 	}
@@ -36,7 +34,8 @@ class CAPI {
 		return this.cache.cached(`${this.type}.contentv1.${Array.isArray(uuids) ? uuids.join('_') : uuids}`, 50, () => {
 			return ApiClient.contentLegacy({
 				uuid: uuids,
-				useElasticSearch: this.elasticSearch
+				useElasticSearch: this.elasticSearch,
+				useElasticSearchOnAws: this.elasticSearchAws
 			});
 		});
 	}
@@ -45,14 +44,17 @@ class CAPI {
 		return this.cache.cached(`${this.type}.contentv2.${uuids.join('_')}`, 50, () => {
 			return ApiClient.content({
 				uuid: uuids,
-				useElasticSearch: this.elasticSearch
+				useElasticSearch: this.elasticSearch,
+				useElasticSearchOnAws: this.elasticSearchAws
 			});
 		});
 	}
 
 	list(uuid, ttl = 50) {
 		// NOTE: for now, list api is bronze, so handle errors
-		return this.cache.cached(`${this.type}.lists.${uuid}`, ttl, () => ApiClient.lists({uuid: uuid}));
+		return this.cache.cached(`${this.type}.lists.${uuid}`, ttl, () => {
+			return ApiClient.lists({ uuid: uuid });
+		});
 	}
 }
 
