@@ -12,7 +12,7 @@ import schema from '../../../server/lib/schema';
 describe('GraphQL Schema', () => {
 	describe('#list', () => {
 		it('fetches list', () => {
-			return graphqlClient(false, true, { flags: { editorsPicksFromList: true } })
+			return graphqlClient({ mock: true }, { editorsPicksFromList: true })
 				.fetch(`
 					query List {
 						editorsPicks {

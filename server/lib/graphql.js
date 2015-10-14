@@ -5,11 +5,11 @@ import schema from './schema';
 import {factory as backend} from './backend';
 import { logger } from 'ft-next-express';
 
-const fetch = backend => {
+const fetch = (backend, flags) => {
 	return (query, vars) => {
 		const then = new Date().getTime();
 
-		return graphql(schema, query, { backend }, vars)
+		return graphql(schema, query, { backend, flags }, vars)
 			.then(it => {
 				const now = new Date().getTime();
 
@@ -24,7 +24,7 @@ const fetch = backend => {
 	};
 };
 
-export default (opts = {}) => ({
-	fetch: fetch(backend(opts)),
+export default (opts = {}, flags = {}) => ({
+	fetch: fetch(backend(opts), flags),
 	printSchema: () => printSchema(schema)
 });
