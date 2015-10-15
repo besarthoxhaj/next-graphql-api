@@ -12,11 +12,14 @@ export default (req, res, next) => {
 		return res.status(400).send();
 	}
 
-	graphql({
+	graphql(
+		{
 			elasticSearch: flags.elasticSearchItemGet,
 			elasticSearchAws: flags.elasticSearchOnAws,
 			mock: flags.mockFrontPage
-		})
+		},
+		flags
+	)
 		.fetch(query, vars)
 		.then(data => {
 			res.json(data);
