@@ -9,9 +9,8 @@ import sources from '../../config/sources';
 // polling it directly.
 
 class FastFtFeed {
-	constructor(elasticSearch, source) {
-		this.elasticSearch = elasticSearch;
-		this.type = (elasticSearch ? 'elasticsearch' : 'capi');
+	constructor(source) {
+		this.type = 'capi';
 		this.source = source;
 
 		// in-memory content cache
@@ -24,8 +23,7 @@ class FastFtFeed {
 	fetchFastFt() {
 		const {uuid} = this.source;
 		return ApiClient.contentAnnotatedBy({
-			uuid: uuid,
-			useElasticSearch: this.elasticSearch
+			uuid: uuid
 		})
 		.then(ids => {
 			this.contentCache = {
@@ -64,7 +62,6 @@ class FastFtFeed {
 	fetch() {	return this.contentCache; }
 }
 
-const esBackend = new FastFtFeed(true, sources.fastFt);
-const capiBackend = new FastFtFeed(false, sources.fastFt);
+const backend = new FastFtFeed(sources.fastFt);
 
-export default (elasticSearch) => (elasticSearch ? esBackend : capiBackend);
+export default () => backend;

@@ -3,8 +3,6 @@ import { logger } from 'ft-next-express';
 
 export default (req, res, next) => {
 	const flags = res.locals.flags;
-	const useElasticSearch = flags.elasticSearchItemGet;
-	const useMockBackend = flags.mockFrontPage;
 
 	const query = req.body.query || req.body;
 	const vars = JSON.parse(req.body.variables || '{}');
@@ -14,7 +12,14 @@ export default (req, res, next) => {
 		return res.status(400).send();
 	}
 
-	graphql(useElasticSearch, useMockBackend, { flags })
+	graphql(
+		{
+			elasticSearch: flags.elasticSearchItemGet,
+			elasticSearchAws: flags.elasticSearchOnAws,
+			mock: flags.mockFrontPage
+		},
+		flags
+	)
 		.fetch(query, vars)
 		.then(data => {
 			res.json(data);
