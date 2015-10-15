@@ -5,7 +5,7 @@ import schema from './schema';
 import {factory as backend} from './backend';
 import { logger } from 'ft-next-express';
 
-const fetch = (backend, flags) => {
+const fetch = (backend, flags = {}) => {
 	return (query, vars) => {
 		const then = new Date().getTime();
 

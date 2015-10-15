@@ -34,6 +34,7 @@ class MockCAPI {
 		if(concept) {
 			return Promise.resolve(concept);
 		}
+
 		return this.realBackend.byConcept(uuid, ttl)
 		.then(it => {
 			const resp = { title: it.title, items: it.slice() };
