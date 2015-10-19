@@ -35,15 +35,20 @@ class Cache {
 
 		// we have fresh data
 		if(expire > now && data) {
-			metrics.count(`cacher.${key}.cached`, 1);	
+			metrics.count(`cacher.${key}.cached`, 1);
 			return Promise.resolve(data);
 		}
 		// we don't have fresh data, fetch it
-		metrics.count(`cacher.${key}.fresh`, 1);	
 		const eventualData = this._fetch(key, now, ttl, fetcher);
 
 		// return stale data or promise of fresh data
-		return (data ? Promise.resolve(data) : eventualData);
+		if(data) {
+			metrics.count(`cacher.${key}.stale`, 1);
+			return Promise.resolve(data);
+		} else {
+			metrics.count(`cacher.${key}.fresh`, 1);
+			return eventualData;
+		}
 	}
 
 	_fetch(key, now, ttl, fetcher) {
