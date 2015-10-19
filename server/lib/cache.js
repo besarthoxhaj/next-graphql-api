@@ -1,3 +1,5 @@
+import { metrics } from 'ft-next-express';
+
 class Cache {
 	constructor(staleTtl) {
 		// in-memory content cache
@@ -32,9 +34,12 @@ class Cache {
 		const now = (new Date().getTime()) / 1000;
 
 		// we have fresh data
-		if(expire > now && data) { return Promise.resolve(data); }
-
+		if(expire > now && data) {
+			metrics.count(`cacher.${key}.cached`, 1);	
+			return Promise.resolve(data);
+		}
 		// we don't have fresh data, fetch it
+		metrics.count(`cacher.${key}.fresh`, 1);	
 		const eventualData = this._fetch(key, now, ttl, fetcher);
 
 		// return stale data or promise of fresh data
@@ -59,6 +64,7 @@ class Cache {
 			return it;
 		})
 		.catch(() => {
+			metrics.count(`cacher.${key}.error`, 1);
 			delete this.requestMap[key];
 		});
 
