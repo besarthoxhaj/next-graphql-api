@@ -92,6 +92,13 @@ const Image = new GraphQLObjectType({
 				return `//next-geebee.ft.com/image/v1/images/raw/${it.url}?source=next&fit=scale-down&width=${width}`;
 			}
 		},
+		rawSrc: {
+			type: GraphQLString,
+			description: 'Original source URL of the image',
+			resolve: (it) => {
+				return it.url;
+			}
+		},
 		alt: {
 			type: GraphQLString,
 			description: 'Alternative text'
