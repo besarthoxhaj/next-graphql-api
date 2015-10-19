@@ -3,6 +3,7 @@ const api = require('next-ft-api-client');
 const articleUuid = 'd0377096-f290-11e4-b914-00144feab7de';
 const listUuid = '73667f46-1a55-11e5-a130-2e7db721f996';
 const pageUuid = 'fcdae4e8-cd25-11de-a748-00144feabdc0';
+const conceptUuid = '5c7592a8-1f0c-11e4-b0cb-b2227cce2b54';
 const playlistId = '69917354001';
 const searchQuery = 'brand:"Person in the news"';
 
@@ -20,7 +21,10 @@ const healthChecks = [
                 uuid: articleUuid,
                 useElasticSearch: true
             })
-                .then(() => this.status = true)
+                .then(article => {
+                    if (!article) throw new Error();
+                    this.status = true;
+                })
                 .catch(() => this.status = false);
         }
     },
@@ -35,22 +39,10 @@ const healthChecks = [
                 uuid: articleUuid,
                 useElasticSearch: true
             })
-                .then(() => this.status = true)
-                .catch(() => this.status = false);
-        }
-    },
-    {
-        name: 'Elasticsearch: By Concept',
-        status: false,
-        businessImpact: 'API may not be able to serve related articles',
-        severity: 2,
-        technicalSummary: 'Tries to fetch articles by a concept from elasticsearch',
-        check: function () {
-            api.contentAnnotatedBy({
-                uuid: articleUuid,
-                useElasticSearch: true
-            })
-                .then(() => this.status = true)
+                .then(article => {
+                    if (!article) throw new Error();
+                    this.status = true;
+                })
                 .catch(() => this.status = false);
         }
     },
@@ -65,7 +57,10 @@ const healthChecks = [
                 query: searchQuery,
                 useElasticSearch: true
             })
-                .then(() => this.status = true)
+                .then(articles => {
+                    if (!articles.length) throw new Error();
+                    this.status = true;
+                })
                 .catch(() => this.status = false);
         }
     },
@@ -80,7 +75,10 @@ const healthChecks = [
                 uuid: articleUuid,
                 useElasticSearch: false
             })
-                .then(() => this.status = true)
+                .then(article => {
+                    if (!article) throw new Error();
+                    this.status = true;
+                })
                 .catch(() => this.status = false);
         }
     },
@@ -92,10 +90,12 @@ const healthChecks = [
         technicalSummary: 'Tries to fetch articles by a concept from capi v2',
         check: function () {
             api.contentAnnotatedBy({
-                uuid: articleUuid,
-                useElasticSearch: false
+                uuid: conceptUuid
             })
-                .then(() => this.status = true)
+                .then(articles => {
+                    if (!articles.length) throw new Error;
+                    this.status = true;
+                })
                 .catch(() => this.status = false);
         }
     },
@@ -109,7 +109,10 @@ const healthChecks = [
             api.lists({
                 uuid: listUuid
             })
-                .then(() => this.status = true)
+                .then(list => {
+                    if (!list) throw new Error;
+                    this.status = true;
+                })
                 .catch(() => this.status = false);
         }
     },
@@ -123,7 +126,10 @@ const healthChecks = [
             api.pages({
                 uuid: pageUuid
             })
-                .then(() => this.status = true)
+                .then(page => {
+                    if (!page.length) throw new Error;
+                    this.status = true;
+                })
                 .catch(() => this.status = false);
         }
     },
@@ -136,7 +142,10 @@ const healthChecks = [
         check: function () {
             const since = new Date().toISOString();
             fetch(`http://api.ft.com/content/notifications?since=${since}&apiKey=${process.env.FAST_FT_KEY}`)
-                .then(() => this.status = true)
+                .then(res => {
+                    if (!res.ok) throw new Error();
+                    this.status = true;
+                })
                 .catch(() => this.status = false);
         }
     },
@@ -151,7 +160,10 @@ const healthChecks = [
                 uuid: articleUuid,
                 useElasticSearch: false
             })
-                .then(() => this.status = true)
+                .then(article => {
+                    if (!article) throw new Error();
+                    this.status = true;
+                })
                 .catch(() => this.status = false);
         }
     },
@@ -166,7 +178,10 @@ const healthChecks = [
                 query: searchQuery,
                 useElasticSearch: false
             })
-                .then(() => this.status = true)
+                .then(articles => {
+                    if (!articles.length) return new Error();
+                    this.status = true;
+                })
                 .catch(() => this.status = false);
         }
     },
@@ -178,7 +193,10 @@ const healthChecks = [
         technicalSummary: 'Tries to fetch a playlist from Brightcove',
         check: function () {
             fetch(`https://next-video.ft.com/api/playlist/${playlistId}`)
-                .then(() => this.status = true)
+                .then(res => {
+                    if (!res.ok) throw new Error();
+                    this.status = true;
+                })
                 .catch(() => this.status = false);
         }
     },
@@ -190,7 +208,10 @@ const healthChecks = [
         technicalSummary: 'Tries to fetch popular topics from the popular-api',
         check: function () {
             fetch(`https://ft-next-popular-api.herokuapp.com/topics?apiKey=${process.env.POPULAR_API_KEY}`)
-                .then(() => this.status = true)
+                .then(res => {
+                    if (!res.ok) throw new Error();
+                    this.status = true;
+                })
                 .catch(() => this.status = false);
         }
     },
@@ -202,7 +223,10 @@ const healthChecks = [
         technicalSummary: 'Tries to fetch popular articles from the mostpopular api',
         check: function () {
             fetch('http://mostpopular.sp.ft-static.com/v1/mostPopular?source=nextArticle')
-                .then(() => this.status = true)
+                .then(res => {
+                    if (!res.ok) throw new Error();
+                    this.status = true;
+                })
                 .catch(() => this.status = false);
         }
     },
@@ -214,7 +238,10 @@ const healthChecks = [
         technicalSummary: 'Tries to fetch live blog data',
         check: function () {
             fetch('http://ftalphaville.ft.com/marketslive/2015-07-30?action=catchup&format=json')
-                .then(() => this.status = true)
+                .then(res => {
+                    if (!res.ok) throw new Error();
+                    this.status = true;
+                })
                 .catch(() => this.status = false);
         }
     }

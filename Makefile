@@ -33,7 +33,7 @@ provision:
 	nbt deploy-hashed-assets
 
 tidy:
-	# `nbt float` now tidys up after itself
+	# `nbt float` now tidies up after itself
 
 deploy:
 	nbt ship -m
