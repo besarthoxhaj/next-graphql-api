@@ -21,7 +21,7 @@
     "next-ft-api-client": "^3.10.1"
   },
   "devDependencies": {
-		"bower": "~1.4.1",
+    "bower": "~1.4.1",
     "chai": "^3.2.0",
     "chai-as-promised": "^5.1.0",
     "eslint-plugin-react": "^3.5.0",
