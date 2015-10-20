@@ -70,6 +70,7 @@ class Cache {
 			return it;
 		})
 		.catch(() => {
+			const metricsKey = key.split('.')[0];
 			metrics.count(`cacher.${metricsKey}.error`, 1);
 			delete this.requestMap[key];
 		});
