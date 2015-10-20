@@ -19,6 +19,7 @@ app.get('/__gtg', (req, res) => {
 	res.status(200).end();
 });
 
+<<<<<<< HEAD
 app.use((req, res, next) => {
 	const apiKey = req.headers['x-api-key'] || req.query.apiKey;
 	if (!apiKey || apiKey !== process.env.GRAPHQL_API_KEY) {
@@ -28,15 +29,19 @@ app.use((req, res, next) => {
 		next();
 	}
 });
-
-import index from './routes/index';
+=======
 import query from './routes/query';
+app.post('/', query);
+>>>>>>> use sso
+
+import authS3O from 's3o-middleware';
+import index from './routes/index';
 import schema from './routes/schema';
 import playground from './routes/playground';
 
-app.get('/', index);
-app.post('/', query);
 
+app.use(authS3O);
+app.get('/', index);
 app.get('/schema', schema);
 app.get('/playground', playground);
 
