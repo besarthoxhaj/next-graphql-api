@@ -27,6 +27,7 @@ class Cache {
 	// Caching wrapper. Always returns a promise, when cache expires
 	// returns stale data immediately and fetches fresh one
 	cached(key, ttl, fetcher) {
+		const metricsKey = key.split('.')[0];
 		const cache = this.contentCache;
 
 		const data = (cache[key] && cache[key].data);
@@ -35,7 +36,7 @@ class Cache {
 
 		// we have fresh data
 		if(expire > now && data) {
-			metrics.count(`cacher.${key}.cached`, 1);
+			metrics.count(`cacher.${metricsKey}.cached`, 1);
 			return Promise.resolve(data);
 		}
 		// we don't have fresh data, fetch it
@@ -43,10 +44,10 @@ class Cache {
 
 		// return stale data or promise of fresh data
 		if(data) {
-			metrics.count(`cacher.${key}.stale`, 1);
+			metrics.count(`cacher.${metricsKey}.stale`, 1);
 			return Promise.resolve(data);
 		} else {
-			metrics.count(`cacher.${key}.fresh`, 1);
+			metrics.count(`cacher.${metricsKey}.fresh`, 1);
 			return eventualData;
 		}
 	}
@@ -69,7 +70,7 @@ class Cache {
 			return it;
 		})
 		.catch(() => {
-			metrics.count(`cacher.${key}.error`, 1);
+			metrics.count(`cacher.${metricsKey}.error`, 1);
 			delete this.requestMap[key];
 		});
 
