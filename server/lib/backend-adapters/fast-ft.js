@@ -1,4 +1,5 @@
 import ApiClient from 'next-ft-api-client';
+import { captureError } from 'express-errors-handler';
 
 // FIXME sources shouldn't be necessary here
 // we should be able to pass the fastFT uuid from the top
@@ -33,7 +34,7 @@ class FastFtFeed {
 				items: ids.slice()
 			};
 			return this.contentCache;
-		}).catch(console.error);
+		}).catch(captureError);
 	}
 
 	pollUpdates() {
@@ -45,7 +46,7 @@ class FastFtFeed {
 					this.since = new Date().toISOString();
 				}
 			})
-			.catch(console.error);
+			.catch(captureError);
 		}, 25 * 1000);
 	}
 	// Requests a list of notifications for FastFT to determine whether there are
@@ -55,7 +56,7 @@ class FastFtFeed {
 		return fetch(url)
 			.then(res => res.json())
 			.then(json => !!json.notifications.length)
-			.catch(console.error);
+			.catch(captureError);
 	}
 
 	// FIXME take uuid as an argument
