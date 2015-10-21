@@ -20,7 +20,8 @@ app.get('/__gtg', (req, res) => {
 });
 
 app.use((req, res, next) => {
-	if (!req.query.apiKey || req.query.apiKey !== process.env.GRAPHQL_API_KEY) {
+	const apiKey = req.headers['x-api-key'] || req.query.apiKey;
+	if (!apiKey || apiKey !== process.env.GRAPHQL_API_KEY) {
 		logger.error('Bad or missing apiKey');
 		res.status(401).send('Bad or missing apiKey');
 	} else {

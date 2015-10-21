@@ -67,15 +67,16 @@ module.exports = [
 	{
 		headers: {
 			'Accept': 'application/json',
-			'Content-Type': 'application/json'
+			'Content-Type': 'application/json',
+			'X-API-KEY': process.env.GRAPHQL_API_KEY
 		},
 		method: 'POST',
 		body: JSON.stringify({
 			query: query
 		}),
 		timeout: 8000,
-		urls: {}
+		urls: {
+			'/': 200
+		}
 	}
 ];
-
-module.exports[0].urls[`/?apiKey=${process.env.GRAPHQL_API_KEY}`] = 200;
