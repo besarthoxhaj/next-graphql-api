@@ -1,72 +1,66 @@
 'use strict';
 
 const query = `
-	fragment Basic on Content {
-			type: __typename
-			contentType
+	query GraphQLSmoke {
+		popularTopics {
+			name
+		}
+		top(region: UK) {
+			lead: items(limit: 1, type: Article) {
+				title
+			}
+			liveBlogs: items(type: LiveBlog) {
+				title
+			}
+			items(from: 1, type: Article) {
+				title
+			}
+		}
+		fastFT {
+			items(limit: 5) {
+				title
+			}
+		}
+		editorsPicks {
+			title
+			items(limit: 6) {
+				title
+			}
+		}
+		opinion {
+			url
+			items {
+				title
+			}
+		}
+		lifestyle {
+			url
+			items(limit: 2) {
+				title
+			}
+		}
+		markets {
+			url
+			items(limit: 2, genres: ["analysis", "comment"]) {
+				title
+			}
+		}
+		technology {
+			url
+			items(limit: 2, genres: ["analysis", "comment"]) {
+				title
+			}
+		}
+		popular {
+			items(limit: 10) {
+				title
+			}
+		}
+		videos {
 			id
 			title
-			lastPublished
-	}
-
-	fragment Extended on Content {
-			genre
-			summary
-			primaryTag {
-					id
-					url
-					taxonomy
-					name
-			}
-			primaryImage {
-					src(width: 710)
-					alt
-			}
-	}
-
-	fragment Related on Content {
-			relatedContent(limit: 3) {
-					id
-					title
-					genre
-					primaryTag {
-							id
-							url
-							taxonomy
-							name
-					}
-			}
-	}
-
-	query TopStoriesTest {
-			popularTopics {
-					name
-					url
-			}
-			top(region: UK) {
-					leads: items(limit: 1, type: Article) {
-							... Basic
-							... Extended
-							... Related
-					}
-					liveBlogs: items(type: LiveBlog) {
-							... Basic
-							... Extended
-							... on LiveBlog {
-									status
-									updates(limit: 1) {
-											date
-											text
-									}
-							}
-					}
-					items(from: 1, type: Article) {
-							... Basic
-							... Extended
-					}
-			}
-	}
-	`;
+		}
+	}`;
 
 
 module.exports = [
