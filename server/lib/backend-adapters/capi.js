@@ -31,23 +31,29 @@ class CAPI {
 	}
 
 	contentv1(uuids) {
-		return this.cache.cached(`${this.type}.contentv1.${Array.isArray(uuids) ? uuids.join('_') : uuids}`, 50, () => {
-			return ApiClient.contentLegacy({
-				uuid: uuids,
-				useElasticSearch: this.elasticSearch,
-				useElasticSearchOnAws: this.elasticSearchAws
+		const promises = [].concat(uuids).map(function(uuid) {
+			return this.cache.cached(`${this.type}.contentv1.${uuid}`, 50, () => {
+				return ApiClient.contentLegacy({
+					uuid: uuid,
+					useElasticSearch: this.elasticSearch,
+					useElasticSearchOnAws: this.elasticSearchAws
+				});
 			});
-		});
+		}.bind(this));
+		return Promise.all(promises);
 	}
 
 	contentv2(uuids) {
-		return this.cache.cached(`${this.type}.contentv2.${uuids.join('_')}`, 50, () => {
-			return ApiClient.content({
-				uuid: uuids,
-				useElasticSearch: this.elasticSearch,
-				useElasticSearchOnAws: this.elasticSearchAws
+		const promises = [].concat(uuids).map(function(uuid) {
+			return this.cache.cached(`${this.type}.contentv2.${uuid}`, 50, () => {
+				return ApiClient.content({
+					uuid: uuid,
+					useElasticSearch: this.elasticSearch,
+					useElasticSearchOnAws: this.elasticSearchAws
+				});
 			});
-		});
+		}.bind(this));
+		return Promise.all(promises);
 	}
 
 	list(uuid, ttl = 50) {
