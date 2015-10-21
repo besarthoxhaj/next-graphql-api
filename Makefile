@@ -29,9 +29,8 @@ run:
 	nbt run
 
 provision:
-	nbt float
+	nbt float --testapp ${TEST_APP}
 	nbt deploy-hashed-assets
-	nbt test-urls ${TEST_APP}
 
 tidy:
 	# `nbt float` now tidies up after itself
