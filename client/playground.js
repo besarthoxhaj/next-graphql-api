@@ -3,7 +3,8 @@ require('isomorphic-fetch');
 import React from 'react';
 import GraphiQL from 'graphiql';
 
-const fetcher = (apiKey, params) => {
+const apiKey = document.querySelector('.api-key').textContent;
+const fetcher = (params) => {
 	console.log('GraphiQL submitted', params);
 
 	return fetch(`/?apiKey=${apiKey}`, {
@@ -17,6 +18,6 @@ const fetcher = (apiKey, params) => {
 
 export default {
 	init: (el, apiKey) => {
-		React.render(<GraphiQL fetcher={fetcher.bind(null, apiKey)} />, el);
+		React.render(<GraphiQL fetcher={fetcher} />, el);
 	}
 }
