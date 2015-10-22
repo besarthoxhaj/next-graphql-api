@@ -59,7 +59,6 @@ class Cache {
 		const itemsToWaitFor = [];
 		const cache = this.contentCache;
 		const now = (new Date().getTime()) / 1000;
-		let requiredFetches = 0;
 		let eventualData;
 
 		ids.forEach((id) => {
@@ -135,6 +134,7 @@ class Cache {
 		})
 		.catch((err) => {
 			metrics.count(`cacher.${metricsKey}.error`, 1);
+			logger.error(err);
 			delete this.requestMap[requestKey];
 		});
 		return this.requestMap[requestKey];

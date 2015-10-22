@@ -8,7 +8,6 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 import contentv1fixture from './fixtures/contentv1';
-import listfixture from './fixtures/list';
 
 import ApiClient from 'next-ft-api-client';
 import Cache from '../../../server/lib/cache';
@@ -24,7 +23,6 @@ describe.only('CAPI backend', () => {
 
 		before(() => {
 			stubAPI = sinon.stub(ApiClient, 'contentLegacy', (opts) => {
-				console.log(opts)
 				return Promise.resolve(opts.uuid.map((uuid) => {
 					switch(uuid) {
 						case 'valid':
