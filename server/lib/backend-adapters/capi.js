@@ -31,7 +31,7 @@ class CAPI {
 	}
 
 	contentv1(uuids) {
-		const promises = [].concat(uuids).map(function(uuid) {
+		const promises = [].concat(uuids).map((uuid) => {
 			return this.cache.cached(`${this.type}.contentv1.${uuid}`, 50, () => {
 				return ApiClient.contentLegacy({
 					uuid: uuid,
@@ -39,12 +39,14 @@ class CAPI {
 					useElasticSearchOnAws: this.elasticSearchAws
 				});
 			});
-		}.bind(this));
-		return Promise.all(promises);
+		});
+		return Promise.all(promises).then((items) => {
+			items.filter(item => !!item);
+		});
 	}
 
 	contentv2(uuids) {
-		const promises = [].concat(uuids).map(function(uuid) {
+		const promises = [].concat(uuids).map((uuid) => {
 			return this.cache.cached(`${this.type}.contentv2.${uuid}`, 50, () => {
 				return ApiClient.content({
 					uuid: uuid,
@@ -52,8 +54,10 @@ class CAPI {
 					useElasticSearchOnAws: this.elasticSearchAws
 				});
 			});
-		}.bind(this));
-		return Promise.all(promises);
+		});
+		return Promise.all(promises).then((items) => {
+			items.filter(item => !!item);
+		});
 	}
 
 	list(uuid, ttl = 50) {

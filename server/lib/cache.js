@@ -1,4 +1,4 @@
-import { metrics } from 'ft-next-express';
+import { metrics, logger } from 'ft-next-express';
 
 class Cache {
 	constructor(staleTtl) {
@@ -47,14 +47,17 @@ class Cache {
 			metrics.count(`cacher.${metricsKey}.stale`, 1);
 			return Promise.resolve(data);
 		} else {
-			metrics.count(`cacher.${metricsKey}.fresh`, 1);
 			return eventualData;
 		}
 	}
 
 	_fetch(key, now, ttl, fetcher) {
+		const metricsKey = key.split('.')[0];
+
 		if(this.requestMap[key])
 			return this.requestMap[key];
+
+		metrics.count(`cacher.${metricsKey}.fresh`, 1);
 
 		this.requestMap[key] = fetcher()
 		.then((it) => {
@@ -69,12 +72,11 @@ class Cache {
 
 			return it;
 		})
-		.catch(() => {
-			const metricsKey = key.split('.')[0];
+		.catch((err) => {
 			metrics.count(`cacher.${metricsKey}.error`, 1);
 			delete this.requestMap[key];
+			logger.error(err);
 		});
-
 		return this.requestMap[key];
 	}
 }
