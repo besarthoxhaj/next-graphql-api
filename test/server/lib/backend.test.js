@@ -31,7 +31,7 @@ describe('GraphQL Backend', () => {
 			return stories.then((it) => {
 				expect(it.length).to.eq(3);
 				return stories.then((it) => {
-					expect(it.length).to.eq(3);	
+					expect(it.length).to.eq(3);
 				});
 			})
 		});
