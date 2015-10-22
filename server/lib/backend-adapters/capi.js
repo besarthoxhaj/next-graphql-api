@@ -31,31 +31,28 @@ class CAPI {
 	}
 
 	contentv1(uuids) {
-		const promises = [].concat(uuids).map((uuid) => {
-			return this.cache.cached(`${this.type}.contentv1.${uuid}`, 50, () => {
-				return ApiClient.contentLegacy({
-					uuid: uuid,
-					useElasticSearch: this.elasticSearch,
-					useElasticSearchOnAws: this.elasticSearchAws
-				});
+
+		const listPromise = this.cache.cachedList(`${this.type}.contentv1`, uuids, 50, (uuids) => {
+			return ApiClient.contentLegacy({
+				uuid: uuids,
+				useElasticSearch: this.elasticSearch,
+				useElasticSearchOnAws: this.elasticSearchAws
 			});
 		});
-		return Promise.all(promises).then((items) => {
+		return listPromise.then((items) => {
 			return items.filter(item => !!item);
 		});
 	}
 
 	contentv2(uuids) {
-		const promises = [].concat(uuids).map((uuid) => {
-			return this.cache.cached(`${this.type}.contentv2.${uuid}`, 50, () => {
-				return ApiClient.content({
-					uuid: uuid,
-					useElasticSearch: this.elasticSearch,
-					useElasticSearchOnAws: this.elasticSearchAws
-				});
+		const listPromise = this.cache.cachedList(`${this.type}.contentv2`, uuids, 50, (uuids) => {
+			return ApiClient.content({
+				uuid: uuids,
+				useElasticSearch: this.elasticSearch,
+				useElasticSearchOnAws: this.elasticSearchAws
 			});
 		});
-		return Promise.all(promises).then((items) => {
+		return listPromise.then((items) => {
 			return items.filter(item => !!item);
 		});
 	}
