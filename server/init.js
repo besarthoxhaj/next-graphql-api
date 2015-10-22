@@ -19,20 +19,8 @@ app.get('/__gtg', (req, res) => {
 	res.status(200).end();
 });
 
-<<<<<<< HEAD
-app.use((req, res, next) => {
-	const apiKey = req.headers['x-api-key'] || req.query.apiKey;
-	if (!apiKey || apiKey !== process.env.GRAPHQL_API_KEY) {
-		logger.error('Bad or missing apiKey');
-		res.status(401).send('Bad or missing apiKey');
-	} else {
-		next();
-	}
-});
-=======
 import query from './routes/query';
 app.post('/', query);
->>>>>>> use sso
 
 import authS3O from 's3o-middleware';
 import index from './routes/index';
