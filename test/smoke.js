@@ -1,5 +1,3 @@
-'use strict';
-
 const query = `
 	query GraphQLSmoke {
 		popularTopics {

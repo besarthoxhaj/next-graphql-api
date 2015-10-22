@@ -17,7 +17,7 @@ const fetcher = (params) => {
 };
 
 export default {
-	init: (el, apiKey) => {
+	init: (el) => {
 		React.render(<GraphiQL fetcher={fetcher} />, el);
 	}
 }
