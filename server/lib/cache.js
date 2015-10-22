@@ -56,8 +56,8 @@ class Cache {
 
 		if(this.requestMap[key])
 			return this.requestMap[key];
-		
-		metrics.count(`cacher.${metricsKey}.stale`, 1);
+
+		metrics.count(`cacher.${metricsKey}.fresh`, 1);
 
 		this.requestMap[key] = fetcher()
 		.then((it) => {
