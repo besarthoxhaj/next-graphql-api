@@ -29,11 +29,12 @@ run:
 	nbt run
 
 provision:
-	nbt float
+	nbt float -md --testapp ${TEST_APP}
 	nbt deploy-hashed-assets
+	nbt test-urls ${TEST_APP}
 
 tidy:
-	# `nbt float` now tidies up after itself
+	nbt destroy ${TEST_APP}
 
 deploy:
 	nbt ship -m
