@@ -41,7 +41,7 @@ class CAPI {
 			});
 		});
 		return Promise.all(promises).then((items) => {
-			items.filter(item => !!item);
+			return items.filter(item => !!item);
 		});
 	}
 
@@ -56,7 +56,7 @@ class CAPI {
 			});
 		});
 		return Promise.all(promises).then((items) => {
-			items.filter(item => !!item);
+			return items.filter(item => !!item);
 		});
 	}
 
