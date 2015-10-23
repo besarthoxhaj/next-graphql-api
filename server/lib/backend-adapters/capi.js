@@ -1,10 +1,8 @@
 import ApiClient from 'next-ft-api-client';
 
 class CAPI {
-	constructor(cache, opts = {}) {
-		this.elasticSearch = opts.elasticSearch;
-		this.elasticSearchAws = opts.elasticSearchAws;
-		this.type = this.elasticSearch ? (this.elasticSearchAws ? 'elasticsearch-aws' : 'elasticsearch') : 'capi';
+	constructor(cache) {
+		this.type = 'capi';
 		this.cache = cache;
 	}
 
@@ -22,22 +20,14 @@ class CAPI {
 
 	search(query, ttl = 50) {
 		return this.cache.cached(`${this.type}.search.${query}`, ttl, () => {
-			return ApiClient.searchLegacy({
-				query: query,
-				useElasticSearch: this.elasticSearch,
-				useElasticSearchOnAws: this.elasticSearchAws
-			});
+			return ApiClient.searchLegacy({ query: query });
 		});
 	}
 
 	contentv1(uuids) {
 		const promises = [].concat(uuids).map((uuid) => {
 			return this.cache.cached(`${this.type}.contentv1.${uuid}`, 50, () => {
-				return ApiClient.contentLegacy({
-					uuid: uuid,
-					useElasticSearch: this.elasticSearch,
-					useElasticSearchOnAws: this.elasticSearchAws
-				});
+				return ApiClient.contentLegacy({ uuid: uuid });
 			});
 		});
 		return Promise.all(promises).then((items) => {
@@ -48,11 +38,7 @@ class CAPI {
 	contentv2(uuids) {
 		const promises = [].concat(uuids).map((uuid) => {
 			return this.cache.cached(`${this.type}.contentv2.${uuid}`, 50, () => {
-				return ApiClient.content({
-					uuid: uuid,
-					useElasticSearch: this.elasticSearch,
-					useElasticSearchOnAws: this.elasticSearchAws
-				});
+				return ApiClient.content({ uuid: uuid });
 			});
 		});
 		return Promise.all(promises).then((items) => {

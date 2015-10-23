@@ -165,49 +165,24 @@ const memCache = new Cache(12 * 60 * 60);
 
 // Adapters
 const fastFT = new FastFtFeed();
-
-const esCAPI = new CAPI(memCache, { elasticSearch: true });
-const esAwsCAPI = new CAPI(memCache, { elasticSearch: true, elasticSearchAws: true });
-const directCAPI = new CAPI(memCache);
-
+const capi = new CAPI(memCache);
 const popular = new Popular(memCache);
+const liveblog = new Liveblog(memCache);
+const playlist = new Playlist(memCache);
 const popularApi = new PopularAPI(memCache);
 
-const playlist = new Playlist(memCache);
-
-const liveblog = new Liveblog(memCache);
-
 // Mock Adapters
-const mockedCAPI = new MockCAPI(esCAPI);
+const mockedCAPI = new MockCAPI(capi);
 const mockLiveblog = new MockLiveblog(liveblog);
 
-// Elasticsearch (and AWS version) & direct CAPI Backends
-const esBackend = new Backend({
+const backend = new Backend({
 	fastFT: fastFT,
-	capi: esCAPI,
+	capi: capi,
 	popular: popular,
 	liveblog: liveblog,
 	videos: playlist,
 	popularApi: popularApi
-}, 'elasticsearch');
-
-const esAwsBackend = new Backend({
-	fastFT: fastFT,
-	capi: esAwsCAPI,
-	popular: popular,
-	liveblog: liveblog,
-	videos: playlist,
-	popularApi: popularApi
-}, 'elasticsearch-aws');
-
-const capiBackend = new Backend({
-	fastFT: fastFT,
-	capi: directCAPI,
-	popular: popular,
-	liveblog: liveblog,
-	videos: playlist,
-	popularApi: popularApi
-}, 'direct');
+}, 'real');
 
 // Mock backend
 const mockBackend = new Backend({
@@ -221,17 +196,5 @@ const mockBackend = new Backend({
 
 export default {
 	Backend: Backend,
-	factory: (opts = {}) => {
-		if (opts.mock) {
-			return mockBackend;
-		} else if (opts.elasticSearch) {
-			if (opts.elasticSearchAws) {
-				return esAwsBackend;
-			} else {
-				return esBackend;
-			}
-		} else {
-			return capiBackend;
-		}
-	}
+	factory: (opts = {}) => opts.mock ? mockBackend : backend
 };
