@@ -8,7 +8,6 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 import contentv1fixture from './fixtures/contentv1';
-import listfixture from './fixtures/list';
 
 import ApiClient from 'next-ft-api-client';
 import Cache from '../../../server/lib/cache';
