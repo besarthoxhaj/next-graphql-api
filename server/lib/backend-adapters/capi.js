@@ -2,7 +2,7 @@ import ApiClient from 'next-ft-api-client';
 
 class CAPI {
 	constructor(cache) {
-		this.type = 'elasticsearch-aws';
+		this.type = 'capi';
 		this.cache = cache;
 	}
 
