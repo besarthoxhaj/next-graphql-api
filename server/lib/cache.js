@@ -14,6 +14,7 @@ class Cache {
 					delete this.contentCache[key];
 				}
 			}
+			metrics.histogram('cacher.size', JSON.stringify(this.contentCache).length);
 		};
 
 		// keep clearing the cache every minute
