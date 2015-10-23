@@ -19,8 +19,6 @@ export default (req, res, next) => {
 
 	graphql(
 		{
-			elasticSearch: flags.elasticSearchItemGet,
-			elasticSearchAws: flags.elasticSearchOnAws,
 			mock: flags.mockFrontPage
 		},
 		flags
