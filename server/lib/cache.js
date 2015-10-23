@@ -14,6 +14,7 @@ class Cache {
 					delete this.contentCache[key];
 				}
 			}
+			metrics.histogram('cache.size', JSON.stringify(this.contentCache).length);
 		};
 
 		// keep clearing the cache every minute
@@ -36,7 +37,7 @@ class Cache {
 
 		// we have fresh data
 		if(expire > now && data) {
-			metrics.count(`cacher.${metricsKey}.cached`, 1);
+			metrics.count(`cache.${metricsKey}.cached`, 1);
 			return Promise.resolve(data);
 		}
 		// we don't have fresh data, fetch it
@@ -44,7 +45,7 @@ class Cache {
 
 		// return stale data or promise of fresh data
 		if(data) {
-			metrics.count(`cacher.${metricsKey}.stale`, 1);
+			metrics.count(`cache.${metricsKey}.stale`, 1);
 			return Promise.resolve(data);
 		} else {
 			return eventualData;
@@ -57,7 +58,7 @@ class Cache {
 		if(this.requestMap[key])
 			return this.requestMap[key];
 
-		metrics.count(`cacher.${metricsKey}.fresh`, 1);
+		metrics.count(`cache.${metricsKey}.fresh`, 1);
 
 		this.requestMap[key] = fetcher()
 		.then((it) => {
@@ -73,7 +74,7 @@ class Cache {
 			return it;
 		})
 		.catch((err) => {
-			metrics.count(`cacher.${metricsKey}.error`, 1);
+			metrics.count(`cache.${metricsKey}.error`, 1);
 			delete this.requestMap[key];
 			logger.error(err);
 		});
