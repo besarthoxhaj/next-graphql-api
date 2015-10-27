@@ -18,6 +18,7 @@
     "ft-next-express": "^15.3.0",
     "graphiql": "^0.3.1",
     "graphql": "^0.4.2",
+    "n-health": "^1.2.2",
     "next-ft-api-client": "^3.15.0",
     "s3o-middleware": "^1.1.2"
   },
