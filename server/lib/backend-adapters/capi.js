@@ -25,24 +25,18 @@ class CAPI {
 	}
 
 	contentv1(uuids) {
-		const promises = [].concat(uuids).map((uuid) => {
-			return this.cache.cached(`${this.type}.contentv1.${uuid}`, 50, () => {
-				return ApiClient.contentLegacy({ uuid: uuid });
+		return this.cache.cached(`${this.type}.contentv1.${Array.isArray(uuids) ? uuids.join('_') : uuids}`, 50, () => {
+			return ApiClient.contentLegacy({
+				uuid: uuids
 			});
-		});
-		return Promise.all(promises).then((items) => {
-			return items.filter(item => !!item);
 		});
 	}
 
 	contentv2(uuids) {
-		const promises = [].concat(uuids).map((uuid) => {
-			return this.cache.cached(`${this.type}.contentv2.${uuid}`, 50, () => {
-				return ApiClient.content({ uuid: uuid });
+		return this.cache.cached(`${this.type}.contentv2.${uuids.join('_')}`, 50, () => {
+			return ApiClient.content({
+				uuid: uuids
 			});
-		});
-		return Promise.all(promises).then((items) => {
-			return items.filter(item => !!item);
 		});
 	}
 
