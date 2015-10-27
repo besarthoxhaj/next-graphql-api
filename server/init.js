@@ -1,14 +1,16 @@
 import bodyParser from 'body-parser';
+import path from 'path';
+
 import express from 'ft-next-express';
-import healthChecks from './lib/health-checks.js';
+import nHealth from 'n-health';
 
-// starts polling the health checks
-healthChecks.init();
+import additionalHealthChecks from './lib/health-checks/index';
 
+const healthChecks = nHealth(path.resolve(__dirname, './config/health-checks'), additionalHealthChecks);
 const app = express({
 	layoutsDir: 'views/layouts',
 	withBackendAuthentication: false,
-	healthChecks: healthChecks.healthChecks
+	healthChecks: healthChecks.asArray()
 });
 const logger = express.logger;
 
