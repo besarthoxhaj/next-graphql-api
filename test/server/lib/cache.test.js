@@ -93,9 +93,8 @@ describe('GraphQL Cache', () => {
 		const clock = sinon.useFakeTimers();
 		const cache = new Cache(10 * 60, 5 * 60);
 
-		const now = Date.now();
 
-		const p1 = cache.cached('test-key-1', Date.now() + 50, fetcher);
+		const p1 = cache.cached('test-key-1', 1, fetcher);
 		const p2 = cache.cached('test-key-unused', 1, fetcher);
 		return Promise.all([p1,p2]).then(() => {
 
