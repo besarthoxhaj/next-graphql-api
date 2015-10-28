@@ -12,7 +12,7 @@ or article -> topics -> latest articles with those topics). Such traversal queri
 can be done in a single request using GraphQL (they will get translated to multiple
 backend requests by the GraphQL server).
 
-Because the possible queries are described by a [schema](/schema) and the schema is defined
+Because the possible queries are described by a [schema](http://next-graphql-api.ft.com/schema) and the schema is defined
 in terms of types, extending types with new attributes immediately benefits all places
 in the schema where a given type is used. For instance, adding the ability to find
 related articles from story package to use on the Homepage means any query surfacing
@@ -31,7 +31,7 @@ pull out specific content components from an article body.
 ## Using Next GraphQL API
 
 You will need a GraphQL API token from the config-vars. Once you have it, you can
-explore the available GraphQL schema in the <a href="/playground">playground</a>,
+explore the available GraphQL schema in the [playground](http://next-graphql-api.ft.com/playground),
 which uses GraphQL's introspection capabilities to suggest possible queries.
 
 For an example of running a query, see the [next-front-page](http://github.com/Financial-Times/next-front-page)
