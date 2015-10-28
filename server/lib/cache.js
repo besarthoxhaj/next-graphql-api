@@ -10,7 +10,7 @@ class Cache {
 		const sweeper = () => {
 			const now = (new Date().getTime()) / 1000;
 			for(let key in this.contentCache) {
-				if(this.contentCache[key].expire + staleTtl < now || 
+				if(this.contentCache[key].expire + staleTtl < now ||
 					this.contentCache[key].lastUsed + unusedStaleTtl < now) {
 					delete this.contentCache[key];
 				}
@@ -36,7 +36,7 @@ class Cache {
 		const expire = (cache[key] && cache[key].expire);
 		const now = (new Date().getTime()) / 1000;
 
-		if(cache[key]) {
+		if(data) {
 			cache[key].lastUsed = now;
 		}
 
