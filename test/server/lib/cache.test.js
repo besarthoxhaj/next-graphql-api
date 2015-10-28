@@ -2,6 +2,8 @@ import fetch from 'isomorphic-fetch';
 global.fetch = fetch;
 
 import chai from 'chai';
+import sinon from 'sinon';
+
 import chaiAsPromised from 'chai-as-promised';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
@@ -84,5 +86,36 @@ describe('GraphQL Cache', () => {
 				})
 			});
 		});
+	});
+
+
+	it('cleans up cache items stale items and unused stale items seperately', () => {
+		const clock = sinon.useFakeTimers();
+		const cache = new Cache(10 * 60, 5 * 60);
+
+		const now = Date.now();
+
+		const p1 = cache.cached('test-key-1', Date.now() + 50, fetcher);
+		const p2 = cache.cached('test-key-unused', 1, fetcher);
+		return Promise.all([p1,p2]).then(() => {
+
+			//After two minutes, both are still valid so remain in cache
+			clock.tick(1000 * 60 * 2);
+			expect(cache.contentCache['test-key-1']).to.exist;
+			expect(cache.contentCache['test-key-unused']).to.exist;
+
+			clock.tick(1000 * 60 * 2);
+			//Rerequest test-key-1 so it remains fresh
+			cache.cached('test-key-1', Date.now() + 50, fetcher);
+
+			clock.tick(1000 * 60 * 2);
+			expect(cache.contentCache['test-key-1']).to.exist;
+			expect(cache.contentCache['test-key-unused']).to.be.undefined;
+
+			clock.tick(1000 * 60 * 5);
+			expect(cache.contentCache['test-key-1']).to.be.undefined;
+			expect(cache.contentCache['test-key-unused']).to.be.undefined;
+		});
+
 	});
 });
