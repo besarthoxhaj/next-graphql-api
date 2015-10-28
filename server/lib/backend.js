@@ -160,8 +160,8 @@ class Backend {
 
 // Assemble the beast
 
-// serve stale cache for 12 hours
-const memCache = new Cache(12 * 60 * 60);
+// serve stale cache for 12 hours, and 30 minutes for unused items
+const memCache = new Cache(12 * 60 * 60, 30 * 60);
 
 // Adapters
 const fastFT = new FastFtFeed();

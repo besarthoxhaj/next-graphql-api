@@ -1,16 +1,17 @@
 import { metrics, logger } from 'ft-next-express';
 
 class Cache {
-	constructor(staleTtl) {
+	constructor(staleTtl, unusedStaleTtl) {
 		// in-memory content cache
 		this.contentCache = {};
 		this.requestMap = {};
+		unusedStaleTtl = unusedStaleTtl || staleTtl;
 
 		const sweeper = () => {
 			const now = (new Date().getTime()) / 1000;
-
 			for(let key in this.contentCache) {
-				if(this.contentCache[key].expire + staleTtl < now) {
+				if(this.contentCache[key].expire + staleTtl < now ||
+					this.contentCache[key].lastUsed + unusedStaleTtl < now) {
 					delete this.contentCache[key];
 				}
 			}
@@ -34,6 +35,10 @@ class Cache {
 		const data = (cache[key] && cache[key].data);
 		const expire = (cache[key] && cache[key].expire);
 		const now = (new Date().getTime()) / 1000;
+
+		if(data) {
+			cache[key].lastUsed = now;
+		}
 
 		// we have fresh data
 		if(expire > now && data) {
@@ -63,9 +68,9 @@ class Cache {
 		this.requestMap[key] = fetcher()
 		.then((it) => {
 			let expireTime = now + ttl;
-
 			this.contentCache[key] = {
 				expire: expireTime,
+				lastUsed: now,
 				data: it
 			};
 
