@@ -142,9 +142,8 @@ class Backend {
 		}
 	}
 
-	videos(id, {from, limit}, ttl = 50) {
-		return this.adapters.videos.fetch(id, ttl)
-			.then(topics => sliceList(topics, {from, limit}));
+	videos(id, ttl = 50) {
+		return this.adapters.videos.fetch(id, ttl);
 	}
 
 	list(uuid, ttl = 50) {
