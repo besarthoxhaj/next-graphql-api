@@ -147,18 +147,9 @@ const Rendition = new GraphQLObjectType({
 	fields: () => ({
 		id: { type: GraphQLID },
 		url: { type: GraphQLString },
-		width: {
-			type: GraphQLInt,
-			resolve: it => it.frameWidth
-		},
-		height: {
-			type: GraphQLInt,
-			resolve: it => it.frameHeight
-		},
-		codec: {
-			type: GraphQLString,
-			resolve: it => it.videoCodec
-		}
+		frameWidth: { type: GraphQLInt },
+		frameHeight: { type: GraphQLInt },
+		videoCodec: { type: GraphQLString }
 	})
 });
 
