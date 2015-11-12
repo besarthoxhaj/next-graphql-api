@@ -89,7 +89,7 @@ const Image = new GraphQLObjectType({
 				width: { type: new GraphQLNonNull(GraphQLInt) }
 			},
 			resolve: (it, {width}) => {
-				return `//next-geebee.ft.com/image/v1/images/raw/${it.url}?source=next&amp;fit=scale-down&amp;width=${width}`;
+				return `//next-geebee.ft.com/image/v1/images/raw/${it.url}?source=next&fit=scale-down&width=${width}`;
 			}
 		},
 		rawSrc: {
