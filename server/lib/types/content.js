@@ -131,6 +131,33 @@ const Video = new GraphQLObjectType({
 					alt: it.name
 				};
 			}
+		},
+		renditions: {
+			type: new GraphQLList(Rendition),
+			resolve: (it) => {
+				return it.renditions;
+			}
+		}
+	})
+});
+
+const Rendition = new GraphQLObjectType({
+	name: 'Rendition',
+	description: 'A Video\'s rendition',
+	fields: () => ({
+		id: { type: GraphQLID },
+		url: { type: GraphQLString },
+		width: {
+			type: GraphQLInt,
+			resolve: it => it.frameWidth
+		},
+		height: {
+			type: GraphQLInt,
+			resolve: it => it.frameHeight
+		},
+		codec: {
+			type: GraphQLString,
+			resolve: it => it.videoCodec
 		}
 	})
 });

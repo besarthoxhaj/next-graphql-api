@@ -96,16 +96,20 @@ const queryType = new GraphQLObjectType({
 		},
 		videos: {
 			type: new GraphQLList(Video),
-			resolve: (root, _, {rootValue: {backend}}) => {
+			args: {
+				from: { type: GraphQLInt },
+				limit: { type: GraphQLInt }
+			},
+			resolve: (root, {from, limit}, {rootValue: {backend}}) => {
 				let {id} = sources.videos;
-				return backend.videos(id);
+				return backend.videos(id, {from, limit});
 			}
 		},
 		popularTopics: {
 			type: new GraphQLList(Concept),
 			args: {
 				from: { type: GraphQLInt },
-				limit: { type: GraphQLInt },
+				limit: { type: GraphQLInt }
 			},
 			resolve: (root, {from, limit}, {rootValue: {backend}}) => {
 				return backend.popularTopics({from, limit})
