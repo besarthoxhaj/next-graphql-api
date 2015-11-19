@@ -1,5 +1,5 @@
 import articleGenres from 'ft-next-article-genre';
-import articlePrimaryTag from 'ft-next-article-primary-tag';
+import articleBranding from 'ft-n-article-branding';
 
 import {
 	GraphQLID,
@@ -42,6 +42,9 @@ const Content = new GraphQLInterfaceType({
 		},
 		genre: {
 			type: GraphQLString
+		},
+		branding: {
+			type: Concept
 		},
 		summary: {
 			type: GraphQLString
@@ -88,6 +91,11 @@ const Article = new GraphQLObjectType({
 		genre: {
 			type: GraphQLString,
 			resolve: content => articleGenres(content.metadata)
+		},
+		branding: {
+			type: Concept,
+			// NOTE: need to copy metadata, as it's passed around by reference
+			resolve: content => articleBranding(JSON.parse(JSON.stringify(content.metadata)))
 		},
 		summary: {
 			type: GraphQLString,
@@ -150,6 +158,11 @@ const LiveBlog = new GraphQLObjectType({
 			type: GraphQLString,
 			resolve: content => articleGenres(content.metadata)
 		},
+		branding: {
+			type: Concept,
+			// NOTE: need to copy metadata, as it's passed around by reference
+			resolve: content => articleBranding(JSON.parse(JSON.stringify(content.metadata)))
+		},
 		summary: {
 			type: GraphQLString,
 			resolve: content => content.summaries.length ? content.summaries[0] : null
@@ -168,9 +181,7 @@ const LiveBlog = new GraphQLObjectType({
 		},
 		lastPublished: {
 			type: GraphQLString,
-			resolve: (content) => {
-				resolve: content => content.publishedDate
-			}
+			resolve: content => content.publishedDate
 		},
 		relatedContent: {
 			type: new GraphQLList(Content),
@@ -193,7 +204,7 @@ const LiveBlog = new GraphQLObjectType({
 		status: {
 			type: LiveBlogStatus,
 			resolve: (content, _, { rootValue: { backend }}) => (
-				backend.liveblogExtras(content.webUrl, {})
+					backend.liveblogExtras(content.webUrl, {})
 						.then(extras => extras.status)
 			)
 		},
@@ -205,7 +216,7 @@ const LiveBlog = new GraphQLObjectType({
 				}
 			},
 			resolve: (content, { limit }, { rootValue: { backend }}) => (
-				backend.liveblogExtras(content.webUrl, { limit })
+					backend.liveblogExtras(content.webUrl, { limit })
 						.then(extras => extras.updates)
 			)
 		}
@@ -234,6 +245,30 @@ const Concept = new GraphQLObjectType({
 			type: GraphQLString,
 			description: 'Stream URL for the concept',
 			resolve: concept => `/stream/${concept.taxonomy}Id/${concept.idV1}`
+		},
+		url: {
+			type: GraphQLString,
+			description: 'Stream URL for the concept',
+			resolve: concept => `/stream/${concept.taxonomy}Id/${concept.idV1}`
+		},
+		attributes: {
+			type: new GraphQLList(ConceptAttributes)
+		},
+		headshot: {
+			type: GraphQLString
+		}
+	})
+});
+
+const ConceptAttributes = new GraphQLObjectType({
+	name: 'ConceptAttributes',
+	description: 'Attribtues of a tag',
+	fields: () => ({
+		key: {
+			type: GraphQLString
+		},
+		value: {
+			type: GraphQLString
 		}
 	})
 });
