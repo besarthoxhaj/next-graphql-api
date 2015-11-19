@@ -230,7 +230,7 @@ const Concept = new GraphQLObjectType({
 		id: {
 			type: GraphQLID,
 			description: 'Concept id',
-			resolve: concept => concept.idV1
+			resolve: concept => concept.id || concept.idV1
 		},
 		taxonomy: {
 			type: GraphQLString,
@@ -239,12 +239,12 @@ const Concept = new GraphQLObjectType({
 		name: {
 			type: GraphQLString,
 			description: 'Name of the concept',
-			resolve: concept => concept.prefLabel
+			resolve: concept => concept.name || concept.prefLabel
 		},
 		url: {
 			type: GraphQLString,
 			description: 'Stream URL for the concept',
-			resolve: concept => `/stream/${concept.taxonomy}Id/${concept.idV1}`
+			resolve: concept => `/stream/${concept.taxonomy}Id/${concept.id || concept.idV1}`
 		},
 		attributes: {
 			type: new GraphQLList(ConceptAttributes)

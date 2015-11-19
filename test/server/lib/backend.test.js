@@ -6,15 +6,15 @@ import chaiAsPromised from 'chai-as-promised';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-import contentv1fixture from './fixtures/contentv1';
+import contentFixture from './fixtures/content';
 import listfixture from './fixtures/list';
 import {Backend} from '../../../server/lib/backend';
 import PopularAPI from '../../../server/lib/backend-adapters/popular-api';
 import Cache from '../../../server/lib/cache';
 
 const mockCAPI = {
-	contentv1: () => {
-		return Promise.resolve(contentv1fixture);
+	content: () => {
+		return Promise.resolve(contentFixture);
 	},
 	list: () => {
 		return Promise.resolve(listfixture);
@@ -22,22 +22,22 @@ const mockCAPI = {
 }
 
 describe('GraphQL Backend', () => {
-	describe('#contentv1', () => {
+	describe('#content', () => {
 		const testBackend = new Backend({capi: mockCAPI}, 'test');
 
 		it('fetches stories', () => {
-			const stories = testBackend.contentv1(['some', 'ids'], {});
+			const stories = testBackend.content(['some', 'ids'], {});
 
 			return stories.then((it) => {
 				expect(it.length).to.eq(3);
 				return stories.then((it) => {
-					expect(it.length).to.eq(3);	
+					expect(it.length).to.eq(3);
 				});
 			})
 		});
 
 		it('filters stories by genre', () => {
-			const stories = testBackend.contentv1(['some', 'ids'], {genres: ['analysis', 'comment']});
+			const stories = testBackend.content(['some', 'ids'], {genres: ['analysis', 'comment']});
 
 			return stories.then((it) => {
 				expect(it.length).to.eq(2);

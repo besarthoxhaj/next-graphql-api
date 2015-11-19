@@ -2,7 +2,7 @@ import pages from '../fixtures/pages';
 import byConcept from '../fixtures/by-concept';
 import searches from '../fixtures/searches';
 import lists from '../fixtures/lists';
-import contentV1 from '../fixtures/contentV1';
+import content from '../fixtures/content';
 import { logger } from 'ft-next-express';
 
 class MockCAPI {
@@ -72,9 +72,9 @@ class MockCAPI {
 
 	// Content endpoints are not mocked because the responses are massive.
 
-	contentv1(uuids, opts) {
+	content(uuids, opts) {
 		const contentPromises = uuids.map(uuid =>
-			contentV1[uuid] ? Promise.resolve(contentV1[uuid]) : this.realBackend.contentv1(uuid, opts)
+			content[uuid] ? Promise.resolve(content[uuid]) : this.realBackend.content(uuid, opts)
 		);
 		return Promise.all(contentPromises);
 	}
