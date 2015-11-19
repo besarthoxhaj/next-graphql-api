@@ -61,8 +61,7 @@ const Page = new GraphQLObjectType({
 			},
 			resolve: (page, {from, limit, genres, type}, {rootValue: {backend}}) => {
 				if(!page.items || page.items.length < 1) { return []; }
-
-				return backend.contentv1(page.items, {from, limit, genres, type});
+				return backend.content(page.items, {from, limit, genres, type});
 			}
 		}
 	}
@@ -92,7 +91,7 @@ const ContentByConcept = new GraphQLObjectType({
 			resolve: (result, args, {rootValue: {backend}}) => {
 				if(!result.items || result.items.length < 1) { return []; }
 
-				return backend.contentv2(result.items, args);
+				return backend.content(result.items, args);
 			}
 		}
 	}
@@ -123,7 +122,7 @@ const List = new GraphQLObjectType({
 			resolve: (result, args, {rootValue: {backend}}) => {
 				if(!result.items || result.items.length < 1) { return []; }
 
-				return backend.contentv1(result.items.map(result => result.id.replace(/http:\/\/api\.ft\.com\/things?\//, '')), args);
+				return backend.content(result.items.map(result => result.id.replace(/http:\/\/api\.ft\.com\/things?\//, '')), args);
 			}
 		}
 	}

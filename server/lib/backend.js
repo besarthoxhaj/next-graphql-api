@@ -72,14 +72,9 @@ class Backend {
 		return this.adapters.capi.search(query, ttl);
 	}
 
-	contentv1(uuids, opts) {
-		return this.adapters.capi.contentv1(uuids)
-		.then(filterContent(opts, this.resolveContentType));
-	}
-
-	contentv2(uuids, opts) {
-		return this.adapters.capi.contentv2(uuids)
-		.then(filterContent(opts, this.resolveContentType));
+	content(uuids, opts) {
+		return this.adapters.capi.content(uuids)
+			.then(filterContent(opts, this.resolveContentType));
 	}
 
 	popular(url, title, ttl = 50) {
@@ -133,12 +128,10 @@ class Backend {
 	}
 
 	resolveContentType(value) {
-		if (value.item && !!value.item.location.uri.match(/liveblog|marketslive|liveqa/i)) {
+		if (/liveblog|marketslive|liveqa/i.test(value.webUrl)) {
 			return 'liveblog';
-		} else if (value.item) {
-			return 'contentv1';
 		} else {
-			return 'contentv2';
+			return 'article';
 		}
 	}
 
