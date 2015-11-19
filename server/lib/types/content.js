@@ -246,11 +246,6 @@ const Concept = new GraphQLObjectType({
 			description: 'Stream URL for the concept',
 			resolve: concept => `/stream/${concept.taxonomy}Id/${concept.idV1}`
 		},
-		url: {
-			type: GraphQLString,
-			description: 'Stream URL for the concept',
-			resolve: concept => `/stream/${concept.taxonomy}Id/${concept.idV1}`
-		},
 		attributes: {
 			type: new GraphQLList(ConceptAttributes)
 		},
