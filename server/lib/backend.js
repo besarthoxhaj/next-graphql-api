@@ -23,11 +23,11 @@ const sliceList = (items, {from, limit}) => {
 // internal content filtering logic shared for ContentV1 and ContentV2
 const filterContent = ({from, limit, genres, type}, resolveType) => {
 	return (items = []) => {
-		if(genres && genres.length) {
-			items = items.filter(it => genres.indexOf(articleGenres(it.item.metadata, {requestedProp: 'editorialTone'})) > -1);
+		if (genres && genres.length) {
+			items = items.filter(item => genres.indexOf(articleGenres(item.metadata, {requestedProp: 'editorialTone'})) > -1);
 		}
 
-		if(type) {
+		if (type) {
 			if(type === 'liveblog') {
 				items = items.filter(it => resolveType(it) === 'liveblog');
 			} else {
