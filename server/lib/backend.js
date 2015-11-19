@@ -13,6 +13,8 @@ import MockLiveblog from './backend-adapters/mock-liveblog';
 import articleGenres from 'ft-next-article-genre';
 import { logger } from 'ft-next-express';
 
+import capifyMetadata from './helpers/capifyMetadata';
+
 const sliceList = (items, {from, limit}) => {
 	items = (from ? items.slice(from) : items);
 	items = (limit ? items.slice(0, limit) : items);
@@ -24,7 +26,7 @@ const sliceList = (items, {from, limit}) => {
 const filterContent = ({from, limit, genres, type}, resolveType) => {
 	return (items = []) => {
 		if (genres && genres.length) {
-			items = items.filter(item => genres.indexOf(articleGenres(item.metadata, {requestedProp: 'editorialTone'})) > -1);
+			items = items.filter(item => genres.indexOf(articleGenres(capifyMetadata(item.metadata), {requestedProp: 'editorialTone'})) > -1);
 		}
 
 		if (type) {

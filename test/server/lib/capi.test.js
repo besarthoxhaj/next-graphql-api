@@ -64,15 +64,15 @@ describe('CAPI backend', () => {
 				expect(stubAPI.callCount).to.eq(1);
 				expect(stubAPI.args[0][0].uuid).to.eql(['a', 'b', 'c']);
 				expect(it.length).to.eq(3);
-				expect(it[0].item.metadata.genre[0].term.name).to.eq('Analysis');
-				expect(it[1].item.metadata.genre[0].term.name).to.eq('Market Report');
+				expect(it[0].metadata.find(metadata => metadata.taxonomy === 'genre').prefLabel).to.eq('Analysis');
+				expect(it[1].metadata.find(metadata => metadata.taxonomy === 'genre').prefLabel).to.eq('Market Report');
 				const secondBatch = testCAPIBackend.content(['a', 'b', 'c']);
 
 				return secondBatch.then((it) => {
 					expect(stubAPI.callCount).to.eq(1);
 					expect(it.length).to.eq(3);
-					expect(it[0].item.metadata.genre[0].term.name).to.eq('Analysis');
-					expect(it[1].item.metadata.genre[0].term.name).to.eq('Market Report');
+					expect(it[0].metadata.find(metadata => metadata.taxonomy === 'genre').prefLabel).to.eq('Analysis');
+					expect(it[1].metadata.find(metadata => metadata.taxonomy === 'genre').prefLabel).to.eq('Market Report');
 				});
 			});
 		});
@@ -83,16 +83,16 @@ describe('CAPI backend', () => {
 				expect(stubAPI.callCount).to.eq(1);
 				expect(stubAPI.args[0][0].uuid).to.eql(['a', 'b', 'c']);
 				expect(it.length).to.eq(3);
-				expect(it[0].item.metadata.genre[0].term.name).to.eq('Analysis');
-				expect(it[1].item.metadata.genre[0].term.name).to.eq('Market Report');
+				expect(it[0].metadata.find(metadata => metadata.taxonomy === 'genre').prefLabel).to.eq('Analysis');
+				expect(it[1].metadata.find(metadata => metadata.taxonomy === 'genre').prefLabel).to.eq('Market Report');
 				const secondBatch = testCAPIBackend.content(['b', 'c', 'd']);
 
 				return secondBatch.then((it) => {
 					expect(stubAPI.callCount).to.eq(2);
 					expect(stubAPI.args[1][0].uuid).to.eql(['b', 'c', 'd']);
 					expect(it.length).to.eq(3);
-					expect(it[0].item.metadata.genre[0].term.name).to.eq('Analysis');
-					expect(it[1].item.metadata.genre[0].term.name).to.eq('Market Report');
+					expect(it[0].metadata.find(metadata => metadata.taxonomy === 'genre').prefLabel).to.eq('Analysis');
+					expect(it[1].metadata.find(metadata => metadata.taxonomy === 'genre').prefLabel).to.eq('Market Report');
 				});
 			});
 		});

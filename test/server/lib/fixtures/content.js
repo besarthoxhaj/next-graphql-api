@@ -1,40 +1,26 @@
 export default [
 	{
-		item: {
-			metadata: {
-				genre: [{
-					term: { name: 'Analysis',
-						attributes: [],
-						id: 'MQ==-R2VucmVz',
-						taxonomy: 'genre'
-					}
-				}]
-			}
-		}
+		metadata: [{
+			idV1: 'MQ==-R2VucmVz',
+			prefLabel: 'Analysis',
+			taxonomy: 'genre',
+			attributes: []
+		}]
 	},
 	{
-		item: {
-			metadata: {
-				genre: [{
-					term: { name: 'Market Report',
-						attributes: [],
-						id: 'Mg==-R2VucmVz',
-						taxonomy: 'genre' }
-				}]
-			}
-		}
+		metadata: [{
+			idV1: 'Mg==-R2VucmVz',
+			prefLabel: 'Market Report',
+			taxonomy: 'genre',
+			attributes: []
+		}]
 	},
 	{
-		item: {
-			metadata: {
-				genre: [{
-					term: { name: 'Comment',
-						attributes: [],
-						id: 'OA==-R2VucmVz',
-						taxonomy: 'genre'
-					}
-				}]
-			}
-		}
+		metadata: [{
+			idV1: 'OA==-R2VucmVz',
+			prefLabel: 'Comment',
+			taxonomy: 'genre',
+			attributes: []
+		}]
 	}
 ];

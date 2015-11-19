@@ -1,6 +1,8 @@
 import articleGenres from 'ft-next-article-genre';
 import articleBranding from 'ft-n-article-branding';
 
+import capifyMetadata from '../helpers/capifyMetadata';
+
 import {
 	GraphQLID,
 	GraphQLInt,
@@ -90,7 +92,7 @@ const Article = new GraphQLObjectType({
 		},
 		genre: {
 			type: GraphQLString,
-			resolve: content => articleGenres(content.metadata)
+			resolve: content => articleGenres(capifyMetadata(content.metadata))
 		},
 		branding: {
 			type: Concept,
@@ -156,7 +158,7 @@ const LiveBlog = new GraphQLObjectType({
 		},
 		genre: {
 			type: GraphQLString,
-			resolve: content => articleGenres(content.metadata)
+			resolve: content => articleGenres(capifyMetadata(content.metadata))
 		},
 		branding: {
 			type: Concept,
