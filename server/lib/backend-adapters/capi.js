@@ -25,7 +25,8 @@ class CAPI {
 	}
 
 	content(uuids) {
-		return this.cache.cached(`${this.type}.content.${uuids.join('_')}`, 50, () => {
+		const cacheKey = `${this.type}.content.${Array.isArray(uuids) ? uuids.join('_') : uuids}`;
+		return this.cache.cached(cacheKey, 50, () => {
 			return ApiClient.content({
 				uuid: uuids,
 				index: 'v3_api_v2'
