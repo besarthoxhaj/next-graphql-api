@@ -1,5 +1,7 @@
 import articleGenres from 'ft-next-article-genre';
-import articlePrimaryTag from 'ft-next-article-primary-tag';
+import articleBranding from 'ft-n-article-branding';
+
+import capifyMetadata from '../helpers/capifyMetadata';
 
 import {
 	GraphQLID,
@@ -24,30 +26,201 @@ const Content = new GraphQLInterfaceType({
 		// to use the backend here, but GraphQL unfortunately doesn't pass the execution
 		// context to us here.
 		// Logged as https://github.com/graphql/graphql-js/issues/103
-
-		if (value.item && !!value.item.location.uri.match(/liveblog|marketslive|liveqa/i)) {
+		if (/liveblog|marketslive|liveqa/i.test(value.webUrl)) {
 			return LiveBlog;
-		} else if (value.item) {
-			return ContentV1;
 		} else {
-			return ContentV2;
+			return Article;
 		}
 	},
 	fields: () => ({
-		id: { type: GraphQLID },
-		contentType: { type: ContentType },
-		title: { type: GraphQLString },
-		genre: { type: GraphQLString },
-		summary: { type: GraphQLString },
-		primaryTag: { type: Concept },
-		primaryImage: { type: Image },
-		lastPublished: { type: GraphQLString },
+		id: {
+			type: GraphQLID
+		},
+		contentType: {
+			type: ContentType
+		},
+		title: {
+			type: GraphQLString
+		},
+		genre: {
+			type: GraphQLString
+		},
+		branding: {
+			type: Concept
+		},
+		summary: {
+			type: GraphQLString
+		},
+		primaryTag: {
+			type: Concept
+		},
+		primaryImage: {
+			type: Image
+		},
+		lastPublished: {
+			type: GraphQLString
+		},
 		relatedContent: {
 			type: new GraphQLList(Content),
 			args: {
-				from: { type: GraphQLInt },
-				limit: { type: GraphQLInt }
+				from: {
+					type: GraphQLInt
+				},
+				limit: {
+					type: GraphQLInt
+				}
 			}
+		}
+	})
+});
+
+const Article = new GraphQLObjectType({
+	name: 'Article',
+	description: 'Content item',
+	interfaces: [Content],
+	fields: () => ({
+		id: {
+			type: GraphQLID
+		},
+		contentType: {
+			type: ContentType,
+			description: 'Type of content',
+			resolve: () => 'article'
+		},
+		title: {
+			type: GraphQLString
+		},
+		genre: {
+			type: GraphQLString,
+			resolve: content => articleGenres(capifyMetadata(content.metadata))
+		},
+		branding: {
+			type: Concept,
+			// NOTE: need to copy metadata, as it's passed around by reference
+			resolve: content => articleBranding(JSON.parse(JSON.stringify(content.metadata)))
+		},
+		summary: {
+			type: GraphQLString,
+			resolve: content => content.summaries.length ? content.summaries[0] : null
+		},
+		primaryTag: {
+			type: Concept,
+			resolve: content => {
+				const primarySection = content.metadata.find(tag => tag.primary === 'section');
+				const primaryTheme = content.metadata.find(tag => tag.primary === 'theme');
+				return primaryTheme || primarySection || null;
+			}
+		},
+		primaryImage: {
+			type: Image,
+			resolve: content => content.mainImage
+		},
+		lastPublished: {
+			type: GraphQLString,
+			resolve: content => content.publishedDate
+		},
+		relatedContent: {
+			type: new GraphQLList(Content),
+			args: {
+				from: {
+					type: GraphQLInt
+				},
+				limit: {
+					type: GraphQLInt
+				}
+			},
+			resolve: (content, { from, limit }, { rootValue: { backend }}) => {
+				let storyPackageIds = content.storyPackage.map(story => story.id);
+				if (storyPackageIds.length < 1) {
+					return [];
+				}
+				return backend.content(storyPackageIds, { from, limit });
+			}
+		}
+	})
+});
+
+const LiveBlog = new GraphQLObjectType({
+	name: 'LiveBlog',
+	description: 'Live blog item',
+	interfaces: [Content],
+	fields: () => ({
+		id: {
+			type: GraphQLID
+		},
+		contentType: {
+			type: ContentType,
+			description: 'Type of content',
+			resolve: () => 'liveblog'
+		},
+		title: {
+			type: GraphQLString
+		},
+		genre: {
+			type: GraphQLString,
+			resolve: content => articleGenres(capifyMetadata(content.metadata))
+		},
+		branding: {
+			type: Concept,
+			// NOTE: need to copy metadata, as it's passed around by reference
+			resolve: content => articleBranding(JSON.parse(JSON.stringify(content.metadata)))
+		},
+		summary: {
+			type: GraphQLString,
+			resolve: content => content.summaries.length ? content.summaries[0] : null
+		},
+		primaryTag: {
+			type: Concept,
+			resolve: content => {
+				const primarySection = content.metadata.find(tag => tag.primary === 'section');
+				const primaryTheme = content.metadata.find(tag => tag.primary === 'theme');
+				return primaryTheme || primarySection || null;
+			}
+		},
+		primaryImage: {
+			type: Image,
+			resolve: content => content.mainImage
+		},
+		lastPublished: {
+			type: GraphQLString,
+			resolve: content => content.publishedDate
+		},
+		relatedContent: {
+			type: new GraphQLList(Content),
+			args: {
+				from: {
+					type: GraphQLInt
+				},
+				limit: {
+					type: GraphQLInt
+				}
+			},
+			resolve: (content, { from, limit }, { rootValue: { backend }}) => {
+				let storyPackageIds = content.storyPackage.map(story => story.id);
+				if (storyPackageIds.length < 1) {
+					return [];
+				}
+				return backend.content(storyPackageIds, { from, limit });
+			}
+		},
+		status: {
+			type: LiveBlogStatus,
+			resolve: (content, _, { rootValue: { backend }}) => (
+					backend.liveblogExtras(content.webUrl, {})
+						.then(extras => extras.status)
+			)
+		},
+		updates: {
+			type: new GraphQLList(LiveBlogUpdate),
+			args: {
+				limit: {
+					type: GraphQLInt
+				}
+			},
+			resolve: (content, { limit }, { rootValue: { backend }}) => (
+					backend.liveblogExtras(content.webUrl, { limit })
+						.then(extras => extras.updates)
+			)
 		}
 	})
 });
@@ -58,7 +231,8 @@ const Concept = new GraphQLObjectType({
 	fields: () => ({
 		id: {
 			type: GraphQLID,
-			description: 'Concept id'
+			description: 'Concept id',
+			resolve: concept => concept.id || concept.idV1
 		},
 		taxonomy: {
 			type: GraphQLString,
@@ -66,14 +240,32 @@ const Concept = new GraphQLObjectType({
 		},
 		name: {
 			type: GraphQLString,
-			description: 'Name of the concept'
+			description: 'Name of the concept',
+			resolve: concept => concept.name || concept.prefLabel
 		},
 		url: {
 			type: GraphQLString,
 			description: 'Stream URL for the concept',
-			resolve: (concept) => {
-				return `/stream/${concept.taxonomy}Id/${concept.id}`;
-			}
+			resolve: concept => `/stream/${concept.taxonomy}Id/${concept.id || concept.idV1}`
+		},
+		attributes: {
+			type: new GraphQLList(ConceptAttributes)
+		},
+		headshot: {
+			type: GraphQLString
+		}
+	})
+});
+
+const ConceptAttributes = new GraphQLObjectType({
+	name: 'ConceptAttributes',
+	description: 'Attribtues of a tag',
+	fields: () => ({
+		key: {
+			type: GraphQLString
+		},
+		value: {
+			type: GraphQLString
 		}
 	})
 });
@@ -86,22 +278,47 @@ const Image = new GraphQLObjectType({
 			type: GraphQLString,
 			description: 'Source URL of the image',
 			args: {
-				width: { type: new GraphQLNonNull(GraphQLInt) }
+				width: {
+					type: new GraphQLNonNull(GraphQLInt)
+				}
 			},
-			resolve: (it, {width}) => {
-				return `//next-geebee.ft.com/image/v1/images/raw/${it.url}?source=next&fit=scale-down&width=${width}`;
-			}
+			resolve: (image, { width }) => `//next-geebee.ft.com/image/v1/images/raw/${image.url}?source=next&fit=scale-down&width=${width}`
 		},
 		rawSrc: {
 			type: GraphQLString,
 			description: 'Original source URL of the image',
-			resolve: (it) => {
-				return it.url;
-			}
+			resolve: image => image.url
 		},
 		alt: {
 			type: GraphQLString,
-			description: 'Alternative text'
+			description: 'Alternative text',
+			resolve: image => image.description
+		}
+	})
+});
+
+const LiveBlogUpdate = new GraphQLObjectType({
+	name: 'LiveBlogUpdate',
+	description: 'Update of a live blog',
+	fields: () => ({
+		event: {
+			type: GraphQLString
+		},
+		author: {
+			type: GraphQLString,
+			resolve: update => update.data && update.data.authordisplayname
+		},
+		date: {
+			type: GraphQLString,
+			resolve: update => update.data && new Date(update.data.datemodified * 1000).toISOString()
+		},
+		text: {
+			type: GraphQLString,
+			resolve: update => update.data && update.data.text
+		},
+		html: {
+			type: GraphQLString,
+			resolve: update => update.data && update.data.html
 		}
 	})
 });
@@ -110,33 +327,31 @@ const Video = new GraphQLObjectType({
 	name: 'Video',
 	description: 'A Video',
 	fields: () => ({
-		id: { type: GraphQLID },
+		id: {
+			type: GraphQLID
+		},
 		title: {
 			type: GraphQLString,
-			resolve: (it) => it.name
+			resolve: video => video.name
 		},
 		description: {
 			type: GraphQLString,
-			resolve: (it) => it.longDescription
+			resolve: video => video.longDescription
 		},
 		lastPublished: {
 			type: GraphQLString,
-			resolve: (it) => it.publishedDate
+			resolve: video => video.publishedDate
 		},
 		image: {
 			type: Image,
-			resolve: (it) => {
-				return {
-					url: it.videoStillURL,
-					alt: it.name
-				};
-			}
+			resolve: video => ({
+				url: video.videoStillURL,
+				alt: video.name
+			})
 		},
 		renditions: {
 			type: new GraphQLList(Rendition),
-			resolve: (it) => {
-				return it.renditions;
-			}
+			resolve: video => video.renditions
 		}
 	})
 });
@@ -145,271 +360,20 @@ const Rendition = new GraphQLObjectType({
 	name: 'Rendition',
 	description: 'A Video\'s rendition',
 	fields: () => ({
-		id: { type: GraphQLID },
-		url: { type: GraphQLString },
-		frameWidth: { type: GraphQLInt },
-		frameHeight: { type: GraphQLInt },
-		videoCodec: { type: GraphQLString }
-	})
-});
-
-const ImageTypePriority = [
-	'wide-format',
-	'article',
-	'leader',
-	'primary',
-	'secondary'
-];
-
-const ContentV1 = new GraphQLObjectType({
-	name: 'ContentV1',
-	description: 'Content item',
-	interfaces: [Content],
-	fields: {
 		id: {
-			type: GraphQLID,
-			resolve: (content) => content.item.id
+			type: GraphQLID
 		},
-		contentType: {
-			type: ContentType,
-			description: 'Type of content',
-			resolve: () => 'article'
-		},
-		title: {
-			type: GraphQLString,
-			resolve: (content) => {
-				return content.item.title.title;
-			}
-		},
-		genre: {
-			type: GraphQLString,
-			resolve: (content) => articleGenres(content.item.metadata)
-		},
-		summary: {
-			type: GraphQLString,
-			resolve: (content) => {
-				return content.item.summary ? content.item.summary.excerpt : '';
-			}
-		},
-		primaryTag: {
-			type: Concept,
-			resolve: (content) => {
-				return articlePrimaryTag(content.item.metadata);
-			}
-		},
-		primaryImage: {
-			type: Image,
-			resolve: (content) => {
-				let imageMap = content.item.images.reduce((map, it) => {
-					return Object.assign({[it.type]: it}, map);
-				}, {});
-				let type = ImageTypePriority.find(it => !!imageMap[it]);
-
-				return imageMap[type];
-			}
-		},
-		lastPublished: {
-			type: GraphQLString,
-			resolve: (content) => {
-				return content.item.lifecycle.lastPublishDateTime;
-			}
-		},
-		relatedContent: {
-			type: new GraphQLList(Content),
-			args: {
-				from: { type: GraphQLInt },
-				limit: { type: GraphQLInt }
-			},
-			resolve: (content, {from, limit}, {rootValue: {backend}}) => {
-				let ids = content.item.package.map(it => it.id);
-				if(ids.length < 1) { return []; }
-
-				return backend.contentv1(ids, {from, limit});
-			}
-		}
-	}
-});
-
-const LiveBlogUpdate = new GraphQLObjectType({
-	name: 'LiveBlogUpdate',
-	description: 'Update of a live blog',
-	fields: () => ({
-		event: { type: GraphQLString },
-		author: {
-			type: GraphQLString,
-			resolve: (update) => {
-				return update.data && update.data.authordisplayname;
-			}
-		},
-		date: {
-			type: GraphQLString,
-			resolve: (update) => {
-				return update.data && new Date(update.data.datemodified * 1000).toISOString();
-			}
-		},
-		text: {
-			type: GraphQLString,
-			resolve: (update) => {
-				return update.data && update.data.text;
-			}
-		},
-		html: {
-			type: GraphQLString,
-			resolve: (update) => {
-				return update.data && update.data.html;
-			}
-		}
-	})
-});
-
-const LiveBlog = new GraphQLObjectType({
-	name: 'LiveBlog',
-	description: 'Live blog item',
-	interfaces: [Content],
-	fields: () => ({
-		id: {
-			type: GraphQLID,
-			resolve: (content) => content.item.id
-		},
-		contentType: {
-			type: ContentType,
-			description: 'Type of content',
-			resolve: () => 'liveblog'
-		},
-		title: {
-			type: GraphQLString,
-			resolve: (content) => {
-				return content.item.title.title;
-			}
-		},
-		genre: {
-			type: GraphQLString,
-			resolve: (content) => articleGenres(content.item.metadata)
-		},
-		summary: {
-			type: GraphQLString,
-			resolve: (content) => content.item.summary.excerpt
-		},
-		primaryTag: {
-			type: Concept,
-			resolve: (content) => {
-				return articlePrimaryTag(content.item.metadata);
-			}
-		},
-		primaryImage: {
-			type: Image,
-			resolve: (content) => {
-				let imageMap = content.item.images.reduce((map, it) => {
-					return Object.assign({[it.type]: it}, map);
-				}, {});
-				let type = ImageTypePriority.find(it => !!imageMap[it]);
-
-				return imageMap[type];
-			}
-		},
-		lastPublished: {
-			type: GraphQLString,
-			resolve: (content) => {
-				return content.item.lifecycle.lastPublishDateTime;
-			}
-		},
-		relatedContent: {
-			type: new GraphQLList(Content),
-			args: {
-				from: { type: GraphQLInt },
-				limit: { type: GraphQLInt }
-			},
-			resolve: (content, {from, limit}, {rootValue: {backend}}) => {
-				let ids = content.item.package.map(it => it.id);
-				if(ids.length < 1) { return []; }
-
-				return backend.contentv1(ids, {from, limit});
-			}
-		},
-		status: {
-			type: LiveBlogStatus,
-			resolve: (content, _, {rootValue: {backend}}) => {
-				const uri = content.item.location.uri;
-
-				return backend.liveblogExtras(uri, {}).then(it => it.status);
-			}
-		},
-		updates: {
-			type: new GraphQLList(LiveBlogUpdate),
-			args: {
-				limit: { type: GraphQLInt }
-			},
-			resolve: (content, {limit}, {rootValue: {backend}}) => {
-				const uri = content.item.location.uri;
-
-				return backend.liveblogExtras(uri, {limit}).then(it => it.updates);
-			}
-		}
-	})
-});
-
-const ContentV2 = new GraphQLObjectType({
-	name: 'ContentV2',
-	description: 'Content item',
-	interfaces: [Content],
-	fields: () => ({
-		id: {
-			type: GraphQLID,
-			resolve: (content) => {
-				return content.id.replace('http://www.ft.com/thing/', '');
-			}
-		},
-		contentType: {
-			type: ContentType,
-			description: 'Type of content',
-			resolve: () => 'article'
-		},
-		title: {
+		url: {
 			type: GraphQLString
 		},
-		genre: {
-			type: GraphQLString,
-			resolve: (content) => articleGenres(content.item.metadata)
+		frameWidth: {
+			type: GraphQLInt
 		},
-		summary: {
-			type: GraphQLString,
-			resolve: (content) => content.item.summary.excerpt
+		frameHeight: {
+			type: GraphQLInt
 		},
-		primaryTag: {
-			type: Concept,
-			resolve: (content) => {
-				return articlePrimaryTag(content.item.metadata);
-			}
-		},
-		primaryImage: {
-			type: Image,
-			resolve: (content) => {
-				let imageMap = content.item.images.reduce((map, it) => {
-					return Object.assign({[it.type]: it}, map);
-				}, {});
-				let type = ImageTypePriority.find(it => !!imageMap[it]);
-
-				return imageMap[type];
-			}
-		},
-		lastPublished: {
-			type: GraphQLString,
-			resolve: (content) => {
-				return content.publishedDate;
-			}
-		},
-		relatedContent: {
-			type: new GraphQLList(Content),
-			args: {
-				from: { type: GraphQLInt },
-				limit: { type: GraphQLInt }
-			},
-			resolve: (content, {from, limit}, {rootValue: {backend}}) => {
-				let ids = content.item.package.map(it => it.id);
-				if(ids.length < 1) { return []; }
-
-				return backend.contentv2(ids, {from, limit});
-			}
+		videoCodec: {
+			type: GraphQLString
 		}
 	})
 });
@@ -417,8 +381,5 @@ const ContentV2 = new GraphQLObjectType({
 export default {
 	Content,
 	Concept,
-	Image,
-	Video,
-	ContentV1,
-	ContentV2
+	Video
 };

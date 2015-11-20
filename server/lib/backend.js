@@ -13,6 +13,8 @@ import MockLiveblog from './backend-adapters/mock-liveblog';
 import articleGenres from 'ft-next-article-genre';
 import { logger } from 'ft-next-express';
 
+import capifyMetadata from './helpers/capifyMetadata';
+
 const sliceList = (items, {from, limit}) => {
 	items = (from ? items.slice(from) : items);
 	items = (limit ? items.slice(0, limit) : items);
@@ -23,11 +25,11 @@ const sliceList = (items, {from, limit}) => {
 // internal content filtering logic shared for ContentV1 and ContentV2
 const filterContent = ({from, limit, genres, type}, resolveType) => {
 	return (items = []) => {
-		if(genres && genres.length) {
-			items = items.filter(it => genres.indexOf(articleGenres(it.item.metadata, {requestedProp: 'editorialTone'})) > -1);
+		if (genres && genres.length) {
+			items = items.filter(item => genres.indexOf(articleGenres(capifyMetadata(item.metadata), {requestedProp: 'editorialTone'})) > -1);
 		}
 
-		if(type) {
+		if (type) {
 			if(type === 'liveblog') {
 				items = items.filter(it => resolveType(it) === 'liveblog');
 			} else {
@@ -72,14 +74,9 @@ class Backend {
 		return this.adapters.capi.search(query, ttl);
 	}
 
-	contentv1(uuids, opts) {
-		return this.adapters.capi.contentv1(uuids)
-		.then(filterContent(opts, this.resolveContentType));
-	}
-
-	contentv2(uuids, opts) {
-		return this.adapters.capi.contentv2(uuids)
-		.then(filterContent(opts, this.resolveContentType));
+	content(uuids, opts) {
+		return this.adapters.capi.content(uuids)
+			.then(filterContent(opts, this.resolveContentType));
 	}
 
 	popular(url, title, ttl = 50) {
@@ -133,12 +130,10 @@ class Backend {
 	}
 
 	resolveContentType(value) {
-		if (value.item && !!value.item.location.uri.match(/liveblog|marketslive|liveqa/i)) {
+		if (/liveblog|marketslive|liveqa/i.test(value.webUrl)) {
 			return 'liveblog';
-		} else if (value.item) {
-			return 'contentv1';
 		} else {
-			return 'contentv2';
+			return 'article';
 		}
 	}
 

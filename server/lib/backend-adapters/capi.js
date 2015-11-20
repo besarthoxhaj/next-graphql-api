@@ -24,18 +24,12 @@ class CAPI {
 		});
 	}
 
-	contentv1(uuids) {
-		return this.cache.cached(`${this.type}.contentv1.${Array.isArray(uuids) ? uuids.join('_') : uuids}`, 50, () => {
-			return ApiClient.contentLegacy({
-				uuid: uuids
-			});
-		});
-	}
-
-	contentv2(uuids) {
-		return this.cache.cached(`${this.type}.contentv2.${uuids.join('_')}`, 50, () => {
+	content(uuids) {
+		const cacheKey = `${this.type}.content.${Array.isArray(uuids) ? uuids.join('_') : uuids}`;
+		return this.cache.cached(cacheKey, 50, () => {
 			return ApiClient.content({
-				uuid: uuids
+				uuid: uuids,
+				index: 'v3_api_v2'
 			});
 		});
 	}
