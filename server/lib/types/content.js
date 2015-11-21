@@ -101,7 +101,7 @@ const Article = new GraphQLObjectType({
 		},
 		summary: {
 			type: GraphQLString,
-			resolve: content => content.summaries.length ? content.summaries[0] : null
+			resolve: content => (content.summaries && content.summaries.length) ? content.summaries[0] : null
 		},
 		primaryTag: {
 			type: Concept,
