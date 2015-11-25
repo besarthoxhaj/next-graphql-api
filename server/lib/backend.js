@@ -16,11 +16,12 @@ import { logger } from 'ft-next-express';
 import capifyMetadata from './helpers/capifyMetadata';
 
 const sliceList = (items, {from, limit}) => {
+	items = items || [];
 	items = (from ? items.slice(from) : items);
 	items = (limit ? items.slice(0, limit) : items);
 
 	return items;
-}
+};
 
 // internal content filtering logic shared for ContentV1 and ContentV2
 const filterContent = ({from, limit, genres, type}, resolveType) => {
