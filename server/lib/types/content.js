@@ -130,8 +130,9 @@ const Article = new GraphQLObjectType({
 				}
 			},
 			resolve: (content, { from, limit }, { rootValue: { backend }}) => {
-				let storyPackageIds = content.storyPackage.map(story => story.id);
-				if (storyPackageIds.length < 1) {
+				const storyPackage = content.storyPackage || [];
+				const storyPackageIds = storyPackage.map(story => story.id);
+				if (!storyPackageIds.length) {
 					return [];
 				}
 				return backend.content(storyPackageIds, { from, limit });
