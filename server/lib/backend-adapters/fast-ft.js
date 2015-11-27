@@ -24,7 +24,9 @@ class FastFtFeed {
 	fetchFastFt() {
 		const {uuid} = this.source;
 		return ApiClient.contentAnnotatedBy({
-			uuid: uuid
+			uuid: uuid,
+			// NOTE - hard-coded to a large number, not sure how to get the required amount in graphql-land
+			count: 20
 		})
 		.then(ids => {
 			this.contentCache = {
