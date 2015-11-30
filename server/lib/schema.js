@@ -9,7 +9,8 @@ import {
 
 import {Region} from './types/basic';
 import {Collection} from './types/collections';
-import {Video, Concept} from './types/content';
+import {Content, Video, Concept} from './types/content';
+import {ContentType} from './types/basic';
 
 import sources from '../config/sources';
 
@@ -113,6 +114,28 @@ const queryType = new GraphQLObjectType({
 			},
 			resolve: (root, {from, limit}, {rootValue: {backend}}) => {
 				return backend.popularTopics({from, limit})
+			}
+		},
+		popularArticles: {
+			type: new GraphQLList(Content),
+			args: {
+				from: {
+					type: GraphQLInt
+				},
+				limit: {
+					type: GraphQLInt
+				},
+				genres: {
+					type: new GraphQLList(GraphQLString)
+				},
+				type: {
+					type: ContentType
+				}
+			},
+			resolve: (root, args, { rootValue: { backend }}) => {
+				return backend
+					.popularArticles(args)
+					.then(articles => backend.content(articles, args));
 			}
 		}
 	}

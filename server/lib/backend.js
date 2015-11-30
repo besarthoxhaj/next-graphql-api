@@ -153,6 +153,11 @@ class Backend {
 		return this.adapters.popularApi.topics(ttl)
 		.then(topics => sliceList(topics, {from, limit}));
 	}
+
+	popularArticles(args, ttl = 50) {
+		return this.adapters.popularApi.articles(ttl)
+			.then(articles => sliceList(articles, args));
+	}
 }
 
 // Assemble the beast
