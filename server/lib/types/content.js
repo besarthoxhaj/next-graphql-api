@@ -379,7 +379,7 @@ const Rendition = new GraphQLObjectType({
 	})
 });
 
-export default {
+export {
 	Content,
 	Concept,
 	Video

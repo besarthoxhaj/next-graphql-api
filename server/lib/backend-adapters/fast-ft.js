@@ -1,10 +1,6 @@
 import ApiClient from 'next-ft-api-client';
 import { captureError } from 'express-errors-handler';
 
-// FIXME sources shouldn't be necessary here
-// we should be able to pass the fastFT uuid from the top
-import sources from '../../config/sources';
-
 // Polls for changes on the notification api to determine whether a fetch should
 // be made for new content. Hopefully this is a little nicer to the content api
 // polling it directly.
@@ -65,6 +61,4 @@ class FastFtFeed {
 	fetch() {	return this.contentCache; }
 }
 
-const backend = new FastFtFeed(sources.fastFt);
-
-export default () => backend;
+export default FastFtFeed;

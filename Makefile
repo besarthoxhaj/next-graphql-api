@@ -26,7 +26,7 @@ watch:
 	nbt build --dev --watch
 
 run:
-	nbt run
+	nbt run --local
 
 provision:
 	nbt float -md --testapp ${TEST_APP}

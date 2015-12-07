@@ -49,7 +49,7 @@ const LiveBlogStatus = new GraphQLEnumType({
 	}
 });
 
-export default {
+export {
 	Region,
 	ContentType,
 	LiveBlogStatus

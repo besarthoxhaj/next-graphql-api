@@ -7,6 +7,8 @@ import Liveblog from './backend-adapters/liveblog';
 import Playlist from './backend-adapters/playlist';
 import PopularAPI from './backend-adapters/popular-api';
 
+import sources from '../config/sources';
+
 import MockCAPI from './backend-adapters/mock-capi';
 import MockLiveblog from './backend-adapters/mock-liveblog';
 
@@ -166,7 +168,7 @@ class Backend {
 const memCache = new Cache(12 * 60 * 60, 30 * 60);
 
 // Adapters
-const fastFT = new FastFtFeed();
+const fastFT = new FastFtFeed(sources.fastFt);
 const capi = new CAPI(memCache);
 const popular = new Popular(memCache);
 const liveblog = new Liveblog(memCache);
