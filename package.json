@@ -8,6 +8,7 @@
     "test": "make test"
   },
   "dependencies": {
+    "babel-core": "^6.3.15",
     "babel-plugin-add-module-exports": "^0.1.1",
     "babel-plugin-transform-es2015-destructuring": "^6.3.13",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.3.13",
@@ -39,13 +40,5 @@
   },
   "engines": {
     "node": "4.2.3"
-  },
-  "babel": {
-    "plugins": [
-      "add-module-exports",
-      "transform-es2015-destructuring",
-      "transform-es2015-modules-commonjs",
-      "transform-es2015-parameters"
-    ]
   }
 }
