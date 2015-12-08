@@ -13,7 +13,6 @@
     "babel-plugin-transform-es2015-destructuring": "^6.3.13",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.3.13",
     "babel-plugin-transform-es2015-parameters": "^6.3.13",
-    "babel-register": "^6.3.13",
     "body-parser": "^1.13.3",
     "directly": "^1.0.1",
     "express-errors-handler": "^1.4.2",
