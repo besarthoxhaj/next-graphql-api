@@ -156,7 +156,12 @@ class Backend {
 	}
 
 	popularArticles(args, ttl = 50) {
-		return this.adapters.hui.list('sector', 'http://api.ft.com/things/96486956-8505-312b-bbaa-20926a9fd790', ttl)
+		return this.adapters.popularApi.articles(ttl)
+			.then(articles => sliceList(articles, args));
+	}
+
+	popularByIndustry(args, ttl = 50) {
+		return this.adapters.hui.content('industry', args.industry, ttl)
 			.then(articles => sliceList(articles, args));
 	}
 
@@ -195,10 +200,10 @@ const backend = new Backend({
 const mockBackend = new Backend({
 	fastFT: fastFT,
 	capi: mockedCAPI,
+	hui: hui,
 	popular: popular,
 	liveblog: mockLiveblog,
 	videos: playlist,
-	hui: hui,
 	popularApi: popularApi
 }, 'mocked');
 
