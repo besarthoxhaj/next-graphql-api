@@ -8,11 +8,11 @@
     "test": "make test"
   },
   "dependencies": {
-    "babel-core": "^6.3.15",
     "babel-plugin-add-module-exports": "^0.1.1",
     "babel-plugin-transform-es2015-destructuring": "^6.3.13",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.3.13",
     "babel-plugin-transform-es2015-parameters": "^6.3.13",
+    "babel-register": "^6.3.13",
     "body-parser": "^1.13.3",
     "directly": "^1.0.1",
     "express-errors-handler": "^1.4.2",
@@ -27,7 +27,6 @@
     "s3o-middleware": "^1.1.2"
   },
   "devDependencies": {
-    "babel-register": "^6.3.13",
     "chai": "^3.2.0",
     "chai-as-promised": "^5.1.0",
     "eslint-plugin-react": "^3.5.0",
