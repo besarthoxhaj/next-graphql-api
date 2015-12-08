@@ -12,7 +12,7 @@ verify:
 	obt verify --esLintPath=./.eslintrc
 
 unit-test:
-	mocha --compilers js:babel/register --recursive --reporter spec test/server/
+	mocha --require test/setup --recursive --reporter spec test/server/
 
 test: verify unit-test
 
@@ -26,7 +26,7 @@ watch:
 	nbt build --dev --watch
 
 run:
-	nbt run
+	nbt run --local
 
 provision:
 	nbt float -md --testapp ${TEST_APP}

@@ -6,4 +6,3 @@ require('babel-register')({
         'transform-es2015-parameters'
     ]
 });
-require('./init');

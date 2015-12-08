@@ -23,7 +23,7 @@ describe('CAPI backend', () => {
 
 		before(() => {
 			stubAPI = sinon.stub(ApiClient, 'content', (opts) => {
-				if(opts.uuid.includes('invalid')) {
+				if(opts.uuid.indexOf('invalid') > -1) {
 					return Promise.reject('Fetch failed');
 				}
 				return Promise.resolve(contentFixture);
@@ -37,7 +37,7 @@ describe('CAPI backend', () => {
 
 		after(() => {
 			stubAPI.restore();
-		})
+		});
 
 		it('fetches stories', () => {
 			const stories = testCAPIBackend.content(['valid', 'another-valid']);

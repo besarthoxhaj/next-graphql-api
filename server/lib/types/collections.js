@@ -6,8 +6,8 @@ import {
 	GraphQLInterfaceType
 } from 'graphql';
 
-import {Content} from './content';
-import {ContentType} from './basic';
+import { Content } from './content';
+import { ContentType } from './basic';
 
 const Collection = new GraphQLInterfaceType({
 	name: 'Collection',
@@ -128,7 +128,7 @@ const List = new GraphQLObjectType({
 	}
 });
 
-export default {
+export {
 	Collection,
 	Page,
 	ContentByConcept,
