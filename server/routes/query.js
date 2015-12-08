@@ -19,7 +19,7 @@ export default (req, res, next) => {
 
 	graphql(
 		{
-			mock: true
+			mock: flags.mockFrontPage
 		},
 		flags
 	)
