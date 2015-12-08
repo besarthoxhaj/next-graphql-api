@@ -6,12 +6,9 @@ class Hui {
 		this.cache = cache;
 	}
 
-	content(facet, uuid, ttl = 50) {
-		return this.cache.cached(`${this.type}.${facet}.${uuid}`, ttl, () => {
-
-			let opts = {};
-			opts[facet] = uuid;
-			return ApiClient.hui(opts);
+	content({industry, position, sector, country}, ttl = 50) {
+		return this.cache.cached(`${this.type}.${industry}.${position}.${sector}.${country}`, ttl, () => {
+			return ApiClient.hui({industry, position, sector, country});
 		});
 	}
 

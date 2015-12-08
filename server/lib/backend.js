@@ -160,8 +160,8 @@ class Backend {
 			.then(articles => sliceList(articles, args));
 	}
 
-	popularByIndustry(args, ttl = 50) {
-		return this.adapters.hui.content('industry', args.industry, ttl)
+	popularFromHui(args, ttl = 50) {
+		return this.adapters.hui.content(args, ttl)
 			.then(articles => sliceList(articles, args));
 	}
 
