@@ -137,6 +137,40 @@ const queryType = new GraphQLObjectType({
 					.popularArticles(args)
 					.then(articles => backend.content(articles, args));
 			}
+		},
+		popularFromHui: {
+			type: new GraphQLList(Content),
+			args: {
+				industry: {
+					type: GraphQLString
+				},
+				position: {
+					type: GraphQLString
+				},
+				sector: {
+					type: GraphQLString
+				},
+				country: {
+					type: GraphQLString
+				},
+				from: {
+					type: GraphQLInt
+				},
+				limit: {
+					type: GraphQLInt
+				},
+				genres: {
+					type: new GraphQLList(GraphQLString)
+				},
+				type: {
+					type: ContentType
+				}
+			},
+			resolve: (root, args, { rootValue: { backend }}) => {
+				return backend
+					.popularFromHui(args)
+					.then(articles => backend.content(articles, args));
+			},
 		}
 	}
 });

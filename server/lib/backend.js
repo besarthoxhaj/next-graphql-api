@@ -2,6 +2,7 @@ import Cache from './cache';
 
 import FastFtFeed from './backend-adapters/fast-ft';
 import CAPI from './backend-adapters/capi';
+import Hui from './backend-adapters/hui';
 import Popular from './backend-adapters/popular';
 import Liveblog from './backend-adapters/liveblog';
 import Playlist from './backend-adapters/playlist';
@@ -158,6 +159,13 @@ class Backend {
 		return this.adapters.popularApi.articles(ttl)
 			.then(articles => sliceList(articles, args));
 	}
+
+	popularFromHui(args, ttl = 50) {
+		return this.adapters.hui.content(args, ttl)
+			.then(articles => sliceList(articles, args));
+	}
+
+
 }
 
 // Assemble the beast
@@ -168,6 +176,7 @@ const memCache = new Cache(12 * 60 * 60, 30 * 60);
 // Adapters
 const fastFT = new FastFtFeed();
 const capi = new CAPI(memCache);
+const hui = new Hui(memCache);
 const popular = new Popular(memCache);
 const liveblog = new Liveblog(memCache);
 const playlist = new Playlist(memCache);
@@ -180,6 +189,7 @@ const mockLiveblog = new MockLiveblog(liveblog);
 const backend = new Backend({
 	fastFT: fastFT,
 	capi: capi,
+	hui: hui,
 	popular: popular,
 	liveblog: liveblog,
 	videos: playlist,
@@ -190,6 +200,7 @@ const backend = new Backend({
 const mockBackend = new Backend({
 	fastFT: fastFT,
 	capi: mockedCAPI,
+	hui: hui,
 	popular: popular,
 	liveblog: mockLiveblog,
 	videos: playlist,
