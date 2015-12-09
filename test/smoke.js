@@ -60,6 +60,8 @@ const query = `
 		}
 	}`;
 
+const getTestUrls = {};
+getTestUrls['/data?query=' + query] = 200;
 
 module.exports = [
 	{
@@ -76,5 +78,15 @@ module.exports = [
 		urls: {
 			'/': 200
 		}
+	},
+	{
+		headers: {
+			'Accept': 'application/json',
+			'Content-Type': 'application/json',
+			'X-API-KEY': process.env.GRAPHQL_API_KEY
+		},
+		method: 'GET',
+		timeout: 8000,
+		urls: getTestUrls
 	}
 ];
