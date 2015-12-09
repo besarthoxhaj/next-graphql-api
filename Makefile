@@ -12,7 +12,7 @@ verify:
 	obt verify --esLintPath=./.eslintrc
 
 unit-test:
-	mocha --require test/setup --recursive --reporter spec test/server/
+	export MYFT_API_URL="http://my.ft.com/"; mocha --require test/setup --recursive --reporter spec test/server/
 
 test: verify unit-test
 

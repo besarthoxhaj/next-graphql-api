@@ -1,5 +1,3 @@
-import myftClient from 'next-myft-client';
-import apiClient from 'next-ft-api-client';
 import {
 	GraphQLEnumType,
 	GraphQLObjectType,

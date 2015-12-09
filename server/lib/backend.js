@@ -169,7 +169,7 @@ class Backend {
 	}
 
 	userArticles(uuid, ttl = 50) {
-		return this.adapters.myft.userArticles(uuid);
+		return this.adapters.myft.userArticles(uuid, ttl);
 	}
 }
 
@@ -207,7 +207,7 @@ const backend = new Backend({
 const mockBackend = new Backend({
 	fastFT,
 	capi: mockedCAPI,
-	hui: hui,
+	hui,
 	popular,
 	liveblog: mockLiveblog,
 	video,
