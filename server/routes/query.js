@@ -9,7 +9,6 @@ export default (req, res, next) => {
 	}
 
 	const flags = res.locals.flags;
-console.log(req.query);
 	const query = req.body.query || req.query.query || req.body;
 	const vars = JSON.parse(req.body.variables || '{}');
 
@@ -26,6 +25,9 @@ console.log(req.query);
 	)
 		.fetch(query, vars)
 		.then(data => {
+			if(req.method === 'GET') {
+				res.set({'Surrogate-Control': 'max-age=120,stale-while-revalidate=6,stale-if-error=259200'});
+			}
 			res.json(data);
 		})
 		.catch(errs => {
