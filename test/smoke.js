@@ -61,7 +61,7 @@ const query = `
 	}`;
 
 const getTestUrls = {};
-getTestUrls['/?query=' + query] = 200;
+getTestUrls['/data?query=' + query] = 200;
 
 module.exports = [
 	{
