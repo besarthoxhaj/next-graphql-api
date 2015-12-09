@@ -9,7 +9,8 @@ export default (req, res, next) => {
 	}
 
 	const flags = res.locals.flags;
-	const query = req.body.query || req.body || req.query.query;
+console.log(req.query);
+	const query = req.body.query || req.query.query || req.body;
 	const vars = JSON.parse(req.body.variables || '{}');
 
 	if (!Object.keys(query).length) {
