@@ -26,11 +26,8 @@ app.get('/__gtg', (req, res) => {
 });
 
 import query from './routes/query';
-app.post('/', externalAuth);
-app.post('/', query);
-app.get('/data', externalAuth);
-app.get('/data', cors);
-app.get('/data', query);
+app.post('/', externalAuth, query);
+app.get('/data', externalAuth, cors, query);
 
 import authS3O from 's3o-middleware';
 import index from './routes/index';
