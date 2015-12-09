@@ -1,4 +1,15 @@
-import {GraphQLEnumType} from 'graphql';
+import myftClient from 'next-myft-client';
+import apiClient from 'next-ft-api-client';
+import {
+	GraphQLEnumType,
+	GraphQLObjectType,
+	GraphQLNonNull,
+	GraphQLString,
+	GraphQLList,
+	GraphQLInt
+} from 'graphql';
+
+import { Content } from './content';
 
 const Region = new GraphQLEnumType({
 	name: 'Region',
@@ -49,8 +60,36 @@ const LiveBlogStatus = new GraphQLEnumType({
 	}
 });
 
+const User = new GraphQLObjectType({
+	name: 'User',
+	description: 'Represents an FT user',
+	fields: {
+		uuid: {
+			type: new GraphQLNonNull(GraphQLString)
+		},
+		saved: {
+			type: new GraphQLList(Content),
+			args: {
+				limit: {
+					type: GraphQLInt
+				}
+			},
+			resolve: (source, { limit }, { rootValue: { backend }}) => {
+				return backend.userArticles(source.uuid)
+					.then(res => {
+						if (!res || !res.items) {
+							return [];
+						}
+						return backend.content(res.items.map(item => item.uuid), { limit })
+					});
+			}
+		}
+	}
+});
+
 export {
 	Region,
 	ContentType,
-	LiveBlogStatus
+	LiveBlogStatus,
+	User
 };

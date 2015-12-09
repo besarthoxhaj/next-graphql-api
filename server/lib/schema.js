@@ -7,10 +7,10 @@ import {
 	GraphQLList,
 } from 'graphql';
 
-import {Region} from './types/basic';
-import {Collection} from './types/collections';
-import {Content, Video, Concept} from './types/content';
-import {ContentType} from './types/basic';
+import { Region, User } from './types/basic';
+import { Collection } from './types/collections';
+import { Content, Video, Concept } from './types/content';
+import { ContentType } from './types/basic';
 
 import sources from '../config/sources';
 
@@ -170,7 +170,18 @@ const queryType = new GraphQLObjectType({
 				return backend
 					.popularFromHui(args)
 					.then(articles => backend.content(articles, args));
+			}
+		},
+		user: {
+			type: User,
+			args: {
+				uuid: {
+					type: new GraphQLNonNull(GraphQLString)
+				}
 			},
+			resolve: (root, args) => {
+				return { uuid: args.uuid };
+			}
 		}
 	}
 });

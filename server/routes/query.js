@@ -17,12 +17,7 @@ export default (req, res, next) => {
 		return res.status(400).send();
 	}
 
-	graphql(
-		{
-			mock: flags.mockFrontPage
-		},
-		flags
-	)
+	graphql({ mock: flags.mockFrontPage }, flags)
 		.fetch(query, vars)
 		.then(data => {
 			res.json(data);

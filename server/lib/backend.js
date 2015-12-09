@@ -1,3 +1,6 @@
+import articleGenres from 'ft-next-article-genre';
+import { logger } from 'ft-next-express';
+
 import Cache from './cache';
 
 import FastFtFeed from './backend-adapters/fast-ft';
@@ -5,16 +8,14 @@ import CAPI from './backend-adapters/capi';
 import Hui from './backend-adapters/hui';
 import Popular from './backend-adapters/popular';
 import Liveblog from './backend-adapters/liveblog';
-import Playlist from './backend-adapters/playlist';
+import Video from './backend-adapters/video';
 import PopularAPI from './backend-adapters/popular-api';
+import Myft from './backend-adapters/myft';
 
 import sources from '../config/sources';
 
 import MockCAPI from './backend-adapters/mock-capi';
 import MockLiveblog from './backend-adapters/mock-liveblog';
-
-import articleGenres from 'ft-next-article-genre';
-import { logger } from 'ft-next-express';
 
 import capifyMetadata from './helpers/capifyMetadata';
 
@@ -142,7 +143,7 @@ class Backend {
 	}
 
 	videos(id, {from, limit}, ttl = 50) {
-		return this.adapters.videos.fetch(id, ttl)
+		return this.adapters.video.playlist(id, ttl)
 			.then(topics => sliceList(topics, {from, limit}));
 	}
 
@@ -167,7 +168,9 @@ class Backend {
 			.then(articles => sliceList(articles, args));
 	}
 
-
+	userArticles(uuid, ttl = 50) {
+		return this.adapters.myft.userArticles(uuid);
+	}
 }
 
 // Assemble the beast
@@ -181,32 +184,35 @@ const capi = new CAPI(memCache);
 const hui = new Hui(memCache);
 const popular = new Popular(memCache);
 const liveblog = new Liveblog(memCache);
-const playlist = new Playlist(memCache);
+const video = new Video(memCache);
 const popularApi = new PopularAPI(memCache);
+const myft = new Myft(memCache);
 
 // Mock Adapters
 const mockedCAPI = new MockCAPI(capi);
 const mockLiveblog = new MockLiveblog(liveblog);
 
 const backend = new Backend({
-	fastFT: fastFT,
-	capi: capi,
-	hui: hui,
-	popular: popular,
-	liveblog: liveblog,
-	videos: playlist,
-	popularApi: popularApi
+	fastFT,
+	capi,
+	hui,
+	popular,
+	liveblog,
+	video,
+	popularApi,
+	myft
 }, 'real');
 
 // Mock backend
 const mockBackend = new Backend({
-	fastFT: fastFT,
+	fastFT,
 	capi: mockedCAPI,
 	hui: hui,
-	popular: popular,
+	popular,
 	liveblog: mockLiveblog,
-	videos: playlist,
-	popularApi: popularApi
+	video,
+	popularApi,
+	myft
 }, 'mocked');
 
 export default {
