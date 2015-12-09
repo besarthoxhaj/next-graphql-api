@@ -60,6 +60,8 @@ const query = `
 		}
 	}`;
 
+const getTestUrls = {};
+getTestUrls['/?query=' + query] = 200;
 
 module.exports = [
 	{
@@ -84,12 +86,7 @@ module.exports = [
 			'X-API-KEY': process.env.GRAPHQL_API_KEY
 		},
 		method: 'GET',
-		body: JSON.stringify({
-			query: query
-		}),
 		timeout: 8000,
-		urls: {
-			`/?query=${query}`: 200
-		}
+		urls: getTestUrls
 	}
 ];
