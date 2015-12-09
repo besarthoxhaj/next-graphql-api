@@ -7,6 +7,7 @@ import nHealth from 'n-health';
 
 import additionalHealthChecks from './lib/health-checks/index';
 import externalAuth from './middleware/external-auth';
+import cors from './middleware/cors';
 
 const healthChecks = nHealth(path.resolve(__dirname, './config/health-checks'), additionalHealthChecks);
 const app = express({
@@ -28,6 +29,7 @@ import query from './routes/query';
 app.post('/', externalAuth);
 app.post('/', query);
 app.get('/data', externalAuth);
+app.get('/data', cors);
 app.get('/data', query);
 
 import authS3O from 's3o-middleware';
