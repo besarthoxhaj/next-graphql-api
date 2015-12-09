@@ -76,5 +76,20 @@ module.exports = [
 		urls: {
 			'/': 200
 		}
+	},
+	{
+		headers: {
+			'Accept': 'application/json',
+			'Content-Type': 'application/json',
+			'X-API-KEY': process.env.GRAPHQL_API_KEY
+		},
+		method: 'GET',
+		body: JSON.stringify({
+			query: query
+		}),
+		timeout: 8000,
+		urls: {
+			`/?query=${query}`: 200
+		}
 	}
 ];
