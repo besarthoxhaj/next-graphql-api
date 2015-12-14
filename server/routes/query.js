@@ -24,7 +24,7 @@ export default (req, res, next) => {
 			if(req.method === 'GET') {
 				res.set({'Surrogate-Control': 'max-age=120,stale-while-revalidate=6,stale-if-error=259200'});
 			}
-			res.json(data);
+			res.jsonp(data);
 		})
 		.catch(errs => {
 			const err = Array.isArray(errs) ? errs.shift() : errs;
