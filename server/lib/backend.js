@@ -168,8 +168,19 @@ class Backend {
 			.then(articles => sliceList(articles, args));
 	}
 
-	userArticles(uuid, ttl = 50) {
-		return this.adapters.myft.userArticles(uuid, ttl);
+	userSavedContent(args, ttl = -1) {
+		return this.adapters.myft.savedContent(args, ttl)
+			.then(res => res.items);
+	}
+
+	userFollowedConcepts(args, ttl = -1) {
+		return this.adapters.myft.followedConcepts(args, ttl)
+			.then(res => res.items);
+	}
+
+	userPersonalisedFeed(args, ttl = -1) {
+		return this.adapters.myft.personalisedFeed(args, ttl)
+			.then(res => sliceList(res.results, args));
 	}
 }
 

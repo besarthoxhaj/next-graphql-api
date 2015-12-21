@@ -7,10 +7,11 @@ import {
 	GraphQLList,
 } from 'graphql';
 
-import { Region, User } from './types/basic';
+import { Region } from './types/basic';
 import { Collection } from './types/collections';
 import { Content, Video, Concept } from './types/content';
 import { ContentType } from './types/basic';
+import User from './types/user';
 
 import sources from '../config/sources';
 
