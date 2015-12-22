@@ -1,4 +1,5 @@
 import ApiClient from 'next-ft-api-client';
+import sliceList from '../helpers/sliceList';
 
 class Hui {
 	constructor(cache) {
@@ -6,9 +7,12 @@ class Hui {
 		this.cache = cache;
 	}
 
-	content({industry, position, sector, country}, ttl = 50) {
+	content({industry, position, sector, country, from, limit}, ttl = 50) {
+		console.log('hui content', {industry, position, sector, country, from, limit});
+
 		return this.cache.cached(`${this.type}.${industry}.${position}.${sector}.${country}`, ttl, () => {
-			return ApiClient.hui({industry, position, sector, country});
+			return ApiClient.hui({industry, position, sector, country})
+				.then(articles => sliceList(articles, {from, limit}));
 		});
 	}
 

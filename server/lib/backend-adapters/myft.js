@@ -1,4 +1,5 @@
 import myftClient from 'next-myft-client';
+import sliceList from '../helpers/capifyMetadata';
 
 class Myft {
     constructor(cache) {
@@ -9,15 +10,17 @@ class Myft {
     savedContent(args, ttl = -1) {
         return this.cache.cached(`${this.type}.user.${args.uuid}.saved.content`, ttl, () => (
             myftClient.getAllRelationship('user', args.uuid, 'saved', 'content', args )
+            .then(res => res.items)
         ));
     }
 
 		followedConcepts(args, ttl=-1) {
 			return this.cache.cached(`${this.type}.user.${args.uuid}.followed.concepts`, ttl, () => (
 					myftClient.getAllRelationship('user', args.uuid, 'followed', 'concept', args)
+					.then(res => res.items)
 			));
 		}
-		
+
 		personalisedFeed(args, ttl=-1) {
 			return this.cache.cached(`${this.type}.user.${args.uuid}.personalised-feed`, ttl, () => (
 				fetch(`https://ft-next-personalised-feed-api.herokuapp.com/v1/feed/${args.uuid}?originatingSignals=followed&from=-7d`, {
@@ -26,6 +29,7 @@ class Myft {
 					}
 				})
 				.then(res => res.json())
+				.then(res => sliceList(res.results, args))
 			));
 		}
 }
