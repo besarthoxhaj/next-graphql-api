@@ -4,7 +4,7 @@ import {
 	GraphQLNonNull,
 	GraphQLString,
 	GraphQLInt,
-	GraphQLList,
+	GraphQLList
 } from 'graphql';
 
 import { Region } from './types/basic';
@@ -39,6 +39,7 @@ const queryType = new GraphQLObjectType({
 		editorsPicks: {
 			type: Collection,
 			resolve: (root, _, {rootValue: {flags}}) => {
+				console.log('flags', flags);
 				if (flags && flags.editorsPicksFromList) {
 					return backend(flags).capi.list(sources['editorsPicks'].uuid);
 				} else {
@@ -114,6 +115,7 @@ const queryType = new GraphQLObjectType({
 				limit: { type: GraphQLInt }
 			},
 			resolve: (root, {from, limit}, {rootValue: {flags}}) => {
+				console.log('about to get popularApi')
 				return backend(flags).popularApi.topics({from, limit})
 			}
 		},

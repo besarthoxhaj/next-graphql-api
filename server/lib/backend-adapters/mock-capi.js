@@ -2,8 +2,12 @@ import pages from '../fixtures/pages';
 import byConcept from '../fixtures/by-concept';
 import searches from '../fixtures/searches';
 import lists from '../fixtures/lists';
+import content from '../fixtures/content/index';
 
 import { logger } from 'ft-next-express';
+
+import filterContent from '../helpers/filter-content';
+import resolveContentType from '../helpers/resolve-content-type';
 
 class MockCAPI {
 	constructor(realBackend) {
@@ -56,7 +60,7 @@ class MockCAPI {
 
 	list(uuid, opts) {
 		let list = lists[uuid];
-
+		console.log('')
 		if (list) {
 			return Promise.resolve(list);
 		}
@@ -71,7 +75,23 @@ class MockCAPI {
 	// Content endpoints are not mocked because the responses are massive.
 
 	content(uuids, opts) {
-		return this.realBackend.content(uuids, opts);
+		let filter = (it) => it;
+		let mockContent = [];
+		let realUuids = [];
+		uuids.forEach(uuid => {
+			if(content[uuid]) {
+				mockContent.push(Promise.resolve(content[uuid]));
+				// filter = filterContent(opts, resolveContentType);
+			} else {
+				realUuids.push(uuid);
+			}
+		});
+		return Promise.all(Promise.all(mockContent), this.realBackend.content(realUuids))
+		.then(([mock, real]) => {
+			console.log('mock', mock);
+			console.log('real', real);
+			return real.concat(filterContent(opts, resolveContentType))
+		});
 	}
 
 	contentv2(uuids, opts) {

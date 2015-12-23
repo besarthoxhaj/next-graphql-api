@@ -8,9 +8,13 @@ class PopularAPI {
 	}
 
 	topics({from, limit}, ttl = 50) {
+
+		console.log('in here');
 		const url = `${this.baseUrl}/topics?apiKey=${this.apiKey}`;
 
 		return this.cache.cached('popular-api.topics', ttl, () => {
+			console.log('fetching', url);
+
 			return fetch(url)
 				.then(response => response.json())
 				.then(topics => sliceList(topics, {from, limit}));
