@@ -1,13 +1,6 @@
 import {
 	GraphQLEnumType,
-	GraphQLObjectType,
-	GraphQLNonNull,
-	GraphQLString,
-	GraphQLList,
-	GraphQLInt
 } from 'graphql';
-
-import { Content, Concept } from './content';
 
 const Region = new GraphQLEnumType({
 	name: 'Region',

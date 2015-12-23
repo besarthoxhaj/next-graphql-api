@@ -210,7 +210,7 @@ const LiveBlog = new GraphQLObjectType({
 		status: {
 			type: LiveBlogStatus,
 			resolve: (content, _, {rootValue: {flags}}) => (
-					backend(flags).liveblog.fetch(content.webUrl, {  })
+					backend(flags).liveblog.fetch(content.webUrl, { })
 						.then(extras => extras.status)
 			)
 		},

@@ -2,9 +2,7 @@ import ApiClient from 'next-ft-api-client';
 import filterContent from '../helpers/filter-content';
 import resolveContentType from '../helpers/resolve-content-type';
 
-
 import { logger } from 'ft-next-express';
-
 
 
 class CAPI {
@@ -28,7 +26,7 @@ class CAPI {
 		});
 	}
 
-	byConcept(uuid, ttl = 50) {
+	byConcept(uuid, title, ttl = 50) {
 		return this.cache.cached(`${this.type}.byconcept.${uuid}`, ttl, () => {
 			return ApiClient.contentAnnotatedBy({ uuid: uuid })
 				.then(ids => ({

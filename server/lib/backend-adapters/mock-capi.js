@@ -2,10 +2,6 @@ import pages from '../fixtures/pages';
 import byConcept from '../fixtures/by-concept';
 import searches from '../fixtures/searches';
 import lists from '../fixtures/lists';
-import content from '../fixtures/content';
-
-import resolveContentType from '../helpers/resolve-content-type';
-import filterContent from '../helpers/filter-content';
 
 import { logger } from 'ft-next-express';
 
