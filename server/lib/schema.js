@@ -104,7 +104,7 @@ const queryType = new GraphQLObjectType({
 			},
 			resolve: (root, {from, limit}, {rootValue: {flags}}) => {
 				let {id} = sources.videos;
-				return backend(flags).video.playlist(id, {from, limit});
+				return backend(flags).video.fetch(id, {from, limit});
 			}
 		},
 		popularTopics: {
