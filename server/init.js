@@ -1,10 +1,13 @@
 import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
 import path from 'path';
 
 import express from 'ft-next-express';
 import nHealth from 'n-health';
 
 import additionalHealthChecks from './lib/health-checks/index';
+import externalAuth from './middleware/external-auth';
+import cors from './middleware/cors';
 
 const healthChecks = nHealth(path.resolve(__dirname, './config/health-checks'), additionalHealthChecks);
 const app = express({
@@ -14,6 +17,7 @@ const app = express({
 });
 const logger = express.logger;
 
+app.use(cookieParser());
 app.use(bodyParser.text());
 app.use(bodyParser.json());
 
@@ -22,7 +26,8 @@ app.get('/__gtg', (req, res) => {
 });
 
 import query from './routes/query';
-app.post('/', query);
+app.post('/', externalAuth, query);
+app.get('/data', externalAuth, cors, query);
 
 import authS3O from 's3o-middleware';
 import index from './routes/index';

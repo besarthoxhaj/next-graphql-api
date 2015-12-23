@@ -5,13 +5,17 @@ class Playlist {
 		this.cache = cache;
 	}
 
-	playlist(id, {from, limit}, ttl = 50) {
+	fetch(id, {from, limit}, ttl = 50) {
 		return this.cache.cached(`videos.playlist.${id}`, ttl, () => {
 			return fetch(`http://next-video.ft.com/api/playlist/${encodeURI(id)}?videoFields=id,name,renditions,longDescription,publishedDate,videoStillURL`)
 				.then(res => res.json())
 				.then(json => json.items)
-				.then(topics => sliceList(topics, {from, limit}));
-		});
+				.then(json => {
+					const renditionsPresent = obj => obj.renditions.length > 0;
+					return json.filter(renditionsPresent);
+				});
+		})
+		.then(topics => sliceList(topics, {from, limit}));
 	}
 }
 
