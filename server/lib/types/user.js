@@ -8,6 +8,7 @@ import {
 } from 'graphql';
 
 import { Content, Concept } from './content';
+import backend from '../backend-adapters/index';
 
 const User = new GraphQLObjectType({
 	name: 'User',
@@ -23,13 +24,13 @@ const User = new GraphQLObjectType({
 					type: GraphQLInt
 				}
 			},
-			resolve: (source, { limit }, { rootValue: { backend }}) => {
-				return backend.userSavedContent({ uuid: source.uuid, limit: limit } )
+			resolve: (source, { limit }, {rootValue: {flags}}) => {
+				return backend(flags).myft.savedContent({ uuid: source.uuid, limit: limit } )
 					.then(items => {
 						if (!items) {
 							return [];
 						}
-						return backend.content(items.map(item => item.uuid), { limit })
+						return backend(flags).capi.content(items.map(item => item.uuid), { limit })
 					});
 			}
 		},
@@ -40,13 +41,12 @@ const User = new GraphQLObjectType({
 					type: GraphQLInt
 				}
 			},
-			resolve: (source, { limit }, { rootValue: { backend }}) => {
-				return backend.userFollowedConcepts({ uuid: source.uuid, limit: limit })
+			resolve: (source, { limit }, {rootValue: {flags}}) => {
+				return backend(flags).myft.followedConcepts({ uuid: source.uuid, limit: limit })
 					.then(items => {
 						if (!items) {
 							return [];
 						}
-						console.log(items);
 						return items
 					});
 			}
@@ -58,8 +58,8 @@ const User = new GraphQLObjectType({
 					type: GraphQLInt
 				}
 			},
-			resolve: (source, { limit }, { rootValue: { backend }}) => {
-				return backend.userPersonalisedFeed({ uuid: source.uuid, limit: limit })
+			resolve: (source, { limit }, {rootValue: {flags}}) => {
+				return backend(flags).myft.personalisedFeed({ uuid: source.uuid, limit: limit })
 					.then(items => {
 						if (!items) {
 							return [];

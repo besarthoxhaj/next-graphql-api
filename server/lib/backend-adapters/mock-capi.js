@@ -3,6 +3,10 @@ import byConcept from '../fixtures/by-concept';
 import searches from '../fixtures/searches';
 import lists from '../fixtures/lists';
 import content from '../fixtures/content';
+
+import resolveContentType from '../helpers/resolve-content-type';
+import filterContent from '../helpers/filter-content';
+
 import { logger } from 'ft-next-express';
 
 class MockCAPI {
@@ -11,11 +15,9 @@ class MockCAPI {
 	}
 
 	page(uuid, sectionsId, ttl = 50) {
-		let page = pages[uuid].items;
-		page.title = pages[uuid].title;
 
-		if(page) {
-			return Promise.resolve(page);
+		if(pages[uuid]) {
+			return Promise.resolve(pages[uuid])
 		}
 
 		return this.realBackend.page(uuid, ttl)
@@ -73,10 +75,7 @@ class MockCAPI {
 	// Content endpoints are not mocked because the responses are massive.
 
 	content(uuids, opts) {
-		const contentPromises = uuids.map(uuid =>
-			content[uuid] ? Promise.resolve(content[uuid]) : this.realBackend.content(uuid, opts)
-		);
-		return Promise.all(contentPromises);
+		return this.realBackend.content(uuids, opts);
 	}
 
 	contentv2(uuids, opts) {

@@ -1,34 +1,11 @@
 import ApiClient from 'next-ft-api-client';
-import articleGenres from 'ft-next-article-genre';
-import sliceList from '../helpers/sliceList';
+import filterContent from '../helpers/filter-content';
+import resolveContentType from '../helpers/resolve-content-type';
 
 
-const resolveContentType = (value) => {
-	if (/liveblog|marketslive|liveqa/i.test(value.webUrl)) {
-		return 'liveblog';
-	} else {
-		return 'article';
-	}
-}
+import { logger } from 'ft-next-express';
 
-// internal content filtering logic shared for ContentV1 and ContentV2
-const filterContent = ({from, limit, genres, type}, resolveType) => {
-	return (items = []) => {
-		if (genres && genres.length) {
-			items = items.filter(item => genres.indexOf(articleGenres(capifyMetadata(item.metadata), {requestedProp: 'editorialTone'})) > -1);
-		}
 
-		if (type) {
-			if(type === 'liveblog') {
-				items = items.filter(it => resolveType(it) === 'liveblog');
-			} else {
-				items = items.filter(it => resolveType(it) !== 'liveblog');
-			}
-		}
-
-		return sliceList(items, {from, limit});
-	};
-};
 
 class CAPI {
 	constructor(cache) {
@@ -36,7 +13,7 @@ class CAPI {
 		this.cache = cache;
 	}
 
-	page(uuid, ttl = 50) {
+	page(uuid, sectionsId, ttl = 50) {
 		return this.cache.cached(`${this.type}.pages.${uuid}`, ttl, () => {
 			return ApiClient.pages({ uuid: uuid })
 				.then(it => ({
@@ -70,17 +47,14 @@ class CAPI {
 	}
 
 	content(uuids, opts, ttl=50) {
-		console.log('uuids', uuids);
-		console.log('opts', opts);
 		const cacheKey = `${this.type}.content.${Array.isArray(uuids) ? uuids.join('_') : uuids}`;
 		return this.cache.cached(cacheKey, ttl, () => {
 			return ApiClient.content({
 				uuid: uuids,
 				index: 'v3_api_v2'
 			})
-			.then(filterContent(opts, resolveContentType));
-
-		});
+		})
+		.then(filterContent(opts, resolveContentType))
 	}
 
 	list(uuid, ttl = 50) {

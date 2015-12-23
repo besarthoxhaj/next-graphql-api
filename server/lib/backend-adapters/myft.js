@@ -1,5 +1,5 @@
 import myftClient from 'next-myft-client';
-import sliceList from '../helpers/capifyMetadata';
+import sliceList from '../helpers/sliceList';
 
 class Myft {
     constructor(cache) {
@@ -23,7 +23,7 @@ class Myft {
 
 		personalisedFeed(args, ttl=-1) {
 			return this.cache.cached(`${this.type}.user.${args.uuid}.personalised-feed`, ttl, () => (
-				fetch(`https://ft-next-personalised-feed-api.herokuapp.com/v1/feed/${args.uuid}?originatingSignals=followed&from=-7d`, {
+				fetch(`https://ft-next-personalised-feed-api.herokuapp.com/v2/feed/${args.uuid}?originatingSignals=followed&from=-7d`, {
 					headers: {
 						'X-FT-Personalised-Feed-Api-Key': process.env.PERSONALISED_FEED_API_KEY
 					}

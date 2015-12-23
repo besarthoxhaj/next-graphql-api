@@ -8,6 +8,7 @@ import {
 
 import { Content } from './content';
 import { ContentType } from './basic';
+import backend from '../backend-adapters/index';
 
 const Collection = new GraphQLInterfaceType({
 	name: 'Collection',
@@ -59,9 +60,9 @@ const Page = new GraphQLObjectType({
 				genres: { type: new GraphQLList(GraphQLString) },
 				type: { type: ContentType }
 			},
-			resolve: (page, {from, limit, genres, type}, {rootValue: {backend}}) => {
+			resolve: (page, {from, limit, genres, type}, {rootValue: {flags}}) => {
 				if(!page.items || page.items.length < 1) { return []; }
-				return backend.content(page.items, {from, limit, genres, type});
+				return backend(flags).capi.content(page.items, {from, limit, genres, type});
 			}
 		}
 	}
@@ -88,10 +89,10 @@ const ContentByConcept = new GraphQLObjectType({
 				genres: { type: new GraphQLList(GraphQLString) },
 				type: { type: ContentType }
 			},
-			resolve: (result, args, {rootValue: {backend}}) => {
+			resolve: (result, args, {rootValue: {flags}}) => {
 				if(!result.items || result.items.length < 1) { return []; }
 
-				return backend.content(result.items, args);
+				return backend(flags).capi.content(result.items, args);
 			}
 		}
 	}
@@ -119,10 +120,11 @@ const List = new GraphQLObjectType({
 				genres: { type: new GraphQLList(GraphQLString) },
 				type: { type: ContentType }
 			},
-			resolve: (result, args, {rootValue: {backend}}) => {
+			resolve: (result, args, {rootValue: {flags}}) => {
+
 				if(!result.items || result.items.length < 1) { return []; }
 
-				return backend.content(result.items.map(result => result.id.replace(/http:\/\/api\.ft\.com\/things?\//, '')), args);
+				return backend(flags).capi.content(result.items.map(result => result.id.replace(/http:\/\/api\.ft\.com\/things?\//, '')), args);
 			}
 		}
 	}

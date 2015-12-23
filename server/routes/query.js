@@ -16,8 +16,8 @@ export default (req, res, next) => {
 		logger.warn('Empty query supplied');
 		return res.status(400).send();
 	}
-
-	graphql({ mock: flags.mockFrontPage }, flags)
+	
+	graphql(flags)
 		.fetch(query, vars)
 		.then(data => {
 			res.json(data);

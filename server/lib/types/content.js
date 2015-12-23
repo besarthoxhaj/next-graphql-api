@@ -3,6 +3,8 @@ import articleBranding from 'ft-n-article-branding';
 
 import capifyMetadata from '../helpers/capifyMetadata';
 
+import backend from '../backend-adapters/index';
+
 import {
 	GraphQLID,
 	GraphQLInt,
@@ -26,6 +28,7 @@ const Content = new GraphQLInterfaceType({
 		// to use the backend here, but GraphQL unfortunately doesn't pass the execution
 		// context to us here.
 		// Logged as https://github.com/graphql/graphql-js/issues/103
+
 		if (/liveblog|marketslive|liveqa/i.test(value.webUrl)) {
 			return LiveBlog;
 		} else {
@@ -129,13 +132,13 @@ const Article = new GraphQLObjectType({
 					type: GraphQLInt
 				}
 			},
-			resolve: (content, { from, limit }, { rootValue: { backend }}) => {
+			resolve: (content, { from, limit }, {rootValue: {flags}}) => {
 				const storyPackage = content.storyPackage || [];
 				const storyPackageIds = storyPackage.map(story => story.id);
 				if (!storyPackageIds.length) {
 					return [];
 				}
-				return backend.content(storyPackageIds, { from, limit });
+				return backend(flags).capi.content(storyPackageIds, { from, limit });
 			}
 		}
 	})
@@ -196,18 +199,18 @@ const LiveBlog = new GraphQLObjectType({
 					type: GraphQLInt
 				}
 			},
-			resolve: (content, { from, limit }, { rootValue: { backend }}) => {
+			resolve: (content, { from, limit }, {rootValue: {flags}}) => {
 				let storyPackageIds = content.storyPackage.map(story => story.id);
 				if (storyPackageIds.length < 1) {
 					return [];
 				}
-				return backend.content(storyPackageIds, { from, limit });
+				return backend(flags).capi.content(storyPackageIds, { from, limit });
 			}
 		},
 		status: {
 			type: LiveBlogStatus,
-			resolve: (content, _, { rootValue: { backend }}) => (
-					backend.liveblogExtras(content.webUrl, {})
+			resolve: (content, _, {rootValue: {flags}}) => (
+					backend(flags).liveblog.fetch(content.webUrl, {  })
 						.then(extras => extras.status)
 			)
 		},
@@ -218,8 +221,8 @@ const LiveBlog = new GraphQLObjectType({
 					type: GraphQLInt
 				}
 			},
-			resolve: (content, { limit }, { rootValue: { backend }}) => (
-					backend.liveblogExtras(content.webUrl, { limit })
+			resolve: (content, { limit }, {rootValue: {flags}}) => (
+					backend(flags).liveblog.fetch(content.webUrl, { limit })
 						.then(extras => extras.updates)
 			)
 		}
