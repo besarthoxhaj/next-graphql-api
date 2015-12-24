@@ -1,5 +1,5 @@
 import ApiClient from 'next-ft-api-client';
-import sliceList from '../helpers/sliceList';
+import sliceList from '../helpers/slice-list';
 
 class Hui {
 	constructor(cache) {

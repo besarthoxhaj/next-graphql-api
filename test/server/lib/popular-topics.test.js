@@ -7,7 +7,7 @@ import chaiAsPromised from 'chai-as-promised';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-import Popular from '../../../server/lib/backend-adapters/popular';
+import Popular from '../../../server/lib/backend-adapters/popular-api';
 import Cache from '../../../server/lib/cache';
 
 
@@ -29,7 +29,7 @@ describe('#popularTopics', () => {
 	const testBackend = new Popular(cache);
 
 	it('fetches topics', () => {
-		testBackend.fetch({})
+		testBackend.topics({})
 		.then(it => {
 			expect(it.length).to.eq(2);
 		})

@@ -1,5 +1,5 @@
 import myftClient from 'next-myft-client';
-import sliceList from '../helpers/sliceList';
+import sliceList from '../helpers/slice-list';
 
 class Myft {
     constructor(cache) {

@@ -1,4 +1,4 @@
-class Popular {
+class PopularFTContent {
 	constructor(cache) {
 		this.cache = cache;
 	}
@@ -24,4 +24,4 @@ class Popular {
 	}
 }
 
-export default Popular;
+export default PopularFTContent;

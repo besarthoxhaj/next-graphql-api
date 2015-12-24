@@ -83,7 +83,7 @@ const queryType = new GraphQLObjectType({
 			resolve: (root, _, {rootValue: {flags}}) => {
 				let url = sources.popular.url;
 
-				return backend(flags).popular.fetch(url, 'Popular');
+				return backend(flags).popularFTContent.fetch(url, 'Popular');
 			}
 		},
 		search: {

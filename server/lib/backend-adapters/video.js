@@ -1,4 +1,4 @@
-import sliceList from '../helpers/sliceList';
+import sliceList from '../helpers/slice-list';
 
 class Playlist {
 	constructor(cache) {
