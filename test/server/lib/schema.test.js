@@ -2,12 +2,9 @@ import realFetch from 'isomorphic-fetch';
 global.fetch = realFetch;
 
 import chai from 'chai';
-import sinon from 'sinon';
 chai.should();
 
-import {graphql} from 'graphql';
 import graphqlClient from '../../../server/lib/graphql';
-import schema from '../../../server/lib/schema';
 
 describe('GraphQL Schema', () => {
 	describe('#list', () => {
@@ -41,7 +38,7 @@ describe('GraphQL Schema', () => {
 	describe('popularTopics', () => {
 
 		before(() => {
-			global.fetch = function() {
+			global.fetch = function () {
 				return Promise.resolve({
 					json: () => [
 						{id: 'abc', taxonomy: 'foo', name: 'One'},

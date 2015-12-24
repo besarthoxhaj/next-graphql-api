@@ -5,7 +5,10 @@ import capifyMetadata from '../helpers/capifyMetadata';
 // internal content filtering logic shared for ContentV1 and ContentV2
 export default ({from, limit, genres, type}, resolveType) => {
 	return (items = []) => {
-		items = [].concat(items);
+
+		if(!Array.isArray(items)) {
+			return [items];
+		}
 
 		if (genres && genres.length) {
 			items = items.filter(item => genres.indexOf(articleGenres(capifyMetadata(item.metadata), {requestedProp: 'editorialTone'})) > -1);

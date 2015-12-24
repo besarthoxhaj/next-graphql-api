@@ -60,7 +60,6 @@ class MockCAPI {
 
 	list(uuid, opts) {
 		let list = lists[uuid];
-		console.log('')
 		if (list) {
 			return Promise.resolve(list);
 		}
@@ -75,23 +74,12 @@ class MockCAPI {
 	// Content endpoints are not mocked because the responses are massive.
 
 	content(uuids, opts) {
-		let filter = (it) => it;
-		let mockContent = [];
-		let realUuids = [];
-		uuids.forEach(uuid => {
-			if(content[uuid]) {
-				mockContent.push(Promise.resolve(content[uuid]));
-				// filter = filterContent(opts, resolveContentType);
-			} else {
-				realUuids.push(uuid);
-			}
-		});
-		return Promise.all(Promise.all(mockContent), this.realBackend.content(realUuids))
-		.then(([mock, real]) => {
-			console.log('mock', mock);
-			console.log('real', real);
-			return real.concat(filterContent(opts, resolveContentType))
-		});
+		const contentPromises = uuids.map(uuid =>
+			content[uuid] ? Promise.resolve(content[uuid]) : this.realBackend.content(uuid, opts)
+			);
+			return Promise.all(contentPromises)
+			.then(content => content.map(item => Array.isArray(item) ? item[0] : item))
+			.then(filterContent(opts, resolveContentType));
 	}
 
 	contentv2(uuids, opts) {
