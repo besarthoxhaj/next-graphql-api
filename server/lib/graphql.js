@@ -4,11 +4,12 @@ import {printSchema} from 'graphql/utilities';
 import schema from './schema';
 import { logger } from 'ft-next-express';
 
-const fetch = (flags = {}) => {
+const fetch = (flags = {}, isUserRequest, userUuid) => {
+	console.log('userUuid', userUuid);
 	return (query, vars) => {
 		const then = new Date().getTime();
 
-		return graphql(schema, query, { flags }, vars)
+		return graphql(schema, query, { flags, isUserRequest, userUuid }, vars)
 			.then(it => {
 				const now = new Date().getTime();
 
@@ -23,7 +24,7 @@ const fetch = (flags = {}) => {
 	};
 };
 
-export default (flags = {}) => ({
-	fetch: fetch(flags),
+export default (flags = {}, isUserRequest, userUuid) => ({
+	fetch: fetch(flags, isUserRequest, userUuid),
 	printSchema: () => printSchema(schema)
 });

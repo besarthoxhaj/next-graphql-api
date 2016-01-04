@@ -177,7 +177,7 @@ const queryType = new GraphQLObjectType({
 			type: User,
 			args: {
 				uuid: {
-					type: new GraphQLNonNull(GraphQLString)
+					type: GraphQLString
 				}
 			},
 			resolve: (root, args) => {

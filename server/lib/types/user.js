@@ -14,7 +14,7 @@ const User = new GraphQLObjectType({
 	description: 'Represents an FT user',
 	fields: {
 		uuid: {
-			type: new GraphQLNonNull(GraphQLString)
+			type: GraphQLString
 		},
 		saved: {
 			type: new GraphQLList(Content),
@@ -23,8 +23,13 @@ const User = new GraphQLObjectType({
 					type: GraphQLInt
 				}
 			},
-			resolve: (source, { limit }, {rootValue: {flags}}) => {
-				return backend(flags).myft.savedContent({ uuid: source.uuid, limit: limit } )
+			resolve: (source, { limit=10 }, {rootValue: {flags, isUserRequest, userUuid}}) => {
+				console.log(isUserRequest, userUuid, source);
+				const uuid = userUuid || (!isUserRequest && source.uuid);
+				if(!uuid) {
+					throw 401;
+				};
+				return backend(flags).myft.savedContent({ uuid: uuid, limit: limit } )
 					.then(items => {
 						if (!items) {
 							return [];
@@ -40,7 +45,7 @@ const User = new GraphQLObjectType({
 					type: GraphQLInt
 				}
 			},
-			resolve: (source, { limit }, {rootValue: {flags}}) => {
+			resolve: (source, { limit=10 }, {rootValue: {flags}}) => {
 				return backend(flags).myft.followedConcepts({ uuid: source.uuid, limit: limit })
 					.then(items => {
 						if (!items) {
@@ -57,7 +62,7 @@ const User = new GraphQLObjectType({
 					type: GraphQLInt
 				}
 			},
-			resolve: (source, { limit }, {rootValue: {flags}}) => {
+			resolve: (source, { limit=10 }, {rootValue: {flags}}) => {
 				return backend(flags).myft.personalisedFeed({ uuid: source.uuid, limit: limit })
 					.then(items => {
 						if (!items) {

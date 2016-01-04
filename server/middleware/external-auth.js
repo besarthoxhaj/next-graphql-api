@@ -15,20 +15,30 @@ export default (req, res, next) => {
 
 	let authPromise;
 
+	res.locals.isUserRequest = true;
+
 	if (sessionToken) {
 		const headers = req.headers;
 
 		delete headers.host;
 		delete headers['content-length']; //API urls send this and it breaks session fetch
 
-		authPromise = fetch('https://session-next.ft.com/validate', {
+		authPromise = fetch('https://session-next.ft.com/uuid', {
 			timeout: 2000,
 			headers: headers
 		})
 		.then(response => {
-			if (response.status === 404) {
+			if (!response.ok) {
 				throw 401;
 			}
+			return response.json();
+		})
+		.then(response => {
+
+			if(!response.uuid) {
+				throw 401;
+			}
+			res.locals.uuid = response.uuid;
 			return next();
 		})
 		.catch(err => {

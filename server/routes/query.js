@@ -12,8 +12,9 @@ export default (req, res, next) => {
 		logger.warn('Empty query supplied');
 		return res.status(400).send();
 	}
-	
-	graphql(flags)
+
+	console.log('uuid', res.locals.uuid);	
+	graphql(flags, res.locals.isUserRequest, res.locals.uuid)
 		.fetch(query, vars)
 		.then(data => {
 			if(req.method === 'GET') {
