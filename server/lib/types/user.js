@@ -1,6 +1,5 @@
 import {
 	GraphQLObjectType,
-	GraphQLNonNull,
 	GraphQLString,
 	GraphQLList,
 	GraphQLInt

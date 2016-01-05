@@ -54,7 +54,7 @@ describe('Authentication', () => {
 		it('can request normal data via GET', () => {
 			return request(app)
 			.get(`/data?apiKey=${process.env.GRAPHQL_API_KEY}&query=${encodeURIComponent(queries.normal)}`)
-			.expect(200);
+		.expect(200);
 		});
 
 		it('can request user data with a user uuid via GET', () => {
@@ -145,7 +145,7 @@ describe('Authentication', () => {
 			.get(`/data?query=${encodeURIComponent(queries.userFromClient)}`)
 			.set('Cookie', 'FTSession=session-token')
 			.expect(200)
-			.expect((response) => {
+			.expect(() => {
 				fetchMock.called('session-service').should.be.true;
 				fetchMock.called('myft-api').should.be.true;
 			})
@@ -201,7 +201,7 @@ describe('Authentication', () => {
 			.get(`/data?query=${encodeURIComponent(queries.userFromClient)}`)
 			.set('Cookie', 'FTSession=invalid-session-token')
 			.expect(401)
-			.expect((response) => {
+			.expect(() => {
 				fetchMock.called('session-service').should.be.true;
 				fetchMock.called('myft-api').should.be.false;
 			})
@@ -247,7 +247,7 @@ describe('Authentication', () => {
 			return request(app)
 			.get(`/data?query=${encodeURIComponent(queries.userFromClient)}`)
 			.expect(401)
-			.expect((response) => {
+			.expect(() => {
 				fetchMock.called('session-service').should.be.false;
 				fetchMock.called('myft-api').should.be.false;
 			})
