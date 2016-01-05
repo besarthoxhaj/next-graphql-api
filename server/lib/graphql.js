@@ -5,7 +5,6 @@ import schema from './schema';
 import { logger } from 'ft-next-express';
 
 const fetch = (flags = {}, isUserRequest, userUuid) => {
-	console.log('userUuid', userUuid);
 	return (query, vars) => {
 		const then = new Date().getTime();
 

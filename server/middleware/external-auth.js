@@ -27,18 +27,13 @@ export default (req, res, next) => {
 			timeout: 2000,
 			headers: headers
 		})
-		.then(response => {
-			if (!response.ok) {
-				throw 401;
-			}
-			return response.json();
-		})
+		.then(response => response.json())
 		.then(response => {
 
-			if(!response.uuid) {
-				throw 401;
+			if(response.uuid) {
+				res.locals.uuid = response.uuid;
 			}
-			res.locals.uuid = response.uuid;
+
 			return next();
 		})
 		.catch(err => {
@@ -52,8 +47,8 @@ export default (req, res, next) => {
 	}
 
 	authPromise.catch(() => {
-		res.set('Cache-Control', 'private, max-age=0, no-cache');
-		res.sendStatus(401);
+		res.locals.uuid = undefined;
+		next();
 	});
 
 };
