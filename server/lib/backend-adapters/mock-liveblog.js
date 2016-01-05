@@ -6,11 +6,10 @@ class MockLiveblog {
 		this.realBackend = realBackend;
 	}
 
-	fetch(uri, ttl = 50) {
+	fetch(uri, opts, ttl = 50) {
 		const liveblog = liveblogs[uri];
-
 		if(liveblog) {
-			return Promise.resolve(liveblog);
+			return Promise.resolve(liveblog).then((json) => this.realBackend.parse(json, opts.limit));
 		}
 
 		return this.realBackend.fetch(uri, ttl)

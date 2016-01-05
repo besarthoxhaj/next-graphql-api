@@ -2,8 +2,12 @@ import pages from '../fixtures/pages';
 import byConcept from '../fixtures/by-concept';
 import searches from '../fixtures/searches';
 import lists from '../fixtures/lists';
-import content from '../fixtures/content';
+import content from '../fixtures/content/index';
+
 import { logger } from 'ft-next-express';
+
+import filterContent from '../helpers/filter-content';
+import resolveContentType from '../helpers/resolve-content-type';
 
 class MockCAPI {
 	constructor(realBackend) {
@@ -11,11 +15,9 @@ class MockCAPI {
 	}
 
 	page(uuid, sectionsId, ttl = 50) {
-		let page = pages[uuid].items;
-		page.title = pages[uuid].title;
 
-		if(page) {
-			return Promise.resolve(page);
+		if(pages[uuid]) {
+			return Promise.resolve(pages[uuid])
 		}
 
 		return this.realBackend.page(uuid, ttl)
@@ -58,7 +60,6 @@ class MockCAPI {
 
 	list(uuid, opts) {
 		let list = lists[uuid];
-
 		if (list) {
 			return Promise.resolve(list);
 		}
@@ -75,8 +76,10 @@ class MockCAPI {
 	content(uuids, opts) {
 		const contentPromises = uuids.map(uuid =>
 			content[uuid] ? Promise.resolve(content[uuid]) : this.realBackend.content(uuid, opts)
-		);
-		return Promise.all(contentPromises);
+			);
+			return Promise.all(contentPromises)
+			.then(content => content.map(item => Array.isArray(item) ? item[0] : item))
+			.then(filterContent(opts, resolveContentType));
 	}
 
 	contentv2(uuids, opts) {

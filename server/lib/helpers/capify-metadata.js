@@ -5,9 +5,11 @@ const convertMetadata = (metadata, taxonomy) => metadata
 /**
  * Take ESv3 style metadata and convert it back to CAPI style
  */
-const capifyMetadata = metadata => ({
+const capifyMetadata = metadata => {
+	return {
     genre: convertMetadata(metadata, 'genre'),
     sections: convertMetadata(metadata, 'sections')
-});
+	}
+};
 
 export default capifyMetadata;

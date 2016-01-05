@@ -13,12 +13,7 @@ export default (req, res, next) => {
 		return res.status(400).send();
 	}
 
-	graphql(
-		{
-			mock: flags.mockFrontPage
-		},
-		flags
-	)
+	graphql(flags, res.locals.isUserRequest, res.locals.uuid)
 		.fetch(query, vars)
 		.then(data => {
 			if(req.method === 'GET') {
@@ -28,6 +23,9 @@ export default (req, res, next) => {
 		})
 		.catch(errs => {
 			const err = Array.isArray(errs) ? errs.shift() : errs;
+			if(Number.isInteger(parseInt(err.message))) {
+				return res.send(parseInt(err.message));
+			}
 			next(err);
 		});
 };

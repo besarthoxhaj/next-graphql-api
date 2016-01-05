@@ -1,18 +1,15 @@
-import fetch from 'isomorphic-fetch';
-global.fetch = fetch;
+import realFetch from 'isomorphic-fetch';
+global.fetch = realFetch;
 
 import chai from 'chai';
-import sinon from 'sinon';
 chai.should();
 
-import {graphql} from 'graphql';
 import graphqlClient from '../../../server/lib/graphql';
-import schema from '../../../server/lib/schema';
 
 describe('GraphQL Schema', () => {
 	describe('#list', () => {
 		it('fetches list', () => {
-			return graphqlClient({ mock: true }, { editorsPicksFromList: true })
+			return graphqlClient({ mockFrontPage: true, editorsPicksFromList: true })
 				.fetch(`
 					query List {
 						editorsPicks {
@@ -39,14 +36,21 @@ describe('GraphQL Schema', () => {
 	});
 
 	describe('popularTopics', () => {
-		const topics = Promise.resolve([
-			{id: 'abc', taxonomy: 'foo', name: 'One'},
-			{id: 'def', taxonomy: 'bar', name: 'Two'}
-		]);
 
-		const backendSpy = {
-			popularTopics: sinon.stub().returns(topics)
-		};
+		before(() => {
+			global.fetch = function () {
+				return Promise.resolve({
+					json: () => [
+						{id: 'abc', taxonomy: 'foo', name: 'One'},
+						{id: 'def', taxonomy: 'bar', name: 'Two'}
+					]
+				})
+			}
+		});
+
+		after(() => {
+			global.fetch = realFetch;
+		});
 
 		it('fetches a list of topics', () => {
 			const query = `query Topics {
@@ -56,15 +60,16 @@ describe('GraphQL Schema', () => {
 				}
 			}`;
 
-			return graphql(schema, query, { backend: backendSpy })
-			.then(({data: {popularTopics}}) => {
-				popularTopics.length.should.eq(2);
+			return graphqlClient()
+			.fetch(query)
+			.then((data) => {
+				data.popularTopics.length.should.eq(2);
 
-				popularTopics[0].name.should.eq('One');
-				popularTopics[0].url.should.eq('/stream/fooId/abc');
+				data.popularTopics[0].name.should.eq('One');
+				data.popularTopics[0].url.should.eq('/stream/fooId/abc');
 
-				popularTopics[1].name.should.eq('Two');
-				popularTopics[1].url.should.eq('/stream/barId/def');
+				data.popularTopics[1].name.should.eq('Two');
+				data.popularTopics[1].url.should.eq('/stream/barId/def');
 			})
 		})
 	})

@@ -1,3 +1,5 @@
+import sliceList from '../helpers/slice-list';
+
 class PopularAPI {
 	constructor(cache) {
 		this.cache = cache;
@@ -5,22 +7,27 @@ class PopularAPI {
 		this.apiKey = process.env.POPULAR_API_KEY;
 	}
 
-	topics(ttl = 50) {
+	topics({from, limit}, ttl = 50) {
+
 		const url = `${this.baseUrl}/topics?apiKey=${this.apiKey}`;
 
 		return this.cache.cached('popular-api.topics', ttl, () => {
+
 			return fetch(url)
-				.then(response => response.json());
+				.then(response => response.json())
+				.then(topics => sliceList(topics, {from, limit}));
+
 		});
 	}
 
-	articles(ttl = 50) {
+	articles({from, limit}, ttl = 50) {
 		const url = `${this.baseUrl}/articles?apiKey=${this.apiKey}`;
 
 		return this.cache.cached('popular-api.articles', ttl, () => {
 			return fetch(url)
 				.then(response => response.json())
-				.then(json => (json.articles || []).map(article => article.uuid));
+				.then(json => (json.articles || []).map(article => article.uuid))
+				.then(articles => sliceList(articles, {from, limit}));
 		});
 	}
 }

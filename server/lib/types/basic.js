@@ -1,4 +1,6 @@
-import {GraphQLEnumType} from 'graphql';
+import {
+	GraphQLEnumType,
+} from 'graphql';
 
 const Region = new GraphQLEnumType({
 	name: 'Region',
