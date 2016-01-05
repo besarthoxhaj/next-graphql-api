@@ -8,7 +8,7 @@ import {
 import { Content, Concept } from './content';
 import backend from '../backend-adapters/index';
 
-const auth = (requestedUUID, sessionUUID, isUserRequest) => {	
+const auth = (requestedUUID, sessionUUID, isUserRequest) => {
 	const uuid = sessionUUID || (!isUserRequest && requestedUUID);
 	if(uuid) {
 		if(sessionUUID && requestedUUID && sessionUUID !== requestedUUID) {
@@ -55,8 +55,9 @@ const User = new GraphQLObjectType({
 					type: GraphQLInt
 				}
 			},
-			resolve: (source, { limit=10 }, {rootValue: {flags}}) => {
-				return backend(flags).myft.followedConcepts({ uuid: source.uuid, limit: limit })
+			resolve: (source, { limit=10 }, {rootValue: {flags, isUserRequest, userUuid}}) => {
+				const uuid = auth(source.uuid, userUuid, isUserRequest);
+				return backend(flags).myft.followedConcepts({ uuid: uuid, limit: limit })
 					.then(items => {
 						if (!items) {
 							return [];
@@ -72,8 +73,9 @@ const User = new GraphQLObjectType({
 					type: GraphQLInt
 				}
 			},
-			resolve: (source, { limit=10 }, {rootValue: {flags}}) => {
-				return backend(flags).myft.personalisedFeed({ uuid: source.uuid, limit: limit })
+			resolve: (source, { limit=10 }, {rootValue: {flags, isUserRequest, userUuid}}) => {
+				const uuid = auth(source.uuid, userUuid, isUserRequest);
+				return backend(flags).myft.personalisedFeed({ uuid: uuid, limit: limit })
 					.then(items => {
 						if (!items) {
 							return [];
