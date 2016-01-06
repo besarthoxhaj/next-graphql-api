@@ -2,8 +2,6 @@ import ApiClient from 'next-ft-api-client';
 import filterContent from '../helpers/filter-content';
 import resolveContentType from '../helpers/resolve-content-type';
 
-import { logger } from 'ft-next-express';
-
 
 class CAPI {
 	constructor(cache) {
