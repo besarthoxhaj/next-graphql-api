@@ -82,6 +82,9 @@ class Cache {
 			metrics.count(`cache.${metricsKey}.error`, 1);
 			delete this.requestMap[key];
 			logger.error(err);
+			
+			// Return stale content
+			return this.contentCache[key].data;
 		});
 		return this.requestMap[key];
 	}
