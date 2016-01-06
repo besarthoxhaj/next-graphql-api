@@ -67,6 +67,9 @@ class Cache {
 
 		this.requestMap[key] = fetcher()
 		.then((it) => {
+			if(!it) {
+				return;
+			}
 			let expireTime = now + ttl;
 			this.contentCache[key] = {
 				expire: expireTime,
@@ -82,6 +85,7 @@ class Cache {
 			metrics.count(`cache.${metricsKey}.error`, 1);
 			delete this.requestMap[key];
 			logger.error(err);
+
 		});
 		return this.requestMap[key];
 	}

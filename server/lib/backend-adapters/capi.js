@@ -2,8 +2,6 @@ import ApiClient from 'next-ft-api-client';
 import filterContent from '../helpers/filter-content';
 import resolveContentType from '../helpers/resolve-content-type';
 
-import { logger } from 'ft-next-express';
-
 
 class CAPI {
 	constructor(cache) {
@@ -20,9 +18,6 @@ class CAPI {
 					sectionId: sectionsId,
 					items: it.slice()
 				}))
-				.catch(e => {
-					logger.error(`Error getting page ${uuid}`, e)
-				});
 		});
 	}
 
@@ -56,11 +51,8 @@ class CAPI {
 	}
 
 	list(uuid, ttl = 50) {
-		// NOTE: for now, list api is bronze, so handle errors
 		return this.cache.cached(`${this.type}.lists.${uuid}`, ttl, () => {
 			return ApiClient.lists({ uuid: uuid })
-			// return 'fake' list, so Collection can resolveType correctly
-			.catch(() => ({ apiUrl: `http://api.ft.com/lists/${uuid}` }));
 		});
 	}
 }

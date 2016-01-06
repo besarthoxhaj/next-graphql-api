@@ -46,6 +46,7 @@ describe('GraphQL Cache', () => {
 			})
 		});
 
+
 		it('fetches new data when cache expires', () => {
 			return cache.cached('test-key-4', -10, () => Promise.resolve('stale'))
 			.then(() => {
@@ -86,6 +87,48 @@ describe('GraphQL Cache', () => {
 				})
 			});
 		});
+	});
+
+
+	it('returns stale data on a fetch error', () => {
+		const clock = sinon.useFakeTimers();
+		const cache = new Cache(10 * 60, 5 * 60);
+		return cache.cached('test-key-7', -1, () => Promise.resolve('stale'))
+		.then(() => {
+			return cache.cached('test-key-7', 10, () => Promise.reject('error'));
+		})
+		.then((it) => {
+			//Stale object in cache, so ignore error and return that
+			expect(it).to.eq('stale');
+			clock.tick(1000 * 60 * 4);
+			return cache.cached('test-key-7', 10, () => Promise.reject('error'));
+		})
+		.then((it) => {
+			//After 6 minutes it is still being used, so return stale again
+			expect(it).to.eq('stale');
+			clock.tick(1000 * 60 * 11);
+			return cache.cached('test-key-7', 10, () => Promise.reject('error'));
+		})
+		.then((it) => {
+			//After 10 minutes we've cleared our cache, so give up and return undefined
+			expect(it).to.eq(undefined);
+		})
+	});
+
+	it('does not cache undefined', () => {
+		return cache.cached('test-key-8', -1, () => Promise.resolve('stale'))
+		.then((it) => {
+			//return stale and go and fetch
+			expect(it).to.eq('stale');
+			return cache.cached('test-key-8', 10, () => Promise.resolve(undefined));
+		})
+		.then((it) => {
+			expect(it).to.eq('stale')
+			return cache.cached('test-key-8', 10, () => Promise.resolve(undefined));
+		})
+		.then((it) => {
+			expect(it).to.eq('stale')
+		})
 	});
 
 
