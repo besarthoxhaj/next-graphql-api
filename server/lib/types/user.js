@@ -39,7 +39,27 @@ const User = new GraphQLObjectType({
 
 				const uuid = auth(source.uuid, userUuid, isUserRequest);
 
-				return backend(flags).myft.savedContent({ uuid: uuid, limit: limit } )
+				return backend(flags).myft.getAllRelationship(uuid, 'saved', 'content', { limit: limit })
+					.then(items => {
+						if (!items) {
+							return [];
+						}
+						return backend(flags).capi.content(items.map(item => item.uuid), { limit })
+					});
+			}
+		},
+		read: {
+			type: new GraphQLList(Content),
+			args: {
+				limit: {
+					type: GraphQLInt
+				}
+			},
+			resolve: (source, { limit=10 }, {rootValue: {flags, isUserRequest, userUuid}}) => {
+
+				const uuid = auth(source.uuid, userUuid, isUserRequest);
+
+				return backend(flags).myft.getAllRelationship(uuid, 'read', 'content', { limit: limit })
 					.then(items => {
 						if (!items) {
 							return [];
@@ -57,7 +77,25 @@ const User = new GraphQLObjectType({
 			},
 			resolve: (source, { limit=10 }, {rootValue: {flags, isUserRequest, userUuid}}) => {
 				const uuid = auth(source.uuid, userUuid, isUserRequest);
-				return backend(flags).myft.followedConcepts({ uuid: uuid, limit: limit })
+				return backend(flags).myft.getAllRelationship(uuid, 'followed', 'concept', { limit: limit })
+					.then(items => {
+						if (!items) {
+							return [];
+						}
+						return items
+					});
+			}
+		},
+		viewed: {
+			type: new GraphQLList(Concept),
+			args: {
+				limit: {
+					type: GraphQLInt
+				}
+			},
+			resolve: (source, { limit=10 }, {rootValue: {flags, isUserRequest, userUuid}}) => {
+				const uuid = auth(source.uuid, userUuid, isUserRequest);
+				return backend(flags).myft.getAllRelationship(uuid, 'viewed', 'concept', { limit: limit })
 					.then(items => {
 						if (!items) {
 							return [];
