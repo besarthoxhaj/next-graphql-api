@@ -92,7 +92,7 @@ const queryType = new GraphQLObjectType({
 				query: { type: new GraphQLNonNull(GraphQLString) }
 			},
 			resolve: (_, {query}, {rootValue: {flags}}) => {
-				return backend(flags).capi.search(query)
+				return backend(flags).capi.searchLegacy(query)
 					.then(ids => ({ items: ids }));
 			}
 		},
