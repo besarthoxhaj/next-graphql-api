@@ -257,6 +257,19 @@ const Concept = new GraphQLObjectType({
 		},
 		headshot: {
 			type: GraphQLString
+		},
+		items: {
+			type: new GraphQLList(Content),
+			description: 'Items within the popular articles',
+			args: {
+				from: { type: GraphQLInt },
+				limit: { type: GraphQLInt },
+				genres: { type: new GraphQLList(GraphQLString) },
+				type: { type: ContentType }
+			},
+			resolve: (concept, { from, limit, genres, type }, { rootValue: { flags }}) => {
+				return backend(flags).capi.search('metadata.idV1', concept.id, { from, limit, genres, type });
+			}
 		}
 	})
 });
