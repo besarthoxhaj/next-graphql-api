@@ -154,6 +154,9 @@ const queryType = new GraphQLObjectType({
 				country: {
 					type: GraphQLString
 				},
+				period: {
+					type: GraphQLString
+				},
 				from: {
 					type: GraphQLInt
 				},

@@ -7,9 +7,9 @@ class Hui {
 		this.cache = cache;
 	}
 
-	content({industry, position, sector, country, from, limit}, ttl = 50) {
-		return this.cache.cached(`${this.type}.${industry}.${position}.${sector}.${country}`, ttl, () => {
-			return ApiClient.hui({industry, position, sector, country})
+	content({industry, position, sector, country, period='last-1-week', from, limit}, ttl = 50) {
+		return this.cache.cached(`${this.type}.${industry}.${position}.${sector}.${country}.${period}`, ttl, () => {
+			return ApiClient.hui({industry, position, sector, country, period})
 				.then(articles => sliceList(articles, {from, limit}));
 		});
 	}
