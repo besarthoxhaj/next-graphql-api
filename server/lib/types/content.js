@@ -268,7 +268,8 @@ const Concept = new GraphQLObjectType({
 				type: { type: ContentType }
 			},
 			resolve: (concept, { from, limit, genres, type }, { rootValue: { flags }}) => {
-				return backend(flags).capi.search('metadata.idV1', concept.id, { from, limit, genres, type });
+				const id = concept.id || concept.idV1 || concept.uuid;
+				return backend(flags).capi.search('metadata.idV1', id, { from, limit, genres, type });
 			}
 		}
 	})
