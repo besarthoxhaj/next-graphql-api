@@ -14,17 +14,23 @@ class Myft {
         ));
     }
 
-		personalisedFeed(args, ttl=-1) {
-			return this.cache.cached(`${this.type}.user.${args.uuid}.personalised-feed`, ttl, () => (
-				fetch(`https://ft-next-personalised-feed-api.herokuapp.com/v2/feed/${args.uuid}?originatingSignals=followed&from=-7d`, {
-					headers: {
-						'X-FT-Personalised-Feed-Api-Key': process.env.PERSONALISED_FEED_API_KEY
-					}
-				})
-				.then(res => res.json())
-				.then(res => sliceList(res.results, args))
-			));
-		}
+	personalisedFeed(args, ttl=-1) {
+		return this.cache.cached(`${this.type}.user.${args.uuid}.personalised-feed`, ttl, () => (
+			fetch(`https://ft-next-personalised-feed-api.herokuapp.com/v2/feed/${args.uuid}?originatingSignals=followed&from=-7d`, {
+				headers: {
+					'X-FT-Personalised-Feed-Api-Key': process.env.PERSONALISED_FEED_API_KEY
+				}
+			})
+			.then(res => res.json())
+			.then(res => sliceList(res.results, args))
+		));
+	}
+
+	getViewed(uuid, { limit = 10 }) {
+		// NOTE: not caching, as would get too diluted keying off the uuid
+		return myftClient.fetchJson('GET', `/next/popular-concepts/${uuid}`)
+			.then(results => results.viewed.filter(concept => concept).slice(0, limit));
+	}
 }
 
 export default Myft;
