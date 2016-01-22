@@ -10,7 +10,7 @@ class Myft {
 	getAllRelationship(uuid, relationship, model, args) {
 		return myftClient.getAllRelationship('user', uuid, relationship, model, args)
 			.then(res => res.items)
-			.catch(err => [] );
+			.catch(() => [] );
 	}
 
 	personalisedFeed(uuid, { limit = 10 }) {
