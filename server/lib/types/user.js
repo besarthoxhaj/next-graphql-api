@@ -39,13 +39,8 @@ const User = new GraphQLObjectType({
 
 				const uuid = auth(source.uuid, userUuid, isUserRequest);
 
-				return backend(flags).myft.getAllRelationship(uuid, 'saved', 'content', { limit: limit })
-					.then(items => {
-						if (!items) {
-							return [];
-						}
-						return backend(flags).capi.content(items.map(item => item.uuid), { limit })
-					});
+				return backend(flags).myft.getAllRelationship(uuid, 'saved', 'content', { limit })
+					.then(items => !items ? [] :backend(flags).capi.content(items.map(item => item.uuid), { limit }));
 			}
 		},
 		read: {
@@ -59,13 +54,8 @@ const User = new GraphQLObjectType({
 
 				const uuid = auth(source.uuid, userUuid, isUserRequest);
 
-				return backend(flags).myft.getAllRelationship(uuid, 'read', 'content', { limit: limit })
-					.then(items => {
-						if (!items) {
-							return [];
-						}
-						return backend(flags).capi.content(items.map(item => item.uuid), { limit })
-					});
+				return backend(flags).myft.getAllRelationship(uuid, 'read', 'content', { limit })
+					.then(items => !items ? [] : backend(flags).capi.content(items.map(item => item.uuid), { limit }));
 			}
 		},
 		followed: {
@@ -77,13 +67,8 @@ const User = new GraphQLObjectType({
 			},
 			resolve: (source, { limit=10 }, {rootValue: {flags, isUserRequest, userUuid}}) => {
 				const uuid = auth(source.uuid, userUuid, isUserRequest);
-				return backend(flags).myft.getAllRelationship(uuid, 'followed', 'concept', { limit: limit })
-					.then(items => {
-						if (!items) {
-							return [];
-						}
-						return items
-					});
+				return backend(flags).myft.getAllRelationship(uuid, 'followed', 'concept', { limit })
+					.then(items => !items ? [] : items);
 			}
 		},
 		viewed: {
@@ -108,15 +93,10 @@ const User = new GraphQLObjectType({
 			},
 			resolve: (source, { limit=10 }, {rootValue: {flags, isUserRequest, userUuid}}) => {
 				const uuid = auth(source.uuid, userUuid, isUserRequest);
-				return backend(flags).myft.personalisedFeed({ uuid: uuid, limit: limit })
-					.then(items => {
-						if (!items) {
-							return [];
-						}
-						return items.map(item => item.content);
-					});
+				return backend(flags).myft.personalisedFeed({ uuid, limit })
+					.then(items => !items ? [] : items.map(item => item.content));
 			}
-		},
+		}
 	}
 });
 

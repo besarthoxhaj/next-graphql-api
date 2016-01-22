@@ -15,12 +15,7 @@ export default (req, res, next) => {
 
 	graphql(flags, res.locals.isUserRequest, res.locals.uuid)
 		.fetch(query, vars)
-		.then(data => {
-			if(req.method === 'GET') {
-				res.set({'Surrogate-Control': 'max-age=120,stale-while-revalidate=6,stale-if-error=259200'});
-			}
-			res.jsonp(data);
-		})
+		.then(data => res.jsonp(data))
 		.catch(errs => {
 			const err = Array.isArray(errs) ? errs.shift() : errs;
 			if(Number.isInteger(parseInt(err.message))) {
