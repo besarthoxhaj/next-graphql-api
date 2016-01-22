@@ -65,10 +65,9 @@ const User = new GraphQLObjectType({
 					type: GraphQLInt
 				}
 			},
-			resolve: (source, { limit=10 }, {rootValue: {flags, isUserRequest, userUuid}}) => {
+			resolve: (source, { limit = 10 }, {rootValue: {flags, isUserRequest, userUuid}}) => {
 				const uuid = auth(source.uuid, userUuid, isUserRequest);
-				return backend(flags).myft.getAllRelationship(uuid, 'followed', 'concept', { limit })
-					.then(items => !items ? [] : items);
+				return backend(flags).myft.personalisedFeed(uuid, { limit });
 			}
 		},
 		viewed: {
@@ -93,7 +92,7 @@ const User = new GraphQLObjectType({
 			},
 			resolve: (source, { limit=10 }, {rootValue: {flags, isUserRequest, userUuid}}) => {
 				const uuid = auth(source.uuid, userUuid, isUserRequest);
-				return backend(flags).myft.personalisedFeed({ uuid, limit })
+				return backend(flags).myft.personalisedFeed(uuid, { limit })
 					.then(items => !items ? [] : items.map(item => item.content));
 			}
 		}
