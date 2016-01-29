@@ -30,6 +30,16 @@ const queryType = new GraphQLObjectType({
 				return backend(flags).capi.page(uuid);
 			}
 		},
+		topStoriesList: {
+			type: Collection,
+			args: {
+				region: { type: new GraphQLNonNull(Region) }
+			},
+			resolve: (root, {region}, {rootValue: {flags}}) => {
+				let uuid = sources[`${region}TopStoriesList`].uuid;
+				return backend(flags).capi.list(uuid);
+			}
+		},
 		fastFT: {
 			type: Collection,
 			resolve: (root, _, {rootValue: {flags}}) => {

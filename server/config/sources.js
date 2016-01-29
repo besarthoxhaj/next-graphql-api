@@ -5,6 +5,12 @@ const sources = {
 	usTop: {
 		uuid: 'b0ed86f4-4e94-11de-8d4c-00144feabdc0'
 	},
+	ukTopStoriesList: {
+		uuid: '520ddb76-e43d-11e4-9e89-00144feab7de'
+	},
+	usTopStoriesList: {
+		uuid: 'b0d8e4fe-10ff-11e5-8413-00144feabdc0'
+	},
 	fastFt: {
 		uuid: '5c7592a8-1f0c-11e4-b0cb-b2227cce2b54'
 	},
