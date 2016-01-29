@@ -16,6 +16,7 @@ const Collection = new GraphQLInterfaceType({
 	fields: {
 		title: { type: GraphQLString },
 		url: { type: GraphQLString },
+		layoutHint: { type: GraphQLString },
 		items: {
 			type: new GraphQLList(Content),
 			args: {
@@ -51,6 +52,10 @@ const Page = new GraphQLObjectType({
 		title: {
 			type: GraphQLString
 		},
+		layoutHint: {
+			type: GraphQLString,
+			resolve: () => null
+		},
 		items: {
 			type: new GraphQLList(Content),
 			description: 'Content items of the page',
@@ -79,6 +84,10 @@ const ContentByConcept = new GraphQLObjectType({
 		url: {
 			type: GraphQLString,
 			resolve: () => (null)
+		},
+		layoutHint: {
+			type: GraphQLString,
+			resolve: () => null
 		},
 		items: {
 			type: new GraphQLList(Content),
@@ -111,6 +120,10 @@ const List = new GraphQLObjectType({
 			type: GraphQLString,
 			resolve: () => (null)
 		},
+		layoutHint: {
+			type: GraphQLString,
+			resolve: list => list.layoutHint
+		},
 		items: {
 			type: new GraphQLList(Content),
 			description: 'Content items',
@@ -121,7 +134,6 @@ const List = new GraphQLObjectType({
 				type: { type: ContentType }
 			},
 			resolve: (result, args, {rootValue: {flags}}) => {
-
 				if(!result.items || result.items.length < 1) { return []; }
 
 				return backend(flags).capi.content(result.items.map(result => result.id.replace(/http:\/\/api\.ft\.com\/things?\//, '')), args);
