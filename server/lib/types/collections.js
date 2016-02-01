@@ -54,7 +54,7 @@ const Page = new GraphQLObjectType({
 		},
 		layoutHint: {
 			type: GraphQLString,
-			resolve: ([page, list]) => list ? list.layoutHint : null
+			resolve: ([, list]) => list ? list.layoutHint : null
 		},
 		items: {
 			type: new GraphQLList(Content),
