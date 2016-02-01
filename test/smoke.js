@@ -4,6 +4,7 @@ const query = `
 			name
 		}
 		top(region: UK) {
+			layoutHint
 			lead: items(limit: 1, type: Article) {
 				title
 			}
