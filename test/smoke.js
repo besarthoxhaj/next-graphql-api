@@ -2,6 +2,9 @@ const query = `
 	query GraphQLSmoke {
 		popularTopics {
 			name
+			items(limit: 1) {
+				title
+			}
 		}
 		top(region: UK) {
 			lead: items(limit: 1, type: Article) {
