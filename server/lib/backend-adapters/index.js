@@ -4,7 +4,6 @@ import FastFtFeed from './fast-ft';
 import CAPI from './capi';
 import MockCapi from './mock-capi';
 import Hui from './hui';
-import PopularFTContent from './popular-ft-content';
 import Liveblog from './liveblog';
 import MockLiveblog from './mock-liveblog';
 import Video from './video';
@@ -23,7 +22,6 @@ const liveblog = new Liveblog(memCache);
 const mockLiveblog = new MockLiveblog(liveblog);
 const myft = new Myft(memCache);
 const popularApi = new PopularAPI(memCache);
-const popularFTContent = new PopularFTContent(memCache);
 const video = new Video(memCache);
 
 export default (flags = {}) => ({
@@ -33,7 +31,6 @@ export default (flags = {}) => ({
 	liveblog: flags.mockFrontPage ? mockLiveblog : liveblog,
 	myft,
 	popularApi,
-	popularFTContent,
 	video
 });
 

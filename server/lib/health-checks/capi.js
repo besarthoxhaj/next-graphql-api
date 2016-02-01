@@ -11,6 +11,8 @@ class CapiCheck extends Check {
     }
 
     get checkOutput() {
+			console.log('this.status', this.status);
+
         switch (this.status) {
             case status.PENDING:
                 return 'This check has not yet run';
