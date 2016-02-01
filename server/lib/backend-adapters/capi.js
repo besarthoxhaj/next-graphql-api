@@ -33,6 +33,26 @@ class CAPI {
 		});
 	}
 
+	search(termName, termValue, opts, ttl = 50) {
+		const searchOpts = {
+			filter: {
+				bool: {
+					must: {
+						term: {
+							[termName]: termValue
+						}
+					}
+				}
+			}
+		};
+
+		console.log(termName, termValue);
+		return this.cache.cached(`${this.type}.search.${termName}:${termValue}`, ttl, () => {
+			return ApiClient.search(searchOpts);
+		})
+			.then(filterContent(opts, resolveContentType));
+	}
+
 	content(uuids, opts, ttl=50) {
 		const cacheKey = `${this.type}.content.${Array.isArray(uuids) ? uuids.join('_') : uuids}`;
 		return this.cache.cached(cacheKey, ttl, () => {
