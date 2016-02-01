@@ -120,7 +120,7 @@ describe('CAPI backend', () => {
 		});
 
 		afterEach(() => {
-			stubAPI.reset();
+			stubAPI.restore();
 			Object.keys(cache.contentCache).forEach(key => cache.clear(key));
 		});
 		it('fetches list', () => {

@@ -26,8 +26,10 @@ const queryType = new GraphQLObjectType({
 				region: { type: new GraphQLNonNull(Region) }
 			},
 			resolve: (root, {region}, {rootValue: {flags}}) => {
-				let uuid = sources[`${region}Top`].uuid;
-				return backend(flags).capi.page(uuid);
+				const uuid = sources[`${region}Top`].uuid;
+				const listUuid = sources[`${region}TopList`].uuid;
+				const listFetch = flags.frontPageMultipleLayouts ? backend(flags).capi.list(listUuid).catch(err => {}) : Promise.resolve({});
+				return Promise.all([backend(flags).capi.page(uuid), listFetch]);
 			}
 		},
 		fastFT: {

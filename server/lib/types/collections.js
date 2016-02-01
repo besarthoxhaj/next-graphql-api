@@ -16,6 +16,7 @@ const Collection = new GraphQLInterfaceType({
 	fields: {
 		title: { type: GraphQLString },
 		url: { type: GraphQLString },
+		layoutHint: { type: GraphQLString },
 		items: {
 			type: new GraphQLList(Content),
 			args: {
@@ -51,6 +52,10 @@ const Page = new GraphQLObjectType({
 		title: {
 			type: GraphQLString
 		},
+		layoutHint: {
+			type: GraphQLString,
+			resolve: ([page, list]) => list ? list.layoutHint : null
+		},
 		items: {
 			type: new GraphQLList(Content),
 			description: 'Content items of the page',
@@ -60,8 +65,12 @@ const Page = new GraphQLObjectType({
 				genres: { type: new GraphQLList(GraphQLString) },
 				type: { type: ContentType }
 			},
-			resolve: (page, {from, limit, genres, type}, {rootValue: {flags}}) => {
+			resolve: ([page, list], {from, limit, genres, type}, {rootValue: {flags}}) => {
 				if(!page.items || page.items.length < 1) { return []; }
+
+				if(list && list.layoutHint === 'standaloneimage' && list.items && list.items.length && list.items[0].id) {
+					page.items.unshift(list.items[0].id.replace(/http:\/\/api\.ft\.com\/things?\//, ''));
+				}
 				return backend(flags).capi.content(page.items, {from, limit, genres, type});
 			}
 		}
@@ -79,6 +88,10 @@ const ContentByConcept = new GraphQLObjectType({
 		url: {
 			type: GraphQLString,
 			resolve: () => (null)
+		},
+		layoutHint: {
+			type: GraphQLString,
+			resolve: () => null
 		},
 		items: {
 			type: new GraphQLList(Content),
@@ -110,6 +123,10 @@ const List = new GraphQLObjectType({
 		url: {
 			type: GraphQLString,
 			resolve: () => (null)
+		},
+		layoutHint: {
+			type: GraphQLString,
+			resolve: list => list.layoutHint
 		},
 		items: {
 			type: new GraphQLList(Content),
