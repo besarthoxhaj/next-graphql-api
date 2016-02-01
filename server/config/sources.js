@@ -26,32 +26,13 @@ const sources = {
 		sectionsId: 'MTQ4-U2VjdGlvbnM=',
 		uuid: 'cec106aa-cd25-11de-a748-00144feabdc0'
 	},
-	bigRead: {
-		type: 'search',
-		uuid: 'sections:"The Big Read"'
-	},
-	lunch: {
-		type: 'search',
-		uuid: 'brand:"Lunch with the FT"'
-	},
-	lex: {
-		type: 'search',
-		uuid: 'brand:"Lex"'
-	},
 	management: {
 		type: 'page',
 		uuid: 'fcdae4e8-cd25-11de-a748-00144feabdc0'
 	},
-	personInNews: {
-		type: 'search',
-		uuid: 'brand:"Person in the news"'
-	},
 	frontPageSkyline: {
 		type: 'page',
 		uuid: '4c499f12-4e94-11de-8d4c-00144feabdc0'
-	},
-	popular: {
-		url: 'http://mostpopular.sp.ft-static.com/v1/mostPopular?source=nextArticle'
 	},
 	videos: {
 		id: '69917354001' // BrightCove ID

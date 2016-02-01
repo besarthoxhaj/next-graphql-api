@@ -49,10 +49,11 @@ const query = `
 				title
 			}
 		}
-		popular {
-			items(limit: 10) {
+		popularArticles {
 				title
-			}
+		}
+		popularFromHui(industry: "http://api.ft.com/things/077bea1d-01ca-328e-aa0b-d7dc92796030") {
+				title
 		}
 		videos {
 			id

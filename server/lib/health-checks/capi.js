@@ -26,6 +26,10 @@ class CapiCheck extends Check {
             .then(data => {
                 this.status = data ? status.PASSED : status.FAILED;
                 this.lastUpdated = new Date();
+            })
+            .catch(() => {
+                this.status = status.FAILED;
+                this.lastUpdated = new Date();
             });
     }
 }

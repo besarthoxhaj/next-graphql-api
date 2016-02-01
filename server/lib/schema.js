@@ -78,24 +78,6 @@ const queryType = new GraphQLObjectType({
 				return backend(flags).capi.page(uuid, sectionsId);
 			}
 		},
-		popular: {
-			type: Collection,
-			resolve: (root, _, {rootValue: {flags}}) => {
-				let url = sources.popular.url;
-
-				return backend(flags).popularFTContent.fetch(url, 'Popular');
-			}
-		},
-		search: {
-			type: Collection,
-			args: {
-				query: { type: new GraphQLNonNull(GraphQLString) }
-			},
-			resolve: (_, {query}, {rootValue: {flags}}) => {
-				return backend(flags).capi.searchLegacy(query)
-					.then(ids => ({ items: ids }));
-			}
-		},
 		videos: {
 			type: new GraphQLList(Video),
 			args: {
