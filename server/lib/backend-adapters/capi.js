@@ -33,15 +33,6 @@ class CAPI {
 		});
 	}
 
-	searchLegacy(query, ttl = 50) {
-		return this.cache.cached(`${this.type}.searchLegacy.${query}`, ttl, () => {
-
-			console.log('searching for query', query);
-			return ApiClient.searchLegacy({ query: query })
-			.then(console.log);
-		});
-	}
-
 	content(uuids, opts, ttl=50) {
 		const cacheKey = `${this.type}.content.${Array.isArray(uuids) ? uuids.join('_') : uuids}`;
 		return this.cache.cached(cacheKey, ttl, () => {
