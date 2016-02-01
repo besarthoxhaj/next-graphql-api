@@ -46,7 +46,6 @@ class CAPI {
 			}
 		};
 
-		console.log(termName, termValue);
 		return this.cache.cached(`${this.type}.search.${termName}:${termValue}`, ttl, () => {
 			return ApiClient.search(searchOpts);
 		})
