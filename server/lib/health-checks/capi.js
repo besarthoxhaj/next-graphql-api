@@ -11,8 +11,6 @@ class CapiCheck extends Check {
     }
 
     get checkOutput() {
-			console.log('this.status', this.status);
-
         switch (this.status) {
             case status.PENDING:
                 return 'This check has not yet run';
@@ -27,6 +25,10 @@ class CapiCheck extends Check {
         return api[this.capiMethod](this.capiOptions)
             .then(data => {
                 this.status = data ? status.PASSED : status.FAILED;
+                this.lastUpdated = new Date();
+            })
+            .catch(() => {
+                this.status = status.FAILED;
                 this.lastUpdated = new Date();
             });
     }
