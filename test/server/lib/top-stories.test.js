@@ -35,7 +35,7 @@ describe('Top Stories', () => {
 				},
 				{
 					name: 'elastic-search',
-					matcher: '^https://search-next-search-edgfdq5nx64rl5widrjtd65epq.eu-west-1.es.amazonaws.com',
+					matcher: '^https://search-next-search-',
 					response: (url, opts) => {
 						const docs = JSON.parse(opts.body).ids.map(id => ({ found: true, _source: { id } }))
 						return { docs: docs };
@@ -185,7 +185,7 @@ describe('Top Stories', () => {
 				},
 				{
 					name: 'elastic-search',
-					matcher: '^https://search-next-search-edgfdq5nx64rl5widrjtd65epq.eu-west-1.es.amazonaws.com',
+					matcher: '^https://search-next-search-',
 					response: (url, opts) => {
 						const docs = JSON.parse(opts.body).ids.map(id => ({ found: true, _source: { id } }))
 						return { docs: docs };
