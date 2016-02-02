@@ -67,7 +67,7 @@ const Page = new GraphQLObjectType({
 			},
 			resolve: ([page, list], {from, limit, genres, type}, {rootValue: {flags}}) => {
 				if(!page.items || page.items.length < 1) { return []; }
-
+				//Picture stories don't come through the page API, so need to take the picture story from the list
 				if(list && list.layoutHint === 'standaloneimage' && list.items && list.items.length && list.items[0].id) {
 					page.items.unshift(list.items[0].id.replace(/http:\/\/api\.ft\.com\/things?\//, ''));
 				}
