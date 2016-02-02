@@ -3,7 +3,7 @@ const query = `
 		popularTopics {
 			name
 			items(limit: 1) {
-				name
+				title
 			}
 		}
 		top(region: UK) {

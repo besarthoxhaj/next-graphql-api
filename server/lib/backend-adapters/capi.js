@@ -33,13 +33,23 @@ class CAPI {
 		});
 	}
 
-	searchLegacy(query, ttl = 50) {
-		return this.cache.cached(`${this.type}.searchLegacy.${query}`, ttl, () => {
+	search(termName, termValue, opts, ttl = 50) {
+		const searchOpts = {
+			filter: {
+				bool: {
+					must: {
+						term: {
+							[termName]: termValue
+						}
+					}
+				}
+			}
+		};
 
-			console.log('searching for query', query);
-			return ApiClient.searchLegacy({ query: query })
-			.then(console.log);
-		});
+		return this.cache.cached(`${this.type}.search.${termName}:${termValue}`, ttl, () => {
+			return ApiClient.search(searchOpts);
+		})
+			.then(filterContent(opts, resolveContentType));
 	}
 
 	content(uuids, opts, ttl=50) {

@@ -3,6 +3,18 @@ const listUuid = '73667f46-1a55-11e5-a130-2e7db721f996';
 const pageUuid = 'fcdae4e8-cd25-11de-a748-00144feabdc0';
 const conceptUuid = '5c7592a8-1f0c-11e4-b0cb-b2227cce2b54';
 
+const searchOpts = {
+    filter: {
+        bool: {
+            must: {
+                term: {
+                    "metadata.idV1": "Mjk=-VG9waWNz"
+                }
+            }
+        }
+    }
+};
+
 export default {
     name: 'CAPI',
     description : 'CAPI service health checks',
@@ -54,6 +66,18 @@ export default {
             capiMethod: 'pages',
             capiOptions: {
                 uuid: pageUuid
+            }
+        },
+        {
+            name: 'Search',
+            severity: 2,
+            businessImpact: 'API may not be able to perform searches',
+            technicalSummary: 'Tries to do a search for a concept',
+            panicGuide: 'Don\'t Panic',
+            type: 'capi',
+            capiMethod: 'search',
+            capiOptions: {
+                searchOpts: searchOpts
             }
         },
         {
