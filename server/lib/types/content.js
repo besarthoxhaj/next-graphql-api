@@ -260,7 +260,7 @@ const Concept = new GraphQLObjectType({
 		},
 		items: {
 			type: new GraphQLList(Content),
-			description: 'Items within the popular articles',
+			description: 'Latest articles published with this concept',
 			args: {
 				from: { type: GraphQLInt },
 				limit: { type: GraphQLInt },
