@@ -8,7 +8,7 @@ import {
 } from 'graphql';
 
 import { Region } from './types/basic';
-import { Collection } from './types/collections';
+import { Page, List, ContentByConcept, CombinedPageAndList } from './types/collections';
 import { Content, Video, Concept } from './types/content';
 import { ContentType } from './types/basic';
 import User from './types/user';
@@ -21,7 +21,7 @@ const queryType = new GraphQLObjectType({
 	description: 'FT content API',
 	fields: {
 		top: {
-			type: Collection,
+			type: CombinedPageAndList,
 			args: {
 				region: { type: new GraphQLNonNull(Region) }
 			},
@@ -33,13 +33,13 @@ const queryType = new GraphQLObjectType({
 			}
 		},
 		fastFT: {
-			type: Collection,
+			type: ContentByConcept,
 			resolve: (root, _, {rootValue: {flags}}) => {
 				return backend(flags).fastFT.fetch();
 			}
 		},
 		editorsPicks: {
-			type: Collection,
+			type: List,
 			resolve: (root, _, {rootValue: {flags}}) => {
 				if (flags && flags.editorsPicksFromList) {
 					return backend(flags).capi.list(sources['editorsPicks'].uuid);
@@ -49,7 +49,7 @@ const queryType = new GraphQLObjectType({
 			}
 		},
 		opinion: {
-			type: Collection,
+			type: Page,
 			resolve: (root, _, {rootValue: {flags}}) => {
 				let {uuid, sectionsId} = sources.opinion;
 
@@ -57,7 +57,7 @@ const queryType = new GraphQLObjectType({
 			}
 		},
 		lifestyle: {
-			type: Collection,
+			type: Page,
 			resolve: (root, _, {rootValue: {flags}}) => {
 				let {uuid, sectionsId} = sources.lifestyle;
 
@@ -65,7 +65,7 @@ const queryType = new GraphQLObjectType({
 			}
 		},
 		markets: {
-			type: Collection,
+			type: Page,
 			resolve: (root, _, {rootValue: {flags}}) => {
 				let {uuid, sectionsId} = sources.markets;
 
@@ -73,7 +73,7 @@ const queryType = new GraphQLObjectType({
 			}
 		},
 		technology: {
-			type: Collection,
+			type: Page,
 			resolve: (root, _, {rootValue: {flags}}) => {
 				let {uuid, sectionsId} = sources.technology;
 

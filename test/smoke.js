@@ -2,6 +2,9 @@ const query = `
 	query GraphQLSmoke {
 		popularTopics {
 			name
+			items(limit: 1) {
+				name
+			}
 		}
 		top(region: UK) {
 			layoutHint
@@ -30,6 +33,10 @@ const query = `
 			url
 			items {
 				title
+				branding {
+					headshot
+					taxonomy
+		    }
 			}
 		}
 		lifestyle {
