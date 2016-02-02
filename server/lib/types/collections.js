@@ -2,8 +2,7 @@ import {
 	GraphQLString,
 	GraphQLInt,
 	GraphQLList,
-	GraphQLObjectType,
-	GraphQLInterfaceType
+	GraphQLObjectType
 } from 'graphql';
 
 import { Content } from './content';
