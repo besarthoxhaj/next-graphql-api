@@ -8,7 +8,7 @@ import {
 } from 'graphql';
 
 import { Region } from './types/basic';
-import { Collection } from './types/collections';
+import { Page, List, ContentByConcept, CombinedPageAndList } from './types/collections';
 import { Content, Video, Concept } from './types/content';
 import { ContentType } from './types/basic';
 import User from './types/user';
@@ -21,23 +21,25 @@ const queryType = new GraphQLObjectType({
 	description: 'FT content API',
 	fields: {
 		top: {
-			type: Collection,
+			type: CombinedPageAndList,
 			args: {
 				region: { type: new GraphQLNonNull(Region) }
 			},
 			resolve: (root, {region}, {rootValue: {flags}}) => {
-				let uuid = sources[`${region}Top`].uuid;
-				return backend(flags).capi.page(uuid);
+				const uuid = sources[`${region}Top`].uuid;
+				const listUuid = sources[`${region}TopList`].uuid;
+				const listFetch = flags.frontPageMultipleLayouts ? backend(flags).capi.list(listUuid).catch(() => {}) : Promise.resolve({});
+				return Promise.all([backend(flags).capi.page(uuid), listFetch]);
 			}
 		},
 		fastFT: {
-			type: Collection,
+			type: ContentByConcept,
 			resolve: (root, _, {rootValue: {flags}}) => {
 				return backend(flags).fastFT.fetch();
 			}
 		},
 		editorsPicks: {
-			type: Collection,
+			type: List,
 			resolve: (root, _, {rootValue: {flags}}) => {
 				if (flags && flags.editorsPicksFromList) {
 					return backend(flags).capi.list(sources['editorsPicks'].uuid);
@@ -47,7 +49,7 @@ const queryType = new GraphQLObjectType({
 			}
 		},
 		opinion: {
-			type: Collection,
+			type: Page,
 			resolve: (root, _, {rootValue: {flags}}) => {
 				let {uuid, sectionsId} = sources.opinion;
 
@@ -55,7 +57,7 @@ const queryType = new GraphQLObjectType({
 			}
 		},
 		lifestyle: {
-			type: Collection,
+			type: Page,
 			resolve: (root, _, {rootValue: {flags}}) => {
 				let {uuid, sectionsId} = sources.lifestyle;
 
@@ -63,7 +65,7 @@ const queryType = new GraphQLObjectType({
 			}
 		},
 		markets: {
-			type: Collection,
+			type: Page,
 			resolve: (root, _, {rootValue: {flags}}) => {
 				let {uuid, sectionsId} = sources.markets;
 
@@ -71,7 +73,7 @@ const queryType = new GraphQLObjectType({
 			}
 		},
 		technology: {
-			type: Collection,
+			type: Page,
 			resolve: (root, _, {rootValue: {flags}}) => {
 				let {uuid, sectionsId} = sources.technology;
 
