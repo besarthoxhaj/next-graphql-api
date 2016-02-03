@@ -46,14 +46,14 @@ class MockCAPI {
 		});
 	}
 
-	search(query, ttl = 50) {
-		const search = searches[query];
+	search(termName, termValue, opts, ttl = 50) {
+		const search = searches[termValue];
 
 		if(search) { return Promise.resolve(search); }
 
-		return this.realBackend.search(query, ttl)
+		return this.realBackend.search(termName, termValue, opts, ttl)
 		.then(it => {
-			logger.info(`Mock backend asked for a search: '${query}'. Add this to searches.js to use current real response: \n'${query}': ${JSON.stringify(it, null, 2)}`);
+			logger.info(`Mock backend asked for a search: '${termValue}'. Add this to searches.js to use current real response: \n'${termValue}': ${JSON.stringify(it, null, 2)}`);
 			return it;
 		});
 	}
