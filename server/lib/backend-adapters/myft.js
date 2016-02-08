@@ -29,7 +29,7 @@ class Myft {
 
 	getViewed(uuid, { limit = 10 }) {
 		// NOTE: not caching, as would get too diluted keying off the uuid
-		return myftClient.fetchJson('GET', `/next/popular-concepts/${uuid}`)
+		return myftClient.fetchJson('GET', `next/popular-concepts/${uuid}`)
 			.then(results =>
 				results.viewed
 					.filter(concept => concept)
