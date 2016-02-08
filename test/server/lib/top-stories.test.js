@@ -3,6 +3,7 @@ import fetchMock from 'fetch-mock';
 import sinon from 'sinon';
 import chai from 'chai';
 
+const expect = chai.expect;
 const should = chai.should();
 
 import graphqlClient from '../../../server/lib/graphql';
@@ -66,7 +67,7 @@ describe('Top Stories', () => {
 				}
 			`)
 			.then(it => {
-				it.top.should.exist;
+				expect(it.top).to.exist;
 				it.top.items.length.should.equal(1);
 				it.top.items[0].id.should.equal('standard-page-item-1');
 				should.equal(it.top.layoutHint, null);
@@ -108,7 +109,7 @@ describe('Top Stories', () => {
 				}
 			`)
 			.then(it => {
-				it.top.should.exist;
+				expect(it.top).to.exist;
 				it.top.items.length.should.equal(1);
 				it.top.items[0].id.should.equal('standard-page-item-1');
 				should.equal(it.top.layoutHint, null);
@@ -149,7 +150,7 @@ describe('Top Stories', () => {
 				}
 			`)
 			.then(it => {
-				it.top.should.exist;
+				expect(it.top).to.exist;
 				it.top.items.length.should.equal(1);
 				it.top.items[0].id.should.equal('standard-page-item-1');
 				it.top.layoutHint.should.equal('standard');
@@ -210,7 +211,7 @@ describe('Top Stories', () => {
 				}
 			`)
 			.then(it => {
-				it.top.should.exist;
+				expect(it.top).to.exist;
 				it.top.items.length.should.equal(2);
 				it.top.items[0].id.should.equal('standard-list-item-1');
 				it.top.items[1].id.should.equal('standard-page-item-1');
