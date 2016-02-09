@@ -4,6 +4,7 @@ import path from 'path';
 
 import express from 'ft-next-express';
 import nHealth from 'n-health';
+import jsonpMiddleware from '@financial-times/n-jsonp';
 
 import additionalHealthChecks from './lib/health-checks/index';
 import externalAuth from './middleware/external-auth';
@@ -29,7 +30,7 @@ app.get('/__gtg', (req, res) => {
 import query from './routes/query';
 app.post('/', externalAuth, cacheControl, query);
 app.post('/data', externalAuth, cacheControl, query);
-app.get('/data', externalAuth, cacheControl, cors, query);
+app.get('/data', externalAuth, cacheControl, cors, jsonpMiddleware, query);
 
 import authS3O from 's3o-middleware';
 import index from './routes/index';

@@ -8,6 +8,7 @@
     "test": "make test"
   },
   "dependencies": {
+    "@financial-times/n-jsonp": "^2.2.0",
     "babel-plugin-add-module-exports": "^0.1.1",
     "babel-plugin-transform-es2015-destructuring": "^6.3.13",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.3.13",
