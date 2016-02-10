@@ -4,7 +4,7 @@ import sinon from 'sinon';
 import chai from 'chai';
 
 const expect = chai.expect;
-const should = chai.should();
+chai.should();
 
 import graphqlClient from '../../../server/lib/graphql';
 
