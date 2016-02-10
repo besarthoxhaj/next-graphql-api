@@ -103,7 +103,6 @@ const List = new GraphQLObjectType({
 				type: { type: ContentType }
 			},
 			resolve: (result, args, {rootValue: {flags}}) => {
-				console.log('result', result);
 				if(!result.items || result.items.length < 1) { return []; }
 
 				return backend(flags).capi.content(result.items.map(result => result.id.replace(/http:\/\/api\.ft\.com\/things?\//, '')), args);

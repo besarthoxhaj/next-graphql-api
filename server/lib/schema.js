@@ -37,7 +37,6 @@ const queryType = new GraphQLObjectType({
 			},
 			resolve: (root, {region}, {rootValue: {flags}}) => {
 				let uuid = sources[`${region}TopList`].uuid;
-				console.log('uuid', uuid);
 				return backend(flags).capi.list(uuid);
 			}
 		},
