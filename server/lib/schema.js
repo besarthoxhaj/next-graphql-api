@@ -8,7 +8,7 @@ import {
 } from 'graphql';
 
 import { Region } from './types/basic';
-import { Page, List, ContentByConcept, CombinedPageAndList } from './types/collections';
+import { Page, List, ContentByConcept } from './types/collections';
 import { Content, Video, Concept } from './types/content';
 import { ContentType } from './types/basic';
 import User from './types/user';
@@ -21,15 +21,23 @@ const queryType = new GraphQLObjectType({
 	description: 'FT content API',
 	fields: {
 		top: {
-			type: CombinedPageAndList,
+			type: Page,
 			args: {
 				region: { type: new GraphQLNonNull(Region) }
 			},
 			resolve: (root, {region}, {rootValue: {flags}}) => {
 				const uuid = sources[`${region}Top`].uuid;
-				const listUuid = sources[`${region}TopList`].uuid;
-				const listFetch = flags.frontPageMultipleLayouts ? backend(flags).capi.list(listUuid).catch(() => {}) : Promise.resolve({});
-				return Promise.all([backend(flags).capi.page(uuid), listFetch]);
+				return backend(flags).capi.page(uuid);
+			}
+		},
+		topStoriesList: {
+			type: List,
+			args: {
+				region: { type: new GraphQLNonNull(Region) }
+			},
+			resolve: (root, {region}, {rootValue: {flags}}) => {
+				let uuid = sources[`${region}TopList`].uuid;
+				return backend(flags).capi.list(uuid);
 			}
 		},
 		fastFT: {
