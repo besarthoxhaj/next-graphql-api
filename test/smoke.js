@@ -18,6 +18,12 @@ const query = `
 				title
 			}
 		}
+		topStoriesList(region: UK) {
+			layoutHint
+			items(limit: 10) {
+				title
+			}
+		}
 		fastFT {
 			items(limit: 5) {
 				title

@@ -32,7 +32,13 @@ describe('Top Stories', () => {
 				{
 					name: 'capi-list-uk',
 					matcher: '^http://api.ft.com/lists/520ddb76-e43d-11e4-9e89-00144feab7de',
-					response: 500
+					response: {
+						layoutHint: 'standard',
+						items: [
+							{id: 'http://api.ft.com/things/standard-list-item-1'},
+							{id: 'http://api.ft.com/things/standard-list-item-2'}
+						]
+					}
 				},
 				{
 					name: 'elastic-search',
@@ -49,9 +55,10 @@ describe('Top Stories', () => {
 
 
 
-	it('still works when lists API is down', () => {
 
-		return graphqlClient({ frontPageMultipleLayouts: true })
+	it('fetches top stories with content from Page', () => {
+
+		return graphqlClient()
 			.fetch(`
 				query TopStories {
 					top(region: UK) {
@@ -70,33 +77,18 @@ describe('Top Stories', () => {
 				expect(it.top).to.exist;
 				it.top.items.length.should.equal(1);
 				it.top.items[0].id.should.equal('standard-page-item-1');
-				should.equal(it.top.layoutHint, null);
+				expect(it.top.layoutHint).to.be.null;
 			});
 	});
 
 
-	it('Returns only the page when frontPageMultipleLayouts flag is off', () => {
+	it('fetches top stories with content and layouthint from List', () => {
 
-		fetchMock.reMock({
-			routes: [
-				{
-					name: 'capi-list-uk',
-					matcher: '^http://api.ft.com/lists/520ddb76-e43d-11e4-9e89-00144feab7de',
-					response: {
-						layoutHint: 'standard',
-						items: [
-							{id: 'standard-list-item-1'},
-							{id: 'standard-list-item-2'}
-						]
-					}
-				}
-			]
-		});
 
-		return graphqlClient({ frontPageMultipleLayouts: false })
+		return graphqlClient()
 			.fetch(`
 				query TopStories {
-					top(region: UK) {
+					topStoriesList(region: UK) {
 						layoutHint
 						items(limit: 1) {
 							type: __typename
@@ -109,113 +101,11 @@ describe('Top Stories', () => {
 				}
 			`)
 			.then(it => {
-				expect(it.top).to.exist;
-				it.top.items.length.should.equal(1);
-				it.top.items[0].id.should.equal('standard-page-item-1');
-				should.equal(it.top.layoutHint, null);
+				expect(it.topStoriesList).to.exist;
+				it.topStoriesList.items.length.should.equal(1);
+				it.topStoriesList.items[0].id.should.equal('standard-list-item-1');
+				it.topStoriesList.layoutHint.should.equal('standard');
 			});
 	});
 
-	it('fetches page with layouthint from list and content from page', () => {
-
-		fetchMock.reMock({
-			routes: [
-				{
-					name: 'capi-list-uk',
-					matcher: '^http://api.ft.com/lists/520ddb76-e43d-11e4-9e89-00144feab7de',
-					response: {
-						layoutHint: 'standard',
-						items: [
-							{id: 'http://api.ft.com/things/standard-list-item-1'},
-							{id: 'http://api.ft.com/things/standard-list-item-2'}
-						]
-					}
-				}
-			]
-		});
-
-		return graphqlClient({ frontPageMultipleLayouts: true })
-			.fetch(`
-				query TopStories {
-					top(region: UK) {
-						layoutHint
-						items(limit: 1) {
-							type: __typename
-							contentType
-							id
-							title
-							lastPublished
-						}
-					}
-				}
-			`)
-			.then(it => {
-				expect(it.top).to.exist;
-				it.top.items.length.should.equal(1);
-				it.top.items[0].id.should.equal('standard-page-item-1');
-				it.top.layoutHint.should.equal('standard');
-			});
-	});
-
-
-	it('if the layout is a picture story, brings in the top story from the list', () => {
-
-		fetchMock.reMock({
-			routes: [
-				{
-					name: 'capi-page-us',
-					matcher: '^http://api.ft.com/site/v1/pages/b0ed86f4-4e94-11de-8d4c-00144feabdc0/main-content',
-					response: {
-						page: { title: 'title' },
-						pageItems: [
-							{id: 'standard-page-item-1'},
-							{id: 'standard-page-item-2'}
-						]
-					}
-				},
-				{
-					name: 'capi-list-us',
-					matcher: '^http://api.ft.com/lists/b0d8e4fe-10ff-11e5-8413-00144feabdc0',
-					response: {
-						layoutHint: 'standaloneimage',
-						items: [
-							{id: 'http://api.ft.com/things/standard-list-item-1'},
-							{id: 'http://api.ft.com/things/standard-list-item-2'}
-						]
-					}
-				},
-				{
-					name: 'elastic-search',
-					matcher: '^https://search-next-search-',
-					response: (url, opts) => {
-						const docs = JSON.parse(opts.body).ids.map(id => ({ found: true, _source: { id } }))
-						return { docs: docs };
-				}
-			}
-			]
-		});
-
-		return graphqlClient({ frontPageMultipleLayouts: true })
-			.fetch(`
-				query TopStories {
-					top(region: US) {
-						layoutHint
-						items(limit: 2) {
-							type: __typename
-							contentType
-							id
-							title
-							lastPublished
-						}
-					}
-				}
-			`)
-			.then(it => {
-				expect(it.top).to.exist;
-				it.top.items.length.should.equal(2);
-				it.top.items[0].id.should.equal('standard-list-item-1');
-				it.top.items[1].id.should.equal('standard-page-item-1');
-				it.top.layoutHint.should.equal('standaloneimage');
-			});
-	});
 });
