@@ -1,23 +1,22 @@
 require('isomorphic-fetch');
-
 import React from 'react';
+import ReactDOM from 'react-dom';
 import GraphiQL from 'graphiql';
 
-const apiKey = document.querySelector('.api-key').textContent;
-const fetcher = (params) => {
+const fetcher = (apiKey, params) => {
 	console.log('GraphiQL submitted', params);
 
-	return fetch(`/?apiKey=${apiKey}`, {
+	return fetch(`/data?apiKey=${apiKey}`, {
 			method: 'post',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(params)
 		})
 		.then(response => response.json())
-		.then(it => ({ data: it }))
+		.then(data => ({ data }))
 };
 
 export default {
-	init: (el) => {
-		React.render(<GraphiQL fetcher={fetcher} />, el);
+	init: (el, apiKey) => {
+		ReactDOM.render(<GraphiQL fetcher={fetcher.bind(null, apiKey)} />, el);
 	}
 }

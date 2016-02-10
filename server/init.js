@@ -28,6 +28,7 @@ app.get('/__gtg', (req, res) => {
 
 import query from './routes/query';
 app.post('/', externalAuth, cacheControl, query);
+app.post('/data', externalAuth, cacheControl, query);
 app.get('/data', externalAuth, cacheControl, cors, query);
 
 import authS3O from 's3o-middleware';
