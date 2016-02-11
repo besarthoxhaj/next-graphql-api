@@ -2,7 +2,7 @@ import {graphql} from 'graphql';
 import {printSchema} from 'graphql/utilities';
 
 import schema from './schema';
-import { logger } from 'ft-next-express';
+import logger from '@financial-times/n-logger';
 
 const fetch = (flags = {}, isUserRequest, userUuid) => {
 	return (query, vars) => {

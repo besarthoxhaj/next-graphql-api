@@ -1,4 +1,4 @@
-const logger = require('ft-next-express').logger;
+import logger from '@financial-times/n-logger';
 
 export default (req, res, next) => {
 	const sessionToken = req.cookies.FTSession;
@@ -38,7 +38,7 @@ export default (req, res, next) => {
 		})
 		.catch(err => {
 			if (typeof err !== 'number') {
-				logger.error('event=failed_session_auth url=%s', req.path);
+				logger.error('Failed session auth', { url: req.path });
 			}
 			throw err;
 		});

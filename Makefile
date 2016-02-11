@@ -12,8 +12,8 @@ verify:
 	obt verify --esLintPath=./.eslintrc
 
 unit-test:
-	export NODE_ENV="test"; export MYFT_API_URL="http://my.ft.com/"; export GRAPHQL_API_KEY=123; \
-	mocha --require test/setup --recursive --reporter spec test/server/
+	export CONSOLE_LOG_LEVEL="error"; export MYFT_API_URL="http://my.ft.com/"; export GRAPHQL_API_KEY=123; \
+	mocha --require server/setup --recursive --reporter spec test/server/
 
 test: verify unit-test
 

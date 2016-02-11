@@ -1,4 +1,4 @@
-import { logger } from 'ft-next-express';
+import logger from '@financial-times/n-logger';
 
 class Liveblog {
 	constructor(cache) {
@@ -39,7 +39,7 @@ class Liveblog {
 			return fetch(`${uri}?action=catchup&format=json`)
 			.then(res => {
 				const now = new Date();
-				logger.log('info', 'Fetching live blog updates from %s?action=catchup&format=json took %d ms', uri, now - then);
+				logger.info(`Fetching live blog updates from ${uri}?action=catchup&format=json took ${now - then} ms`);
 
 				return res;
 			})

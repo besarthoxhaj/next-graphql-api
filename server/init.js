@@ -17,7 +17,6 @@ const app = express({
 	withBackendAuthentication: false,
 	healthChecks: healthChecks.asArray()
 });
-const logger = express.logger;
 
 app.use(cookieParser());
 app.use(bodyParser.text());
@@ -37,15 +36,13 @@ import index from './routes/index';
 import schema from './routes/schema';
 import playground from './routes/playground';
 
-
 app.use(authS3O);
 app.get('/', index);
 app.get('/schema', schema);
 app.get('/playground', playground);
 
 const port = process.env.PORT || 3001;
+const listen = app.listen(port, () => { });
 
 export default app;
-export let listen = app.listen(port, () => {
-	logger.info('Listening on ' + port);
-});
+export { listen };
