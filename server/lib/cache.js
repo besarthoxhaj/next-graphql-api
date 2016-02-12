@@ -1,4 +1,5 @@
-import { metrics, logger } from 'ft-next-express';
+import { metrics } from 'ft-next-express';
+import logger from '@financial-times/n-logger';
 
 class Cache {
 	constructor(staleTtl, unusedStaleTtl) {

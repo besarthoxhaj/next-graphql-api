@@ -1,5 +1,5 @@
 import graphql from '../lib/graphql';
-import { logger } from 'ft-next-express';
+import logger from '@financial-times/n-logger';
 
 export default (req, res, next) => {
 
