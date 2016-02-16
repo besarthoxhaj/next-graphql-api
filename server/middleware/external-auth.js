@@ -8,8 +8,9 @@ export default (req, res, next) => {
 		if(apiKey === process.env.GRAPHQL_API_KEY) {
 			return next();
 		} else {
-			logger.error('Bad or missing apiKey');
-			return res.status(401).send('Bad or missing apiKey');
+			const message = 'Bad or missing apiKey';
+			logger.error(message);
+			return res.status(401).jsonp({ type: 'Unauthorized', error: { message }});
 		}
 	}
 

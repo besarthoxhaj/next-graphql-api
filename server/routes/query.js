@@ -9,8 +9,9 @@ export default (req, res, next) => {
 	const vars = JSON.parse(req.body.variables || '{}');
 
 	if (!Object.keys(query).length) {
-		logger.warn('Empty query supplied');
-		return res.status(400).send();
+		const message = 'Empty query supplied';
+		logger.warn(message);
+		return res.status(400).jsonp({ type: 'Bad Request', error: { message }});
 	}
 
 	graphql(flags, res.locals.isUserRequest, res.locals.uuid)
@@ -18,9 +19,6 @@ export default (req, res, next) => {
 		.then(data => res.jsonp(data))
 		.catch(errs => {
 			const err = Array.isArray(errs) ? errs.shift() : errs;
-			if(Number.isInteger(parseInt(err.message))) {
-				return res.send(parseInt(err.message));
-			}
 			next(err);
 		});
 };
