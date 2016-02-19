@@ -1,5 +1,6 @@
 import graphql from '../lib/graphql';
 import logger from '@financial-times/n-logger';
+import httpStatus from 'http-status-codes';
 
 export default (req, res, next) => {
 
@@ -19,6 +20,12 @@ export default (req, res, next) => {
 		.then(data => res.jsonp(data))
 		.catch(errs => {
 			const err = Array.isArray(errs) ? errs.shift() : errs;
+			if (Number.isInteger(parseInt(err.message))) {
+				return res.status(err.message).jsonp({
+					type: httpStatus.getStatusText(err.message),
+					error: { message: err.message }
+				});
+			}
 			next(err);
 		});
 };

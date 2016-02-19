@@ -53,28 +53,28 @@ describe('Authentication', () => {
 	describe('User with an API key in query string', () => {
 		it('can request normal data via GET', () => {
 			return request(app)
-			.get(`/data?apiKey=${process.env.GRAPHQL_API_KEY}&query=${encodeURIComponent(queries.normal)}`)
-		.expect(200);
+				.get(`/data?apiKey=${process.env.GRAPHQL_API_KEY}&query=${encodeURIComponent(queries.normal)}`)
+				.expect(200);
 		});
 
 		it('can request user data with a user uuid via GET', () => {
 			return request(app)
-			.get(`/data?apiKey=${process.env.GRAPHQL_API_KEY}&query=${encodeURIComponent(queries.userWithUUID)}`)
-			.expect(200)
-			.expect(() => {
-				fetchMock.called('myft-api').should.be.true;
-			})
+				.get(`/data?apiKey=${process.env.GRAPHQL_API_KEY}&query=${encodeURIComponent(queries.userWithUUID)}`)
+				.expect(200)
+				.expect(() => {
+					fetchMock.called('myft-api').should.be.true;
+				})
 		});
 
 		it('will not get session details passed', () => {
 			return request(app)
-			.get(`/data?apiKey=${process.env.GRAPHQL_API_KEY}&query=${encodeURIComponent(queries.userFromClient)}`)
-			.expect(500)
-			.expect((response) => {
-				fetchMock.called('session-service').should.be.false;
-				fetchMock.called('myft-api').should.be.false;
-				response.error.text.should.include("Must specify a user UUID");
-			})
+				.get(`/data?apiKey=${process.env.GRAPHQL_API_KEY}&query=${encodeURIComponent(queries.userFromClient)}`)
+				.expect(500)
+				.expect((response) => {
+					fetchMock.called('session-service').should.be.false;
+					fetchMock.called('myft-api').should.be.false;
+					response.error.text.should.include("Must specify a user UUID");
+				})
 		})
 
 
@@ -83,29 +83,29 @@ describe('Authentication', () => {
 	describe('User with an invalid API key in query string', () => {
 		it('can request normal data via GET', () => {
 			return request(app)
-			.get(`/data?apiKey=invalidKey&query=${encodeURIComponent(queries.normal)}`)
-			.expect(401);
+				.get(`/data?apiKey=invalidKey&query=${encodeURIComponent(queries.normal)}`)
+				.expect(401, { error: { message: 'Bad or missing apiKey' }, type: 'Unauthorized' })
 		});
 
 		it('can request user data with a user uuid via GET', () => {
 			return request(app)
-			.get(`/data?apiKey=invalidKey&query=${encodeURIComponent(queries.userWithUUID)}`)
-			.expect(401)
-			.expect(() => {
-				fetchMock.called('session-service').should.be.false;
-				fetchMock.called('myft-api').should.be.false;
-			})
+				.get(`/data?apiKey=invalidKey&query=${encodeURIComponent(queries.userWithUUID)}`)
+				.expect(401, { error: { message: 'Bad or missing apiKey' }, type: 'Unauthorized' })
+				.expect(() => {
+					fetchMock.called('session-service').should.be.false;
+					fetchMock.called('myft-api').should.be.false;
+				})
 		});
 
 		it('will not get session details passed from client', () => {
 			return request(app)
-			.get(`/data?apiKey=invalidKey&query=${encodeURIComponent(queries.userFromClient)}`)
-			.expect(401)
-			.expect((response) => {
-				fetchMock.called('session-service').should.be.false;
-				fetchMock.called('myft-api').should.be.false;
-				response.error.text.should.include("Bad or missing apiKey");
-			})
+				.get(`/data?apiKey=invalidKey&query=${encodeURIComponent(queries.userFromClient)}`)
+				.expect(401, { error: { message: 'Bad or missing apiKey' }, type: 'Unauthorized' })
+				.expect((response) => {
+					fetchMock.called('session-service').should.be.false;
+					fetchMock.called('myft-api').should.be.false;
+					response.error.text.should.include("Bad or missing apiKey");
+				})
 		})
 
 
@@ -114,41 +114,41 @@ describe('Authentication', () => {
 	describe('User with a session token', () => {
 		it('can request normal data via GET', () => {
 			return request(app)
-			.get(`/data?query=${encodeURIComponent(queries.normal)}`)
-			.set('Cookie', 'FTSession=session-token')
-			.expect(200);
+				.get(`/data?query=${encodeURIComponent(queries.normal)}`)
+				.set('Cookie', 'FTSession=session-token')
+				.expect(200);
 		});
 
 		it('can request user data with their own user uuid via GET', () => {
 			return request(app)
-			.get(`/data?query=${encodeURIComponent(queries.userWithUUID)}`)
-			.set('Cookie', 'FTSession=session-token')
-			.expect(200)
-			.expect(() => {
-				fetchMock.called('myft-api').should.be.true;
-			})
+				.get(`/data?query=${encodeURIComponent(queries.userWithUUID)}`)
+				.set('Cookie', 'FTSession=session-token')
+				.expect(200)
+				.expect(() => {
+					fetchMock.called('myft-api').should.be.true;
+				})
 		});
 
 		it('cannot request another users data', () => {
 			return request(app)
-			.get(`/data?query=${encodeURIComponent(queries.userWithRandomUUID)}`)
-			.set('Cookie', 'FTSession=session-token')
-			.expect(401)
-			.expect(() => {
-				fetchMock.called('session-service').should.be.true;
-				fetchMock.called('myft-api').should.be.false;
-			})
+				.get(`/data?query=${encodeURIComponent(queries.userWithRandomUUID)}`)
+				.set('Cookie', 'FTSession=session-token')
+				.expect(401, { error: { message: '401' }, type: 'Unauthorized' })
+				.expect(() => {
+					fetchMock.called('session-service').should.be.true;
+					fetchMock.called('myft-api').should.be.false;
+				})
 		});
 
 		it('will get session details passed', () => {
 			return request(app)
-			.get(`/data?query=${encodeURIComponent(queries.userFromClient)}`)
-			.set('Cookie', 'FTSession=session-token')
-			.expect(200)
-			.expect(() => {
-				fetchMock.called('session-service').should.be.true;
-				fetchMock.called('myft-api').should.be.true;
-			})
+				.get(`/data?query=${encodeURIComponent(queries.userFromClient)}`)
+				.set('Cookie', 'FTSession=session-token')
+				.expect(200)
+				.expect(() => {
+					fetchMock.called('session-service').should.be.true;
+					fetchMock.called('myft-api').should.be.true;
+				})
 		});
 
 	});
@@ -167,44 +167,44 @@ describe('Authentication', () => {
 
 		it('can request normal data via GET', () => {
 			return request(app)
-			.get(`/data?query=${encodeURIComponent(queries.normal)}`)
-			.set('Cookie', 'FTSession=invalid-session-token')
-			.expect(200)
-			.expect(() => {
-				fetchMock.called('session-service').should.be.true;
-			})
+				.get(`/data?query=${encodeURIComponent(queries.normal)}`)
+				.set('Cookie', 'FTSession=invalid-session-token')
+				.expect(200)
+				.expect(() => {
+					fetchMock.called('session-service').should.be.true;
+				})
 		});
 
 		it('cannot request user data with their own user uuid via GET', () => {
 			return request(app)
-			.get(`/data?query=${encodeURIComponent(queries.userWithUUID)}`)
-			.set('Cookie', 'FTSession=invalid-session-token')
-			.expect(401)
-			.expect(() => {
-				fetchMock.called('myft-api').should.be.false;
-			})
+				.get(`/data?query=${encodeURIComponent(queries.userWithUUID)}`)
+				.set('Cookie', 'FTSession=invalid-session-token')
+				.expect(401, { error: { message: '401' }, type: 'Unauthorized' })
+				.expect(() => {
+					fetchMock.called('myft-api').should.be.false;
+				})
 		});
 
 		it('cannot request another users data', () => {
 			return request(app)
-			.get(`/data?query=${encodeURIComponent(queries.userWithRandomUUID)}`)
-			.set('Cookie', 'FTSession=invalid-session-token')
-			.expect(401)
-			.expect(() => {
-				fetchMock.called('session-service').should.be.true;
-				fetchMock.called('myft-api').should.be.false;
-			})
+				.get(`/data?query=${encodeURIComponent(queries.userWithRandomUUID)}`)
+				.set('Cookie', 'FTSession=invalid-session-token')
+				.expect(401, { error: { message: '401' }, type: 'Unauthorized' })
+				.expect(() => {
+					fetchMock.called('session-service').should.be.true;
+					fetchMock.called('myft-api').should.be.false;
+				})
 		});
 
 		it('cannot access their own user data from client', () => {
 			return request(app)
-			.get(`/data?query=${encodeURIComponent(queries.userFromClient)}`)
-			.set('Cookie', 'FTSession=invalid-session-token')
-			.expect(401)
-			.expect(() => {
-				fetchMock.called('session-service').should.be.true;
-				fetchMock.called('myft-api').should.be.false;
-			})
+				.get(`/data?query=${encodeURIComponent(queries.userFromClient)}`)
+				.set('Cookie', 'FTSession=invalid-session-token')
+				.expect(401, { error: { message: '401' }, type: 'Unauthorized' })
+				.expect(() => {
+					fetchMock.called('session-service').should.be.true;
+					fetchMock.called('myft-api').should.be.false;
+				})
 		});
 
 	});
