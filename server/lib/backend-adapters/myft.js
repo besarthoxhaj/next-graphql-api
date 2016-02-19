@@ -16,7 +16,7 @@ class Myft {
 	personalisedFeed(uuid, { limit = 10 }) {
 		return fetch(`https://ft-next-personalised-feed-api.herokuapp.com/v2/feed/${uuid}?originatingSignals=followed&from=-7d`, {
 			headers: {
-				'X-FT-Personalised-Feed-Api-Ke': process.env.PERSONALISED_FEED_API_KEY
+				'X-FT-Personalised-Feed-Api-Key': process.env.PERSONALISED_FEED_API_KEY
 			}
 		})
 			.then(res => res.json())
@@ -24,10 +24,7 @@ class Myft {
 				(new TopicCards(res.results).process())
 					.slice(0, limit)
 					.map(card => card.term)
-			)
-			.catch(err => {
-				console.log('#####');
-			})
+			);
 	}
 
 	getViewed(uuid, { limit = 10 }) {
