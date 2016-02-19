@@ -45,7 +45,6 @@ class CAPI {
 				}
 			}
 		};
-
 		return this.cache.cached(`${this.type}.search.${termName}:${termValue}`, ttl, () => {
 			return ApiClient.search(searchOpts);
 		})
@@ -66,6 +65,16 @@ class CAPI {
 	list(uuid, ttl = 50) {
 		return this.cache.cached(`${this.type}.lists.${uuid}`, ttl, () => {
 			return ApiClient.lists({ uuid: uuid })
+		});
+	}
+
+	things(uuids, ttl = 50) {
+		const cacheKey = `${this.type}.things.${Array.isArray(uuids) ? uuids.join('_') : uuids}`;
+		return this.cache.cached(cacheKey, ttl, () => {
+			return ApiClient.things({
+				identifierValues: uuids,
+				authority: 'http://api.ft.com/system/FT-TME'
+			});
 		});
 	}
 }

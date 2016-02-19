@@ -36,6 +36,19 @@ class Myft {
 					.slice(0, limit)
 			);
 	}
+
+	getMostReadTopics({ limit = 10 }) {
+		return myftClient.fetchJson('GET', 'recommendation/most-read/concept', { limit })
+				.then(results => results.items
+					.filter(concept => concept));
+	}
+
+	getMostFollowedTopics({ limit = 10 }) {
+		return myftClient.fetchJson('GET', 'recommendation/most-followed/concept', { limit })
+				.then(results => results.items
+					.filter(concept => concept));
+	}
+
 }
 
 export default Myft;
