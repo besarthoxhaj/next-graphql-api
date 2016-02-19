@@ -109,6 +109,26 @@ const queryType = new GraphQLObjectType({
 				return backend(flags).popularApi.topics({from, limit})
 			}
 		},
+		popularReadTopicsFromMyFtApi: {
+			type: new GraphQLList(Concept),
+			args: {
+				limit: { type: GraphQLInt }
+			},
+			resolve: (root, {limit}, {rootValue: {flags}}) => {
+				return backend(flags).myft.getMostReadTopics({limit})
+						.then(items => backend(flags).capi.things(items.map(t => t.uuid)).then(c => c.items));
+			}
+		},
+		popularFollowedTopicsFromMyFtApi: {
+			type: new GraphQLList(Concept),
+			args: {
+				limit: { type: GraphQLInt }
+			},
+			resolve: (root, {limit}, {rootValue: {flags}}) => {
+				return backend(flags).myft.getMostFollowedTopics({limit})
+						.then(items => backend(flags).capi.things(items.map(t => t.uuid)).then(c => c.items));
+			}
+		},
 		popularArticles: {
 			type: new GraphQLList(Content),
 			args: {
