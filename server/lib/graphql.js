@@ -18,7 +18,9 @@ const fetch = (flags = {}, isUserRequest, userUuid) => {
 					throw it.errors;
 				}
 
-				if(it.data) { return it.data; }
+				if (it.data) {
+					return it.data;
+				}
 			});
 	};
 };
