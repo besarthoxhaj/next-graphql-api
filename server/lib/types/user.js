@@ -95,6 +95,20 @@ const User = new GraphQLObjectType({
 				return backend(flags).myft.personalisedFeed(uuid, { limit })
 					.then(items => !items ? [] : items.map(item => item.content));
 			}
+		},
+		recommendedTopics: {
+			type: new GraphQLList(Concept),
+			args: {
+				limit: {
+					type: GraphQLInt
+				}
+			},
+			resolve: (source, { limit=10 }, {rootValue: {flags, isUserRequest, userUuid}}) => {
+				const uuid = auth(source.uuid, userUuid, isUserRequest);
+				return backend(flags).myft.getRecommendedTopics(uuid, { limit })
+						.then(concepts => !concepts ? [] : concepts);
+
+			}
 		}
 	}
 });

@@ -49,6 +49,12 @@ class Myft {
 					.filter(concept => concept));
 	}
 
+	getRecommendedTopics(uuid, { limit = 10 }) {
+		return myftClient.fetchJson('GET', `recommendation/user/${uuid}/concept`, { limit })
+				.then(results => results.items
+				.filter(concept => concept));
+	}
+
 }
 
 export default Myft;
