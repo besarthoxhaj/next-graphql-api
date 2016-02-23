@@ -99,6 +99,35 @@ const queryType = new GraphQLObjectType({
 				return backend(flags).video.fetch(id, {from, limit});
 			}
 		},
+		todaysTopics: {
+			type: new GraphQLList(Concept),
+			args: {
+				region: { type: new GraphQLNonNull(Region) },
+				from: { type: GraphQLInt },
+				limit: { type: GraphQLInt },
+				genres: { type: new GraphQLList(GraphQLString) },
+				type: { type: ContentType }
+			},
+			resolve: (root, {region, from, limit, genres, type}, {rootValue: {flags}}) => {
+				const uuid = sources[`${region}Top`].uuid;
+				const be = backend(flags);
+				const args = { from, limit, genres, type };
+				function getPrimaryTag(metadata) {
+					const primarySection = metadata.find(tag => tag.primary === 'section');
+					const primaryTheme = metadata.find(tag => tag.primary === 'theme');
+					return primaryTheme || primarySection || null;
+				}
+				return Promise.all([
+					be.capi.page(sources[`${region}Top`].uuid).then(p => be.capi.content(p.items, args)).then(c => c.map(c => getPrimaryTag(c.metadata))),
+					be.capi.page(sources.opinion.uuid, sources.opinion.sectionsId).then(p => be.capi.content(p.items, args)).then(c => c.map(c => getPrimaryTag(c.metadata))),
+					be.capi.list(sources.editorsPicks.uuid).then(r => be.capi.content(r.items.map(i => i.id.replace(/http:\/\/api\.ft\.com\/things?\//, '')), args)).then(c => c.map(c => getPrimaryTag(c.metadata)))
+				]).then((data) => {
+					const tags = data.reduce((res, next) => res.concat(next), []);
+
+					return tags;
+				});
+			}
+		},
 		popularTopics: {
 			type: new GraphQLList(Concept),
 			args: {
