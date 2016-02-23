@@ -188,6 +188,46 @@ const queryType = new GraphQLObjectType({
 					.then(articles => be.capi.content(articles, args));
 			}
 		},
+		popularTopicsFromHui: {
+			type: new GraphQLList(Concept),
+			args: {
+				industry: {
+					type: GraphQLString
+				},
+				position: {
+					type: GraphQLString
+				},
+				sector: {
+					type: GraphQLString
+				},
+				country: {
+					type: GraphQLString
+				},
+				period: {
+					type: GraphQLString
+				},
+				from: {
+					type: GraphQLInt
+				},
+				limit: {
+					type: GraphQLInt
+				},
+				genres: {
+					type: new GraphQLList(GraphQLString)
+				},
+				type: {
+					type: ContentType
+				}
+			},
+			resolve: (root, args, {rootValue: {flags}}) => {
+				return backend(flags).hui.topics(args)
+						.then(items => {
+							return backend(flags).capi
+									.things(items, 'prefLabel')
+									.then(c => c.items);
+						});
+			}
+		},
 		user: {
 			type: User,
 			args: {
