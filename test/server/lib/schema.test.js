@@ -1,8 +1,10 @@
 import realFetch from 'isomorphic-fetch';
+import fetchMock from 'fetch-mock';
 global.fetch = realFetch;
 
 import chai from 'chai';
 chai.should();
+const expect = chai.expect;
 
 import graphqlClient from '../../../server/lib/graphql';
 
@@ -72,5 +74,32 @@ describe('GraphQL Schema', () => {
 				data.popularTopics[1].url.should.eq('/stream/barId/def');
 			})
 		})
-	})
+	});
+
+	describe.only('topStoriesList', () => {
+
+		before(() => {
+			fetchMock.mock('http://api.ft.com/lists/520ddb76-e43d-11e4-9e89-00144feab7de', 500)
+		});
+
+		after(() => {
+			fetchMock.restore();
+		});
+
+		it('should not break if list api is down', () => {
+			const query = `
+				query List {
+					topStoriesList(region: UK) {
+						title
+					}
+				}
+			`;
+			return graphqlClient()
+				.fetch(query)
+				.then(data => {
+					expect(data).to.have.property('topStoriesList');
+					expect(data.topStoriesList).to.equal.null;
+				})
+		});
+	});
 });
