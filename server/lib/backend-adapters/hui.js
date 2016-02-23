@@ -8,8 +8,15 @@ class Hui {
 	}
 
 	content({industry, position, sector, country, period='last-1-week', from, limit}, ttl = 50) {
-		return this.cache.cached(`${this.type}.${industry}.${position}.${sector}.${country}.${period}`, ttl, () => {
-			return ApiClient.hui({industry, position, sector, country, period})
+		return this.cache.cached(`${this.type}.content.${industry}.${position}.${sector}.${country}.${period}`, ttl, () => {
+			return ApiClient.hui({model: 'content', industry, position, sector, country, period})
+				.then(articles => sliceList(articles, {from, limit}));
+		});
+	}
+
+	topics({industry, position, sector, country, period='last-1-week', from, limit}, ttl = 50) {
+		return this.cache.cached(`${this.type}.topics.${industry}.${position}.${sector}.${country}.${period}`, ttl, () => {
+			return ApiClient.hui({model: 'annotations', industry, position, sector, country, period})
 				.then(articles => sliceList(articles, {from, limit}));
 		});
 	}

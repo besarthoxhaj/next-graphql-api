@@ -68,11 +68,12 @@ class CAPI {
 		});
 	}
 
-	things(uuids, ttl = 50) {
-		const cacheKey = `${this.type}.things.${Array.isArray(uuids) ? uuids.join('_') : uuids}`;
+	things(uuids, type = 'idV1', ttl = 50) {
+		const cacheKey = `${this.type}.things.${type}.${Array.isArray(uuids) ? uuids.join('_') : uuids}`;
 		return this.cache.cached(cacheKey, ttl, () => {
 			return ApiClient.things({
 				identifierValues: uuids,
+				identifierType: type,
 				authority: 'http://api.ft.com/system/FT-TME'
 			});
 		});
