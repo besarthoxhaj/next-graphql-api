@@ -9,6 +9,7 @@ import MockLiveblog from './mock-liveblog';
 import Video from './video';
 import PopularAPI from './popular-api';
 import Myft from './myft';
+import TodaysTopics from './todays-topics';
 
 import Cache from '../cache';
 
@@ -23,6 +24,7 @@ const mockLiveblog = new MockLiveblog(liveblog);
 const myft = new Myft(memCache);
 const popularApi = new PopularAPI(memCache);
 const video = new Video(memCache);
+const todaysTopics = new TodaysTopics(memCache);
 
 export default (flags = {}) => ({
 	capi: flags.mockFrontPage ? mockCapi : capi,
@@ -31,6 +33,7 @@ export default (flags = {}) => ({
 	liveblog: flags.mockFrontPage ? mockLiveblog : liveblog,
 	myft,
 	popularApi,
-	video
+	video,
+	todaysTopics
 });
 
