@@ -36,11 +36,7 @@ class TodaysTopics {
 					return res.find(i => i.idV1 === item.idV1) ? res : res.concat(item);
 				}, []);
 				//Sort by frequency
-				const result = uniq.sort((a, b) => {
-					if (countById[a.idV1] > countById[b.idV1]) return -1;
-					if (countById[a.idV1] < countById[b.idV1]) return 1;
-					return 0;
-				});
+				const result = uniq.sort((a, b) => countById[b.idV1] - countById[a.idV1]);
 
 				return result.slice(0, limit);
 			});
