@@ -17,7 +17,6 @@ class TodaysTopics {
 	getTopics({region, from, limit, genres, type}, flags = {}, ttl = 10) {
 		const cacheKey = `${this.type}.region.${region}`;
 		return this.cache.cached(cacheKey, ttl, () => {
-			const uuid = sources[`${region}Top`].uuid;
 			const be = backend(flags);
 			const args = { from, limit, genres, type };
 			return Promise.all([
