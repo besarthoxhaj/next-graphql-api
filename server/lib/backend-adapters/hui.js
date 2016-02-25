@@ -14,10 +14,9 @@ class Hui {
 		});
 	}
 
-	topics({industry, position, sector, country, period='last-1-week', from, limit}, ttl = 50) {
+	topics({industry, position, sector, country, period='last-1-week'}, ttl = 50) {
 		return this.cache.cached(`${this.type}.topics.${industry}.${position}.${sector}.${country}.${period}`, ttl, () => {
-			return ApiClient.hui({model: 'annotations', industry, position, sector, country, period})
-				.then(articles => sliceList(articles, {from, limit}));
+			return ApiClient.hui({model: 'annotations', industry, position, sector, country, period});
 		});
 	}
 
