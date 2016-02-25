@@ -25,7 +25,7 @@ class TodaysTopics {
 				be.capi.list(sources.editorsPicks.uuid).then(r => be.capi.content(r.items.map(i => i.id.replace(/http:\/\/api\.ft\.com\/things?\//, '')), args)).then(c => c.map(c => getPrimaryTag(c.metadata)))
 			]).then((data) => {
 				//Flatten results
-				const tags = data.reduce((res, item) => res.concat(item), []);
+				const tags = data.reduce((res, item) => res.concat(item), []).filter(t => t);
 				//Group by frequency of tag
 				const countById = tags.reduce((res, item) => {
 					res[item.idV1] = res[item.idV1] ? ++res[item.idV1] : 1;
