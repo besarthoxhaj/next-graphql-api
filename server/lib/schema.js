@@ -232,12 +232,15 @@ const queryType = new GraphQLObjectType({
 					type: ContentType
 				}
 			},
-			resolve: (root, args, {rootValue: {flags}}) => {
-				return backend(flags).hui.topics(args)
+			resolve: (root, { industry, position, sector, country, period, from, limit, genres, type}, {rootValue: {flags}}) => {
+				return backend(flags)
+						.hui.topics({industry, position, sector, country, period})
 						.then(items => {
 							return backend(flags).capi
 									.things(items, 'prefLabel')
-									.then(c => c.items);
+									.then(c => c.items
+												.filter(t => t)
+												.slice(0, limit));
 						});
 			}
 		},
