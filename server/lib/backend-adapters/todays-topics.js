@@ -14,7 +14,7 @@ class TodaysTopics {
 		this.cache = cache;
 	}
 
-	getTopics({region, from, limit, genres, type}, flags = {}, ttl = 10) {
+	getTopics({region, from, limit, genres, type}, flags = {}, ttl = 60 * 10) {
 		const cacheKey = `${this.type}.region.${region}`;
 		return this.cache.cached(cacheKey, ttl, () => {
 			const be = backend(flags);
