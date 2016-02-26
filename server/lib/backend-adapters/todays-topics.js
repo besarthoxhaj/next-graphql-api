@@ -14,7 +14,7 @@ class TodaysTopics {
 		this.cache = cache;
 	}
 
-	getTopics({region, from, limit, genres, type}, flags = {}, ttl = 10) {
+	getTopics({region, from, limit, genres, type}, flags = {}, ttl = 60 * 10) {
 		const cacheKey = `${this.type}.region.${region}`;
 		return this.cache.cached(cacheKey, ttl, () => {
 			const be = backend(flags);
@@ -38,7 +38,7 @@ class TodaysTopics {
 				//Sort by frequency
 				const result = uniq.sort((a, b) => countById[b.idV1] - countById[a.idV1]);
 
-				return result.slice(0, limit);
+				return result;
 			});
 		});
 	}

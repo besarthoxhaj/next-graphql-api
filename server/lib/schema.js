@@ -109,7 +109,10 @@ const queryType = new GraphQLObjectType({
 				type: { type: ContentType }
 			},
 			resolve: (root, {region, from, limit, genres, type}, {rootValue: {flags}}) => {
-				return backend(flags).todaysTopics.getTopics({region, from, limit, genres, type}, flags);
+				return backend(flags)
+						.todaysTopics
+						.getTopics({region, from, limit, genres, type}, flags)
+						.then(topics => topics.slice(0, limit));
 			}
 		},
 		popularTopics: {
@@ -119,7 +122,7 @@ const queryType = new GraphQLObjectType({
 				limit: { type: GraphQLInt }
 			},
 			resolve: (root, {from, limit}, {rootValue: {flags}}) => {
-				return backend(flags).popularApi.topics({from, limit})
+				return backend(flags).popularApi.topics({from, limit});
 			}
 		},
 		popularReadTopicsFromMyFtApi: {
