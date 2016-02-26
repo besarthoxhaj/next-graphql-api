@@ -38,7 +38,7 @@ class TodaysTopics {
 				//Sort by frequency
 				const result = uniq.sort((a, b) => countById[b.idV1] - countById[a.idV1]);
 
-				return result.slice(0, limit);
+				return result;
 			});
 		});
 	}
