@@ -11,7 +11,7 @@ import graphqlClient from '../../../server/lib/graphql';
 describe('GraphQL Schema', () => {
 	describe('#list', () => {
 		it('fetches list', () => {
-			return graphqlClient({ mockFrontPage: true, editorsPicksFromList: true })
+			return graphqlClient({ mockFrontPage: true })
 				.fetch(`
 					query List {
 						editorsPicks {
