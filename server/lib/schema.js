@@ -36,55 +36,47 @@ const queryType = new GraphQLObjectType({
 				region: { type: new GraphQLNonNull(Region) }
 			},
 			resolve: (root, {region}, {rootValue: {flags}}) => {
-				let uuid = sources[`${region}TopList`].uuid;
+				const uuid = sources[`${region}TopList`].uuid;
 				return backend(flags).capi.list(uuid);
 			}
 		},
 		fastFT: {
 			type: ContentByConcept,
-			resolve: (root, _, {rootValue: {flags}}) => {
-				return backend(flags).fastFT.fetch();
-			}
+			resolve: (root, _, {rootValue: {flags}}) =>
+				backend(flags).fastFT.fetch()
 		},
 		editorsPicks: {
 			type: List,
 			resolve: (root, _, {rootValue: {flags}}) => {
-				if (flags && flags.editorsPicksFromList) {
-					return backend(flags).capi.list(sources['editorsPicks'].uuid);
-				} else {
-					return [];
-				}
+				const uuid = sources['editorsPicks'].uuid;
+				return backend(flags).capi.list(uuid);
 			}
 		},
 		opinion: {
 			type: Page,
 			resolve: (root, _, {rootValue: {flags}}) => {
-				let {uuid, sectionsId} = sources.opinion;
-
+				const { uuid, sectionsId } = sources.opinion;
 				return backend(flags).capi.page(uuid, sectionsId);
 			}
 		},
 		lifestyle: {
 			type: Page,
 			resolve: (root, _, {rootValue: {flags}}) => {
-				let {uuid, sectionsId} = sources.lifestyle;
-
+				const { uuid, sectionsId } = sources.lifestyle;
 				return backend(flags).capi.page(uuid, sectionsId);
 			}
 		},
 		markets: {
 			type: Page,
 			resolve: (root, _, {rootValue: {flags}}) => {
-				let {uuid, sectionsId} = sources.markets;
-
+				const { uuid, sectionsId } = sources.markets;
 				return backend(flags).capi.page(uuid, sectionsId);
 			}
 		},
 		technology: {
 			type: Page,
 			resolve: (root, _, {rootValue: {flags}}) => {
-				let {uuid, sectionsId} = sources.technology;
-
+				const { uuid, sectionsId } = sources.technology;
 				return backend(flags).capi.page(uuid, sectionsId);
 			}
 		},
@@ -95,7 +87,7 @@ const queryType = new GraphQLObjectType({
 				limit: { type: GraphQLInt }
 			},
 			resolve: (root, {from, limit}, {rootValue: {flags}}) => {
-				let {id} = sources.videos;
+				const { id } = sources.videos;
 				return backend(flags).video.fetch(id, {from, limit});
 			}
 		},
@@ -108,12 +100,11 @@ const queryType = new GraphQLObjectType({
 				genres: { type: new GraphQLList(GraphQLString) },
 				type: { type: ContentType }
 			},
-			resolve: (root, {region, from, limit, genres, type}, {rootValue: {flags}}) => {
-				return backend(flags)
-						.todaysTopics
-						.getTopics({region, from, limit, genres, type}, flags)
-						.then(topics => topics.slice(0, limit));
-			}
+			resolve: (root, {region, from, limit, genres, type}, {rootValue: {flags}}) =>
+				backend(flags)
+					.todaysTopics
+					.getTopics({region, from, limit, genres, type}, flags)
+					.then(topics => topics.slice(0, limit))
 		},
 		popularTopics: {
 			type: new GraphQLList(Concept),
@@ -121,29 +112,26 @@ const queryType = new GraphQLObjectType({
 				from: { type: GraphQLInt },
 				limit: { type: GraphQLInt }
 			},
-			resolve: (root, {from, limit}, {rootValue: {flags}}) => {
-				return backend(flags).popularApi.topics({from, limit});
-			}
+			resolve: (root, {from, limit}, {rootValue: {flags}}) =>
+				backend(flags).popularApi.topics({from, limit})
 		},
 		popularReadTopicsFromMyFtApi: {
 			type: new GraphQLList(Concept),
 			args: {
 				limit: { type: GraphQLInt }
 			},
-			resolve: (root, {limit}, {rootValue: {flags}}) => {
-				return backend(flags).myft.getMostReadTopics({limit})
-						.then(items => backend(flags).capi.things(items.map(t => t.uuid)).then(c => c.items));
-			}
+			resolve: (root, {limit}, {rootValue: {flags}}) =>
+				backend(flags).myft.getMostReadTopics({limit})
+					.then(items => backend(flags).capi.things(items.map(t => t.uuid)).then(c => c.items))
 		},
 		popularFollowedTopicsFromMyFtApi: {
 			type: new GraphQLList(Concept),
 			args: {
 				limit: { type: GraphQLInt }
 			},
-			resolve: (root, {limit}, {rootValue: {flags}}) => {
-				return backend(flags).myft.getMostFollowedTopics({limit})
-						.then(items => backend(flags).capi.things(items.map(t => t.uuid)).then(c => c.items));
-			}
+			resolve: (root, {limit}, {rootValue: {flags}}) =>
+				backend(flags).myft.getMostFollowedTopics({limit})
+					.then(items => backend(flags).capi.things(items.map(t => t.uuid)).then(c => c.items))
 		},
 		popularArticles: {
 			type: new GraphQLList(Content),
@@ -235,17 +223,16 @@ const queryType = new GraphQLObjectType({
 					type: ContentType
 				}
 			},
-			resolve: (root, { industry, position, sector, country, period, from, limit, genres, type}, {rootValue: {flags}}) => {
-				return backend(flags)
-						.hui.topics({industry, position, sector, country, period})
-						.then(items => {
-							return backend(flags).capi
-									.things(items, 'prefLabel')
-									.then(c => c.items
-												.filter(t => t)
-												.slice(0, limit));
-						});
-			}
+			resolve: (root, { industry, position, sector, country, period, from, limit, genres, type}, {rootValue: {flags}}) =>
+				backend(flags)
+					.hui.topics({industry, position, sector, country, period})
+					.then(items => backend(flags).capi
+						.things(items, 'prefLabel')
+						.then(c => c.items
+							.filter(t => t)
+							.slice(0, limit)
+						)
+					)
 		},
 		user: {
 			type: User,
@@ -254,9 +241,7 @@ const queryType = new GraphQLObjectType({
 					type: GraphQLString
 				}
 			},
-			resolve: (root, args) => {
-				return { uuid: args.uuid };
-			}
+			resolve: (root, args) => ({ uuid: args.uuid })
 		}
 	}
 });
