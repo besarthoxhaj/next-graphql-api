@@ -6,6 +6,7 @@ import capifyMetadata from '../helpers/capify-metadata';
 import backend from '../backend-adapters/index';
 
 import {
+	GraphQLBoolean,
 	GraphQLID,
 	GraphQLInt,
 	GraphQLString,
@@ -19,6 +20,8 @@ import {
 	LiveBlogStatus,
 	ContentType
 } from './basic';
+
+const podcastIdV1 = 'NjI2MWZlMTEtMTE2NS00ZmI0LWFkMzMtNDhiYjA3YjcxYzIy-U2VjdGlvbnM=';
 
 const Content = new GraphQLInterfaceType({
 	name: 'Content',
@@ -140,6 +143,10 @@ const Article = new GraphQLObjectType({
 				}
 				return backend(flags).capi.content(storyPackageIds, { from, limit });
 			}
+		},
+		isPodcast: {
+			type: GraphQLBoolean,
+			resolve: content => content.metadata.some(concept => concept.idV1 === podcastIdV1)
 		}
 	})
 });
