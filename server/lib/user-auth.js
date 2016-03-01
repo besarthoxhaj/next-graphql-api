@@ -1,3 +1,5 @@
+import { json as fetchresJson } from 'fetchres';
+
 import { HttpError } from './errors';
 
 export default (req, uuid) => {
@@ -17,8 +19,7 @@ export default (req, uuid) => {
 			timeout: 2000,
 			headers: headers
 		})
-			.then(foo => console.log(foo))
-			.then(response => response.json())
+			.then(fetchresJson)
 			.then(response => {
 				if (response.uuid && response.uuid === uuid) {
 					return uuid;
