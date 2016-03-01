@@ -44,6 +44,5 @@ deploy:
 deploy-fastly-staging:
 	nbt deploy-vcl -e -s FASTLY_STAGING_SERVICE_ID --vars SERVICEID --main main.vcl ./src/vcl/
 
-
 deploy-fastly:
 	nbt deploy-vcl -e -s FASTLY_SERVICE_ID --vars SERVICEID --main main.vcl ./src/vcl/
