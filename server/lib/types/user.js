@@ -1,27 +1,9 @@
-import {
-	GraphQLObjectType,
-	GraphQLString,
-	GraphQLList,
-	GraphQLInt
-} from 'graphql';
+import { GraphQLObjectType, GraphQLString, GraphQLList, GraphQLInt } from 'graphql';
 
 import { Content, Concept } from './content';
 import backend from '../backend-adapters/index';
 
-const auth = (requestedUUID, sessionUUID, isUserRequest) => {
-	const uuid = sessionUUID || (!isUserRequest && requestedUUID);
-	if(uuid) {
-		if(sessionUUID && requestedUUID && sessionUUID !== requestedUUID) {
-			throw 401;
-		} else {
-			return uuid;
-		}
-	} else {
-			throw new Error(isUserRequest ? 401 : 'Must specify a user UUID');
-	}
-};
-
-const User = new GraphQLObjectType({
+export default new GraphQLObjectType({
 	name: 'User',
 	description: 'Represents an FT user',
 	fields: {
@@ -35,12 +17,9 @@ const User = new GraphQLObjectType({
 					type: GraphQLInt
 				}
 			},
-			resolve: (source, { limit=10 }, {rootValue: {flags, isUserRequest, userUuid}}) => {
-
-				const uuid = auth(source.uuid, userUuid, isUserRequest);
-
+			resolve: ({ uuid }, { limit = 10 }, { rootValue: { flags }}) => {
 				return backend(flags).myft.getAllRelationship(uuid, 'saved', 'content', { limit })
-					.then(items => !items ? [] :backend(flags).capi.content(items.map(item => item.uuid), { limit }));
+					.then(items => !items ? [] : backend(flags).capi.content(items.map(item => item.uuid), { limit }));
 			}
 		},
 		read: {
@@ -50,10 +29,7 @@ const User = new GraphQLObjectType({
 					type: GraphQLInt
 				}
 			},
-			resolve: (source, { limit=10 }, {rootValue: {flags, isUserRequest, userUuid}}) => {
-
-				const uuid = auth(source.uuid, userUuid, isUserRequest);
-
+			resolve: ({ uuid }, { limit=10 }, { rootValue: { flags }}) => {
 				return backend(flags).myft.getAllRelationship(uuid, 'read', 'content', { limit })
 					.then(items => !items ? [] : backend(flags).capi.content(items.map(item => item.uuid), { limit }));
 			}
@@ -65,10 +41,8 @@ const User = new GraphQLObjectType({
 					type: GraphQLInt
 				}
 			},
-			resolve: (source, { limit = 10 }, {rootValue: {flags, isUserRequest, userUuid}}) => {
-				const uuid = auth(source.uuid, userUuid, isUserRequest);
-				return backend(flags).myft.personalisedFeed(uuid, { limit });
-			}
+			resolve: ({ uuid }, { limit = 10 }, { rootValue: { flags }}) =>
+				backend(flags).myft.personalisedFeed(uuid, { limit })
 		},
 		viewed: {
 			type: new GraphQLList(Concept),
@@ -77,11 +51,9 @@ const User = new GraphQLObjectType({
 					type: GraphQLInt
 				}
 			},
-			resolve: (source, { limit = 10 }, { rootValue: { flags, isUserRequest, userUuid }}) => {
-				const uuid = auth(source.uuid, userUuid, isUserRequest);
-				return backend(flags).myft.getViewed(uuid, { limit })
-					.then(concepts => !concepts ? [] : concepts);
-			}
+			resolve: ({ uuid }, { limit = 10 }, { rootValue: { flags }}) =>
+				backend(flags).myft.getViewed(uuid, { limit })
+					.then(concepts => !concepts ? [] : concepts)
 		},
 		personalisedFeed: {
 			type: new GraphQLList(Content),
@@ -90,8 +62,7 @@ const User = new GraphQLObjectType({
 					type: GraphQLInt
 				}
 			},
-			resolve: (source, { limit=10 }, {rootValue: {flags, isUserRequest, userUuid}}) => {
-				const uuid = auth(source.uuid, userUuid, isUserRequest);
+			resolve: ({ uuid }, { limit = 10 }, { rootValue: { flags }}) => {
 				return backend(flags).myft.personalisedFeed(uuid, { limit })
 					.then(items => !items ? [] : items.map(item => item.content));
 			}
@@ -103,8 +74,7 @@ const User = new GraphQLObjectType({
 					type: GraphQLInt
 				}
 			},
-			resolve: (source, { limit=10 }, {rootValue: {flags, isUserRequest, userUuid}}) => {
-				const uuid = auth(source.uuid, userUuid, isUserRequest);
+			resolve: ({ uuid }, { limit = 10 }, { rootValue: { flags }}) => {
 				return backend(flags).myft.getRecommendedTopics(uuid, { limit })
 						.then(concepts => !concepts ? [] : concepts);
 
@@ -112,5 +82,3 @@ const User = new GraphQLObjectType({
 		}
 	}
 });
-
-export default User;

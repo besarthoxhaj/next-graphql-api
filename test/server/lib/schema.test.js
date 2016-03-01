@@ -76,7 +76,7 @@ describe('GraphQL Schema', () => {
 		})
 	});
 
-	describe.only('topStoriesList', () => {
+	describe('topStoriesList', () => {
 
 		before(() => {
 			fetchMock.mock('http://api.ft.com/lists/520ddb76-e43d-11e4-9e89-00144feab7de', 500)
@@ -99,6 +99,36 @@ describe('GraphQL Schema', () => {
 				.then(data => {
 					expect(data).to.have.property('topStoriesList');
 					expect(data.topStoriesList).to.equal.null;
+				})
+		});
+	});
+
+	describe('User', () => {
+		before(() => {
+			fetchMock.mock('https://session-next.ft.com/uuid', { uuid: '1234' })
+		});
+
+		after(() => {
+			fetchMock.restore();
+		});
+
+		it('should be able to access if header has api key', () => {
+			const query = `
+				query User {
+					user(uuid: "1234") {
+						uuid
+					}
+				}
+			`;
+			const req =  {
+				headers: {
+					'x-api-key': process.env.GRAPHQL_API_KEY
+				}
+			};
+			return graphqlClient({ req })
+				.fetch(query)
+				.then(data => {
+					data.user.uuid.should.equal('1234');
 				})
 		});
 	});

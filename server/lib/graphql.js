@@ -1,23 +1,20 @@
-import {graphql} from 'graphql';
-import {printSchema} from 'graphql/utilities';
+import { graphql } from 'graphql';
+import { printSchema } from 'graphql/utilities';
 
 import schema from './schema';
 import logger from '@financial-times/n-logger';
 
-const fetch = (flags = {}, isUserRequest, userUuid) => {
+const fetch = ({ flags, req }) => {
 	return (query, vars) => {
 		const then = new Date().getTime();
 
-		return graphql(schema, query, { flags, isUserRequest, userUuid }, vars)
+		return graphql(schema, query, { flags, req }, vars)
 			.then(it => {
 				const now = new Date().getTime();
-
 				logger.info(`Graphql responded in ${now - then} ms`);
-
 				if (it.errors) {
 					throw it.errors;
 				}
-
 				if (it.data) {
 					return it.data;
 				}
@@ -25,7 +22,7 @@ const fetch = (flags = {}, isUserRequest, userUuid) => {
 	};
 };
 
-export default (flags = {}, isUserRequest, userUuid) => ({
-	fetch: fetch(flags, isUserRequest, userUuid),
+export default ({ flags = {}, req }) => ({
+	fetch: fetch({ flags, req }),
 	printSchema: () => printSchema(schema)
 });

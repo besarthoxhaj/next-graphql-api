@@ -1,10 +1,11 @@
-import graphql from '../lib/graphql';
 import logger from '@financial-times/n-logger';
 import httpStatus from 'http-status-codes';
+import { GraphQLError } from 'graphql/error'
 
-export default (req, res, next) => {
+import graphql from '../lib/graphql';
+import { HttpError } from '../lib/errors';
 
-
+export default (req, res) => {
 	const flags = res.locals.flags;
 	const query = req.body.query || req.query.query || req.body;
 	const vars = JSON.parse(req.body.variables || '{}');
@@ -15,17 +16,17 @@ export default (req, res, next) => {
 		return res.status(400).jsonp({ type: 'Bad Request', error: { message }});
 	}
 
-	graphql(flags, res.locals.isUserRequest, res.locals.uuid)
+	graphql({ flags, req })
 		.fetch(query, vars)
 		.then(data => res.jsonp(data))
 		.catch(errs => {
 			const err = Array.isArray(errs) ? errs.shift() : errs;
-			if (Number.isInteger(parseInt(err.message))) {
-				return res.status(err.message).jsonp({
-					type: httpStatus.getStatusText(err.message),
-					error: { message: err.message }
-				});
-			}
-			next(err);
+			const error = err instanceof GraphQLError && err.originalError ? err.originalError : err;
+			const status = error instanceof HttpError ? error.status : 500;
+
+			return res.status(status).jsonp({
+				type: httpStatus.getStatusText(status),
+				error: { message: error.message }
+			});
 		});
 };
