@@ -22,7 +22,7 @@ const fetch = ({ flags, req }) => {
 	};
 };
 
-export default ({ flags = {}, req }) => ({
+export default ({ flags = {}, req } = {}) => ({
 	fetch: fetch({ flags, req }),
 	printSchema: () => printSchema(schema)
 });

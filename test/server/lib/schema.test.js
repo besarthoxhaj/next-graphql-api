@@ -11,7 +11,7 @@ import graphqlClient from '../../../server/lib/graphql';
 describe('GraphQL Schema', () => {
 	describe('#list', () => {
 		it('fetches list', () => {
-			return graphqlClient({ mockFrontPage: true })
+			return graphqlClient({ flags: { mockFrontPage: true }})
 				.fetch(`
 					query List {
 						editorsPicks {
@@ -120,7 +120,7 @@ describe('GraphQL Schema', () => {
 					}
 				}
 			`;
-			const req =  {
+			const req = {
 				headers: {
 					'x-api-key': process.env.GRAPHQL_API_KEY
 				}

@@ -57,7 +57,6 @@ describe('Top Stories', () => {
 
 
 	it('fetches top stories with content from Page', () => {
-
 		return graphqlClient()
 			.fetch(`
 				query TopStories {

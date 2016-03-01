@@ -1,4 +1,3 @@
-import realFetch from 'isomorphic-fetch';
 import fetchMock from 'fetch-mock';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
@@ -7,28 +6,28 @@ chai.use(chaiAsPromised);
 
 import userAuth from '../../../server/lib/user-auth';
 
-describe.only('User Auth', () => {
+describe('User Auth', () => {
 
 	afterEach(() => {
 		fetchMock.restore();
 	});
 
 	it('should return uuid if header has correct api key', () => {
-		const req =  {
+		const req = {
 			headers: { 'x-api-key': process.env.GRAPHQL_API_KEY }
 		};
 		return userAuth(req, '1234').should.become('1234');
 	});
 
 	it('should return uuid if query string has correct api key', () => {
-		const req =  {
+		const req = {
 			query: { apiKey: process.env.GRAPHQL_API_KEY }
 		};
 		return userAuth(req, '1234').should.become('1234');
 	});
 
 	it('should throw error if incorrect api key', () => {
-		const req =  {
+		const req = {
 			headers: { 'x-api-key': 'bad-api-key' }
 		};
 		return userAuth(req, '1234').should.be.rejectedWith('Bad or missing apiKey');
@@ -36,7 +35,7 @@ describe.only('User Auth', () => {
 
 	it('should return uuid if valid session', () => {
 		fetchMock.mock('https://session-next.ft.com/uuid', { uuid: '1234' });
-		const req =  {
+		const req = {
 			cookies: { FTSession: 'session-id' },
 			headers: { }
 		};
@@ -45,7 +44,7 @@ describe.only('User Auth', () => {
 
 	it('should throw error if nothing returned from session endpoint', () => {
 		fetchMock.mock('https://session-next.ft.com/uuid', { });
-		const req =  {
+		const req = {
 			cookies: { FTSession: 'session-id' },
 			headers: { }
 		};
@@ -54,7 +53,7 @@ describe.only('User Auth', () => {
 
 	it('should throw error if no FTSession cookie', () => {
 		fetchMock.mock('https://session-next.ft.com/uuid', { });
-		const req =  {
+		const req = {
 			cookies: { },
 			headers: { }
 		};
@@ -63,7 +62,7 @@ describe.only('User Auth', () => {
 
 	it('should throw error if requested uuid is different to user\'s', () => {
 		fetchMock.mock('https://session-next.ft.com/uuid', { uuid: '1234' });
-		const req =  {
+		const req = {
 			cookies: { FTSession: 'session-id' },
 			headers: { }
 		};
