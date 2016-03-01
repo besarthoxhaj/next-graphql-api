@@ -72,7 +72,7 @@ sub vcl_recv {
 		}
 	}
 
-	log {"syslog ${SERVICEID} ft-next-syslog-server :: "} {" event=SESSION_REQUEST url="} req.url {" token="} req.http.FT-Session-Token;
+	log {"syslog ${SERVICEID} ft-next-syslog-server :: "} {" level=info event=GRAPHQL_API_REQUEST url="} req.url {" method="} req.request;
 
 	if (req.request != "HEAD" && req.request != "GET" && req.request != "FASTLYPURGE") {
 		return(pass);
@@ -116,7 +116,7 @@ sub vcl_fetch {
 		set beresp.ttl = 3600s;
 	}
 
-	log {"syslog ${SERVICEID} ft-next-syslog-server :: "} {" event=BACKEND_RESPONSE status="} beresp.status {"  "};
+	log {"syslog ${SERVICEID} ft-next-syslog-server :: "} {" level=info event=GRAPHQL_API_BACKEND_RESPONSE url="} req.url {" method="} req.request {" status="} beresp.status;
 
 	return(deliver);
 }
@@ -157,7 +157,7 @@ sub vcl_deliver {
 
 sub vcl_error {
 	#FASTLY error
-	log {"syslog ${SERVICEID} ft-next-syslog-server :: "} {" event=ERROR url="} req.url {" status="} obj.status {"  "};
+	log {"syslog ${SERVICEID} ft-next-syslog-server :: "} {" level=error event=GRAPHQL_API_ERROR url="} req.url {" status="} obj.status {" stale.exists="} stale.exists {" method="} req.request;
 }
 
 sub vcl_pass {
