@@ -1,6 +1,5 @@
-'use strict';
-
-module.exports = (func) => function(value) {
-    func.apply(null, arguments);
-    return value;
-};
+export default func =>
+	value => {
+		func.call(null, value);
+		return value;
+	};

@@ -1,106 +1,105 @@
-'use strict';
-const getBranding = require('ft-n-article-branding');
-const toLegacyTag = require('./legacy-tag');
-const tap = require('../tap');
+import getBranding from 'ft-n-article-branding';
 
-class TopicCards {
-    constructor(articles) {
-        this.articles = articles;
-    }
+import toLegacyTag from './legacy-tag';
+import tap from '../tap';
 
-    distinct(articles) {
-        const distinctTopics = {};
+export default class {
+	constructor (articles) {
+		this.articles = articles;
+	}
 
-        articles.forEach(article => {
-            const metaData = article.signals.followed.tags.map(toLegacyTag);
+	distinct (articles) {
+		const distinctTopics = {};
 
-            if (!metaData) {
-                return;
-            }
+		articles.forEach(article => {
+			const metaData = article.signals.followed.tags.map(toLegacyTag);
 
-            metaData.forEach(theme => {
-                !distinctTopics[theme.id] && (distinctTopics[theme.id] = {
-                    term: theme,
-                    items: []
-                });
-                distinctTopics[theme.id].items.push(article);
+			if (!metaData) {
+				return;
+			}
 
-            });
-        });
+			metaData.forEach(theme => {
+				!distinctTopics[theme.id] && (distinctTopics[theme.id] = {
+					term: theme,
+					items: []
+				});
+				distinctTopics[theme.id].items.push(article);
 
-        return distinctTopics;
-    }
+			});
+		});
 
-    sort(topics) {
-        const sortedTopics = Object.keys(topics).sort((a, b) => {
-            if (topics[a].items.length < topics[b].items.length) {
-                return 1;
-            }
+		return distinctTopics;
+	}
 
-            if (topics[a].items.length > topics[b].items.length) {
-                return -1;
-            }
+	sort (topics) {
+		const sortedTopics = Object.keys(topics).sort((a, b) => {
+			if (topics[a].items.length < topics[b].items.length) {
+				return 1;
+			}
 
-            const dateA = new Date(topics[a].items[0].contentTimeStamp).getTime();
-            const dateB = new Date(topics[b].items[0].contentTimeStamp).getTime();
+			if (topics[a].items.length > topics[b].items.length) {
+				return -1;
+			}
 
-            if (dateA < dateB) {
-                return 1;
-            }
+			const dateA = new Date(topics[a].items[0].contentTimeStamp).getTime();
+			const dateB = new Date(topics[b].items[0].contentTimeStamp).getTime();
 
-            if (dateA > dateB) {
-                return -1;
-            }
+			if (dateA < dateB) {
+				return 1;
+			}
 
-            return 0;
-        });
+			if (dateA > dateB) {
+				return -1;
+			}
 
-        return sortedTopics.map(topicId => topics[topicId]);
-    }
+			return 0;
+		});
 
-    images(topic) {
-        let result;
+		return sortedTopics.map(topicId => topics[topicId]);
+	}
 
-        topic.items.some(item => {
-            result = item.content && item.content.mainImage;
-            return result;
-        });
-        topic.mainImage = result;
+	images (topic) {
+		let result;
 
-        return topic;
-    }
+		topic.items.some(item => {
+			result = item.content && item.content.mainImage;
+			return result;
+		});
+		topic.mainImage = result;
+
+		return topic;
+	}
 
 
-    pluck(topics) {
-        return topics.map(tap(topic => topic.items = topic.items.slice(0, 4)));
-    }
+	pluck (topics) {
+		return topics.map(tap(topic => topic.items = topic.items.slice(0, 4)));
+	}
 
-    articleModel(topic) {
-        topic.items = topic.items.map(article => {
-            return {
-                id: article.content.id,
-                title: article.content.title ? article.content.title : '',
-                datePublished: article.content.publishedDate,
-                images: article.content.mainImage,
-                brand: toLegacyTag(getBranding(article.content.metadata)),
-                referrerTracking: `?myftTopics=${encodeURIComponent(topic.term.id)}#myft:my-news:grid`
-            };
-        });
+	articleModel (topic) {
+		topic.items = topic.items.map(article => {
+			return {
+				id: article.content.id,
+				title: article.content.title ? article.content.title : '',
+				datePublished: article.content.publishedDate,
+				images: article.content.mainImage,
+				brand: toLegacyTag(getBranding(article.content.metadata)),
+				referrerTracking: `?myftTopics=${encodeURIComponent(topic.term.id)}#myft:my-news:grid`
+			};
+		});
 
-        return topic;
-    }
+		return topic;
+	}
 
-    process() {
-        const topics = this.sort(this.distinct(this.articles));
+	process () {
+		const topics = this.sort(this.distinct(this.articles));
 
-        topics.forEach(topic => {
-            this.images(topic);
-            this.articleModel(topic);
-            topic.isFollowing = true;
-            topic.template = 'dashboard/followed-topic';
-        });
+		topics.forEach(topic => {
+			this.images(topic);
+			this.articleModel(topic);
+			topic.isFollowing = true;
+			topic.template = 'dashboard/followed-topic';
+		});
 
-        return this.pluck(topics);
-    }
+		return this.pluck(topics);
+	}
 }
-module.exports = TopicCards;

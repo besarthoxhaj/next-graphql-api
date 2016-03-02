@@ -1,11 +1,11 @@
 import logger from '@financial-times/n-logger';
 
-class Liveblog {
-	constructor(cache) {
+export default class {
+	constructor (cache) {
 		this.cache = cache;
 	}
 
-	parse(json, limit) {
+	parse (json, limit) {
 
 			const dated = json.filter(it => !!it.data.datemodified);
 			const [first, second] = dated.slice(0, 2);
@@ -32,7 +32,7 @@ class Liveblog {
 			return {updates, status};
 	}
 
-	fetch(uri, opts, ttl = 50) {
+	fetch (uri, opts, ttl = 50) {
 		const then = new Date();
 
 		return this.cache.cached(`liveblogs.${uri}`, ttl, () => {
@@ -48,5 +48,3 @@ class Liveblog {
 	.then(json => this.parse(json, opts.limit));
 	}
 }
-
-export default Liveblog;

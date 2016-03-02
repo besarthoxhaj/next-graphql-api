@@ -5,8 +5,8 @@ import { captureError } from 'express-errors-handler';
 // be made for new content. Hopefully this is a little nicer to the content api
 // polling it directly.
 
-class FastFtFeed {
-	constructor(source) {
+export default class {
+	constructor (source) {
 		this.type = 'capi';
 		this.source = source;
 
@@ -17,7 +17,7 @@ class FastFtFeed {
 		this.pollUpdates();
 	}
 
-	fetchFastFt() {
+	fetchFastFt () {
 		const {uuid} = this.source;
 		return ApiClient.contentAnnotatedBy({
 			uuid: uuid,
@@ -35,7 +35,7 @@ class FastFtFeed {
 		}).catch(captureError);
 	}
 
-	pollUpdates() {
+	pollUpdates () {
 		this.poller = setInterval(() => {
 			this.hasNewUpdates()
 			.then(hasNewUpdates => {
@@ -49,7 +49,7 @@ class FastFtFeed {
 	}
 	// Requests a list of notifications for FastFT to determine whether there are
 	// any new items.
-	hasNewUpdates() {
+	hasNewUpdates () {
 		const url = `http://api.ft.com/content/notifications?since=${this.since}&apiKey=${process.env.FAST_FT_KEY}`;
 		return fetch(url)
 			.then(res => res.json())
@@ -58,7 +58,5 @@ class FastFtFeed {
 	}
 
 	// FIXME take uuid as an argument
-	fetch() {	return this.contentCache; }
+	fetch () {	return this.contentCache; }
 }
-
-export default FastFtFeed;

@@ -1,13 +1,17 @@
 .DS_Store
 
-/.env
 /.editorconfig
+/.env
+/.eslintrc.json
+/.scss-lint.yml
 /npm-debug.log*
 
-/.idea/
-/node*/
-/bower_components/
 /.haikro-cache/
+/.idea/
 /.node-version
 /.sass-cache/
+/bower_components/
+/node*/
 /public/
+
+!/nodemon.json

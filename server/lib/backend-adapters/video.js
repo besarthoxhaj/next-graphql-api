@@ -1,11 +1,11 @@
 import sliceList from '../helpers/slice-list';
 
-class Playlist {
-	constructor(cache) {
+export default class {
+	constructor (cache) {
 		this.cache = cache;
 	}
 
-	fetch(id, {from, limit}, ttl = 50) {
+	fetch (id, {from, limit}, ttl = 50) {
 		return this.cache.cached(`videos.playlist.${id}`, ttl, () => {
 			return fetch(`http://next-video.ft.com/api/playlist/${encodeURI(id)}?videoFields=id,name,renditions,longDescription,publishedDate,videoStillURL`)
 				.then(res => res.json())
@@ -18,5 +18,3 @@ class Playlist {
 		.then(topics => sliceList(topics, {from, limit}));
 	}
 }
-
-export default Playlist;

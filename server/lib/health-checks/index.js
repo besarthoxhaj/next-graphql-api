@@ -1,5 +1,5 @@
 import CapiCheck from './capi'
 
 export default {
-    capi: CapiCheck
+	capi: CapiCheck
 }

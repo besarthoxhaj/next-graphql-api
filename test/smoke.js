@@ -42,7 +42,7 @@ const query = `
 				branding {
 					headshot
 					taxonomy
-		    }
+			}
 			}
 		}
 		lifestyle {

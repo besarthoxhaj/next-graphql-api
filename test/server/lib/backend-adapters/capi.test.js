@@ -1,135 +1,109 @@
-import realFetch from 'isomorphic-fetch';
-global.fetch = realFetch;
-
+import fetchMock from 'fetch-mock';
+import sinon from 'sinon';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import sinon from 'sinon';
+chai.should();
 chai.use(chaiAsPromised);
-const expect = chai.expect;
 
-import contentFixture from '../fixtures/content';
-import listFixture from '../fixtures/list';
-
-import ApiClient from 'next-ft-api-client';
-import Cache from '../../../../server/lib/cache';
 import CAPI from '../../../../server/lib/backend-adapters/capi';
 
+const cachedSpy = () => sinon.spy((cacheKey, cacheTTL, value) => value());
 
+describe('CAPI', () => {
 
-describe('CAPI backend', () => {
 	describe('#content', () => {
-		const cache = new Cache(10);
-		const testCAPIBackend = new CAPI(cache, {});
-		let stubAPI;
 
 		before(() => {
-			stubAPI = sinon.stub(ApiClient, 'content', (opts) => {
-				if(opts.uuid.indexOf('invalid') > -1) {
-					return Promise.reject('Fetch failed');
+			fetchMock.mock(
+				new RegExp('https://search-next-search-[^\.]*.eu-west-1.es.amazonaws.com/v3_api_v2/item/_mget'),
+				{
+					docs: [
+						{
+							found: true,
+							_source: { id: 'content-one' }
+						},
+						{
+							found: true,
+							_source: { id: 'content-two' }
+						}
+					]
 				}
-				return Promise.resolve(contentFixture);
-			});
-
-		});
-
-		afterEach(() => {
-			stubAPI.reset();
-			Object.keys(cache.contentCache).forEach(key => cache.clear(key));
+			);
 		});
 
 		after(() => {
-			stubAPI.restore();
+			fetchMock.restore();
 		});
 
-		it('fetches stories', () => {
-			const stories = testCAPIBackend.content(['valid', 'another-valid'], {});
+		it('should be able to fetch content', () => {
+			const cache = { cached: cachedSpy() };
+			const capi = new CAPI(cache);
 
-			return stories.then((it) => {
-				expect(stubAPI.callCount).to.eq(1);
-				expect(it.length).to.eq(3);
-			});
-		});
-
-		it('handles bad responses from CAPI', () => {
-			const stories = testCAPIBackend.content(['valid', 'invalid', 'another-valid'], {});
-
-			return stories.then((it) => {
-				expect(stubAPI.callCount).to.eq(1);
-				expect(Array.isArray(it)).to.be.true;
-				expect(it.length).to.equal(0);
-			});
-		});
-
-
-		it('caching - [a,b, c], [a,b,c] makes no requests the second time round ', () => {
-			const firstBatch = testCAPIBackend.content(['a', 'b', 'c'], {});
-			return firstBatch.then((it) => {
-				expect(stubAPI.callCount).to.eq(1);
-				expect(stubAPI.args[0][0].uuid).to.eql(['a', 'b', 'c']);
-				expect(it.length).to.eq(3);
-				expect(it[0].metadata.find(metadata => metadata.taxonomy === 'genre').prefLabel).to.eq('Analysis');
-				expect(it[1].metadata.find(metadata => metadata.taxonomy === 'genre').prefLabel).to.eq('Market Report');
-				const secondBatch = testCAPIBackend.content(['a', 'b', 'c'], {});
-
-				return secondBatch.then((it) => {
-					expect(stubAPI.callCount).to.eq(1);
-					expect(it.length).to.eq(3);
-					expect(it[0].metadata.find(metadata => metadata.taxonomy === 'genre').prefLabel).to.eq('Analysis');
-					expect(it[1].metadata.find(metadata => metadata.taxonomy === 'genre').prefLabel).to.eq('Market Report');
+			return capi.content(['content-one', 'content-two'])
+				.then(content => {
+					content.should.have.length(2);
+					content.should.eql([{ id: 'content-one' }, { id: 'content-two' }]);
 				});
-			});
 		});
 
-		it('caching - [a,b,c], [b,c,d] makes a fetch the second time round', () => {
-			const firstBatch = testCAPIBackend.content(['a', 'b', 'c'], {});
-			return firstBatch.then((it) => {
-				expect(stubAPI.callCount).to.eq(1);
-				expect(stubAPI.args[0][0].uuid).to.eql(['a', 'b', 'c']);
-				expect(it.length).to.eq(3);
-				expect(it[0].metadata.find(metadata => metadata.taxonomy === 'genre').prefLabel).to.eq('Analysis');
-				expect(it[1].metadata.find(metadata => metadata.taxonomy === 'genre').prefLabel).to.eq('Market Report');
-				const secondBatch = testCAPIBackend.content(['b', 'c', 'd'], {});
+		it('should use correct cache key and ttl', () => {
+			const cached = cachedSpy();
+			const cache = { cached };
+			const capi = new CAPI(cache);
 
-				return secondBatch.then((it) => {
-					expect(stubAPI.callCount).to.eq(2);
-					expect(stubAPI.args[1][0].uuid).to.eql(['b', 'c', 'd']);
-					expect(it.length).to.eq(3);
-					expect(it[0].metadata.find(metadata => metadata.taxonomy === 'genre').prefLabel).to.eq('Analysis');
-					expect(it[1].metadata.find(metadata => metadata.taxonomy === 'genre').prefLabel).to.eq('Market Report');
+			return capi.content(['content-one', 'content-two'])
+				.then(() => {
+					cached.alwaysCalledWith(`capi.content.content-one_content-two`, 50);
 				});
-			});
 		});
 
+		it('should handle empty response from CAPI', () => {
+			fetchMock.reMock(
+				new RegExp('https://search-next-search-[^\.]*.eu-west-1.es.amazonaws.com/v3_api_v2/item/_mget'),
+				{
+					docs: []
+				}
+			);
+			const cache = { cached: cachedSpy() };
+			const capi = new CAPI(cache);
 
+			return capi.content(['content-one', 'content-two'])
+				.then(content => {
+					content.should.have.length(0);
+				});
+		});
 
 	});
 
-
 	describe('#list', () => {
-		const cache = new Cache(10);
-		const testBackend = new CAPI(cache, {});
-		let stubAPI;
+		const listUuid = '73667f46-1a55-11e5-a130-2e7db721f996';
 
 		before(() => {
-			stubAPI = sinon.stub(ApiClient, 'lists', (opts) => {
-				if(opts.uuid.indexOf('invalid') > -1) {
-					return Promise.reject('Fetch failed');
-				}
-				return Promise.resolve(listFixture);
-			});
+			fetchMock.mock(
+				new RegExp(`https://[^\.]*.ft.com/lists/${listUuid}`),
+				[{ id: 'content-one' }, { id: 'content-two' }]
+			);
 		});
 
-		afterEach(() => {
-			stubAPI.restore();
-			Object.keys(cache.contentCache).forEach(key => cache.clear(key));
+		after(() => {
+			fetchMock.restore();
 		});
-		it('fetches list', () => {
-			const stories = testBackend.list('73667f46-1a55-11e5-a130-2e7db721f996', {});
 
-			return stories.then((it) => {
-				expect(it.items.length).to.eq(11);
-			});
+		it('should be able to fetch list', () => {
+			const cached = cachedSpy();
+			const cache = { cached };
+			const capi = new CAPI(cache);
+
+			return capi.list(listUuid)
+				.then(list => {
+					list.should.have.length(2);
+					list.should.deep.equal([{ id: 'content-one' }, { id: 'content-two' }]);
+					cached.alwaysCalledWith(`capi.lists.73667f46-1a55-11e5-a130-2e7db721f996`, 50);
+					// make sure mock was called
+					fetchMock.called().should.be.true;
+				});
 		});
+
 	});
 
 });

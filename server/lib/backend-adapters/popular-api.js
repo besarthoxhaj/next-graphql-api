@@ -1,13 +1,13 @@
 import sliceList from '../helpers/slice-list';
 
 export default class {
-	constructor(cache) {
+	constructor (cache) {
 		this.cache = cache;
 		this.baseUrl = 'https://ft-next-popular-api.herokuapp.com';
 		this.apiKey = process.env.POPULAR_API_KEY;
 	}
 
-	topics({ from, limit } = {}, ttl = 50) {
+	topics ({ from, limit } = {}, ttl = 50) {
 		const url = `${this.baseUrl}/topics?apiKey=${this.apiKey}`;
 
 		return this.cache.cached('popular-api.topics', ttl, () =>
@@ -16,7 +16,7 @@ export default class {
 			.then(topics => sliceList(topics, { from, limit }));
 	}
 
-	articles({ from, limit } = {}, ttl = 50) {
+	articles ({ from, limit } = {}, ttl = 50) {
 		const url = `${this.baseUrl}/articles?apiKey=${this.apiKey}`;
 
 		return this.cache.cached('popular-api.articles', ttl, () =>

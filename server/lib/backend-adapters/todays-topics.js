@@ -1,20 +1,19 @@
-'use strict';
 import sources from '../../config/sources';
 import backend from '.';
 
-function getPrimaryTag(metadata) {
+function getPrimaryTag (metadata) {
 	const primarySection = metadata.find(tag => tag.primary === 'section');
 	const primaryTheme = metadata.find(tag => tag.primary === 'theme');
 	return primaryTheme || primarySection || null;
 }
 
-class TodaysTopics {
-	constructor(cache) {
+export default class {
+	constructor (cache) {
 		this.type = 'todays-topics';
 		this.cache = cache;
 	}
 
-	getTopics({region, from, limit, genres, type}, flags = {}, ttl = 60 * 10) {
+	getTopics ({region, from, limit, genres, type}, flags = {}, ttl = 60 * 10) {
 		const cacheKey = `${this.type}.region.${region}`;
 		return this.cache.cached(cacheKey, ttl, () => {
 			const be = backend(flags);
@@ -43,5 +42,3 @@ class TodaysTopics {
 		});
 	}
 }
-
-export default TodaysTopics;
