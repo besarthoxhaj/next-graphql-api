@@ -35,8 +35,10 @@
     "s3o-middleware": "^1.1.2"
   },
   "devDependencies": {
+    "bower": "^1.7.7",
     "chai": "^3.2.0",
     "chai-as-promised": "^5.1.0",
+    "eslint": "^2.2.0",
     "eslint-plugin-react": "^3.5.0",
     "fetch-mock": "^4.1.1",
     "isomorphic-fetch": "^2.1.1",
