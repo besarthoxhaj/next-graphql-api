@@ -15,7 +15,7 @@ describe('CAPI', () => {
 
 		before(() => {
 			fetchMock.mock(
-				new RegExp('https://search-next-search-[^\.]*.eu-west-1.es.amazonaws.com/v3_api_v2/item/_mget'),
+				new RegExp('https://[^/]*/v3_api_v2/item/_mget'),
 				{
 					docs: [
 						{
@@ -59,7 +59,7 @@ describe('CAPI', () => {
 
 		it('should handle empty response from CAPI', () => {
 			fetchMock.reMock(
-				new RegExp('https://search-next-search-[^\.]*.eu-west-1.es.amazonaws.com/v3_api_v2/item/_mget'),
+				new RegExp('https://[^/]*/v3_api_v2/item/_mget'),
 				{
 					docs: []
 				}
