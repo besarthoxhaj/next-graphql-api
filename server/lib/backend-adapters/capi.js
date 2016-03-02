@@ -1,7 +1,9 @@
+import { json as fetchresJson } from 'fetchres';
 import ApiClient from 'next-ft-api-client';
+import logger from '@financial-times/n-logger';
+
 import filterContent from '../helpers/filter-content';
 import resolveContentType from '../helpers/resolve-content-type';
-
 
 class CAPI {
 	constructor(cache) {
@@ -64,7 +66,18 @@ class CAPI {
 
 	list(uuid, ttl = 50) {
 		return this.cache.cached(`${this.type}.lists.${uuid}`, ttl, () => {
-			return ApiClient.lists({ uuid: uuid })
+			const headers = { Authorization: process.env.LIST_API_AUTHORIZATION };
+			return fetch(`https://prod-up-read.ft.com/lists/${uuid}`, { headers })
+				.then(response => {
+					if (!response.ok) {
+						logger.warn('Failed getting List response', {
+							uuid: uuid,
+							status: response.status
+						});
+					}
+					return response;
+				})
+				.then(fetchresJson);
 		});
 	}
 
