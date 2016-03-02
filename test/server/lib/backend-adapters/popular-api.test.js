@@ -6,11 +6,10 @@ chai.should();
 chai.use(chaiAsPromised);
 
 import Popular from '../../../../server/lib/backend-adapters/popular-api';
-import Cache from '../../../../server/lib/cache';
 
 const cachedSpy = () => sinon.spy((cacheKey, cacheTTL, value) => value());
 
-describe.only('Popular API', () => {
+describe('Popular API', () => {
 
 	describe('Topics', () => {
 
