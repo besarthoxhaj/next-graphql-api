@@ -112,8 +112,8 @@ const queryType = new GraphQLObjectType({
 				from: { type: GraphQLInt },
 				limit: { type: GraphQLInt }
 			},
-			resolve: (root, {from, limit}, {rootValue: {flags}}) =>
-				backend(flags).popularApi.topics({from, limit})
+			resolve: (root, { from, limit }, { rootValue: { flags }}) =>
+				backend(flags).popularApi.topics({ from, limit })
 		},
 		popularReadTopicsFromMyFtApi: {
 			type: new GraphQLList(Concept),

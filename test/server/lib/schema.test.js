@@ -1,118 +1,138 @@
-import realFetch from 'isomorphic-fetch';
+import { graphql } from 'graphql';
+import proxyquire from 'proxyquire';
+import sinon from 'sinon';
 import fetchMock from 'fetch-mock';
-global.fetch = realFetch;
-
 import chai from 'chai';
 chai.should();
 const expect = chai.expect;
 
-import graphqlClient from '../../../server/lib/graphql';
+describe('Schema', () => {
 
-describe('GraphQL Schema', () => {
-	describe('#list', () => {
-		it('fetches list', () => {
-			return graphqlClient({ flags: { mockFrontPage: true }})
-				.fetch(`
-					query List {
-						editorsPicks {
-							items(limit: 2) {
-								type: __typename
-								contentType
-								id
-								title
-								lastPublished
-							}
-						}
+	describe('Editor\'s Picks', () => {
+
+		it('should be able to get editor\'s picks', () => {
+			const listStub = sinon.stub();
+			listStub.returns({ title: 'Editor\'s Picks'});
+			const capi = { list: listStub };
+			const schema = proxyquire('../../../server/lib/schema', { './backend-adapters/index': () => ({ capi })});
+			const query = `
+				query EditorsPicks {
+					editorsPicks {
+						title
 					}
-				`)
-				.then(it => {
-					it.editorsPicks.items.length.should.eq(2);
-					it.editorsPicks.items.forEach(item => {
-						item.contentType.should.exist;
-						item.id.should.exist;
-						item.title.should.exist;
-						item.lastPublished.should.exist;
-					});
+				}
+			`;
+
+			return graphql(schema, query, {})
+				.then(({ data }) => {
+					data.editorsPicks.title.should.equal('Editor\'s Picks');
+				});
+		});
+
+	});
+
+	describe.only('Popular Topics', () => {
+
+		it('should be able to fetch topics', () => {
+			const topicsStub = sinon.stub();
+			topicsStub.returns([
+				{ id: 'abc', taxonomy: 'foo', name: 'One' },
+				{ id: 'def', taxonomy: 'bar', name: 'Two' }
+			]);
+			const popularApi = { topics: topicsStub };
+			const schema = proxyquire('../../../server/lib/schema', { './backend-adapters/index': () => ({ popularApi })});
+			const query = `
+				query PopularTopics {
+					popularTopics {
+						name
+						url
+					}
+				}
+			`;
+
+			return graphql(schema, query, {})
+				.then(({ data }) => {
+					data.popularTopics.length.should.eq(2);
+					expect(data.popularTopics[0]).to.deep.equal({ name: 'One', url: '/stream/fooId/abc' });
+					expect(data.popularTopics[1]).to.deep.equal({ name: 'Two', url: '/stream/barId/def' });
 				});
 		});
 	});
 
-	describe('popularTopics', () => {
+	describe('Top Stories', () => {
 
-		before(() => {
-			global.fetch = function () {
-				return Promise.resolve({
-					json: () => [
-						{id: 'abc', taxonomy: 'foo', name: 'One'},
-						{id: 'def', taxonomy: 'bar', name: 'Two'}
-					]
-				})
-			}
-		});
-
-		after(() => {
-			global.fetch = realFetch;
-		});
-
-		it('fetches a list of topics', () => {
-			const query = `query Topics {
-				popularTopics {
-					name
-					url
+		it('should be able to fetch', () => {
+			const pageStub = sinon.stub();
+			pageStub.returns({ title: 'Top Stories', sectionId: '1234' });
+			const capi = { page: pageStub };
+			const schema = proxyquire('../../../server/lib/schema', { './backend-adapters/index': () => ({ capi })});
+			const query = `
+				query TopStories {
+					top(region: UK) {
+						url
+						title
+					}
 				}
-			}`;
+			`;
 
-			return graphqlClient()
-			.fetch(query)
-			.then((data) => {
-				data.popularTopics.length.should.eq(2);
+			return graphql(schema, query, {})
+				.then(({ data }) => {
+					data.top.title.should.equal('Top Stories');
+					data.top.url.should.equal('/stream/sectionsId/1234');
+				})
+		});
 
-				data.popularTopics[0].name.should.eq('One');
-				data.popularTopics[0].url.should.eq('/stream/fooId/abc');
-
-				data.popularTopics[1].name.should.eq('Two');
-				data.popularTopics[1].url.should.eq('/stream/barId/def');
-			})
-		})
 	});
 
-	describe('topStoriesList', () => {
+	describe('Top Stories List', () => {
 
-		before(() => {
-			fetchMock.mock('http://api.ft.com/lists/520ddb76-e43d-11e4-9e89-00144feab7de', 500)
-		});
+		it('should be able to fetch', () => {
+			const listStub = sinon.stub();
+			listStub.returns({ title: 'Top Stories List', layoutHint: 'bigstory' });
+			const capi = { list: listStub };
+			const schema = proxyquire('../../../server/lib/schema', { './backend-adapters/index': () => ({ capi })});
+			const query = `
+				query TopStoriesList {
+					topStoriesList(region: UK) {
+						title
+						layoutHint
+					}
+				}
+			`;
 
-		after(() => {
-			fetchMock.restore();
+			return graphql(schema, query, {})
+				.then(({ data }) => {
+					data.topStoriesList.title.should.equal('Top Stories List');
+					data.topStoriesList.layoutHint.should.equal('bigstory');
+				})
 		});
 
 		it('should not break if list api is down', () => {
+			const listStub = sinon.stub();
+			listStub.returns(null);
+			const capi = { list: listStub };
+			const schema = proxyquire('../../../server/lib/schema', { './backend-adapters/index': () => ({ capi })});
 			const query = `
-				query List {
+				query TopStoriesList {
 					topStoriesList(region: UK) {
 						title
 					}
 				}
 			`;
-			return graphqlClient()
-				.fetch(query)
-				.then(data => {
+
+			return graphql(schema, query, {})
+				.then(({ data }) => {
 					expect(data).to.have.property('topStoriesList');
-					expect(data.topStoriesList).to.equal.null;
+					expect(data.topStoriesList).to.be.null;
 				})
 		});
+
 	});
 
 	describe('User', () => {
-		before(() => {
-			fetchMock.mock('https://session-next.ft.com/uuid', { uuid: '1234' })
-		});
-
-		after(() => {
-			fetchMock.restore();
-		});
 
 		it('should be able to access if header has api key', () => {
+			const schema = proxyquire('../../../server/lib/schema', { backend: { }});
 			const query = `
 				query User {
 					user(uuid: "1234") {
@@ -125,11 +145,12 @@ describe('GraphQL Schema', () => {
 					'x-api-key': process.env.GRAPHQL_API_KEY
 				}
 			};
-			return graphqlClient({ req })
-				.fetch(query)
-				.then(data => {
+
+			return graphql(schema, query, { req })
+				.then(({ data }) => {
 					data.user.uuid.should.equal('1234');
 				})
 		});
+
 	});
 });

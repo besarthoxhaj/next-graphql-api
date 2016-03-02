@@ -16,6 +16,7 @@ describe('User Auth', () => {
 		const req = {
 			headers: { 'x-api-key': process.env.GRAPHQL_API_KEY }
 		};
+
 		return userAuth(req, '1234').should.become('1234');
 	});
 
@@ -23,6 +24,7 @@ describe('User Auth', () => {
 		const req = {
 			query: { apiKey: process.env.GRAPHQL_API_KEY }
 		};
+
 		return userAuth(req, '1234').should.become('1234');
 	});
 
@@ -30,6 +32,7 @@ describe('User Auth', () => {
 		const req = {
 			headers: { 'x-api-key': 'bad-api-key' }
 		};
+
 		return userAuth(req, '1234').should.be.rejectedWith('Bad or missing apiKey');
 	});
 
@@ -39,6 +42,7 @@ describe('User Auth', () => {
 			cookies: { FTSession: 'session-id' },
 			headers: { }
 		};
+
 		return userAuth(req, '1234').should.become('1234');
 	});
 
@@ -48,6 +52,7 @@ describe('User Auth', () => {
 			cookies: { FTSession: 'session-id' },
 			headers: { }
 		};
+
 		return userAuth(req, '1234').should.be.rejectedWith('Failed session auth');
 	});
 
@@ -57,6 +62,7 @@ describe('User Auth', () => {
 			cookies: { },
 			headers: { }
 		};
+
 		return userAuth(req, '1234').should.be.rejectedWith('Not authorised to view user data');
 	});
 
@@ -66,6 +72,7 @@ describe('User Auth', () => {
 			cookies: { FTSession: 'session-id' },
 			headers: { }
 		};
+
 		return userAuth(req, '4567').should.be.rejectedWith('Failed session auth');
 	});
 

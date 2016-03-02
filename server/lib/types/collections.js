@@ -104,6 +104,7 @@ const List = new GraphQLObjectType({
 			},
 			resolve: (result, args, {rootValue: {flags}}) => {
 				if(!result.items || result.items.length < 1) { return []; }
+				console.log('#####');
 
 				return backend(flags).capi.content(result.items.map(result => result.id.replace(/http:\/\/api\.ft\.com\/things?\//, '')), args);
 			}

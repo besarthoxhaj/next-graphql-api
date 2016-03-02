@@ -7,8 +7,8 @@ import sinon from 'sinon';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-import contentFixture from './../fixtures/content';
-import listFixture from './../fixtures/list';
+import contentFixture from '../fixtures/content';
+import listFixture from '../fixtures/list';
 
 import ApiClient from 'next-ft-api-client';
 import Cache from '../../../../server/lib/cache';
