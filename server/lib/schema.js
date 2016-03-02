@@ -13,7 +13,7 @@ import { Content, Video, Concept } from './types/content';
 import { ContentType } from './types/basic';
 import User from './types/user';
 import sources from '../config/sources';
-import { backend as backendReal }from './backend-adapters/index';
+import backendReal from './backend-adapters/index';
 import userAuth from './user-auth';
 
 const queryType = new GraphQLObjectType({

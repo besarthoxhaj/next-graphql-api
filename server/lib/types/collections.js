@@ -1,13 +1,8 @@
-import {
-	GraphQLString,
-	GraphQLInt,
-	GraphQLList,
-	GraphQLObjectType
-} from 'graphql';
+import { GraphQLString, GraphQLInt, GraphQLList, GraphQLObjectType } from 'graphql';
 
 import { Content } from './content';
 import { ContentType } from './basic';
-import { backend as backendReal } from '../backend-adapters/index';
+import backendReal from '../backend-adapters/index';
 
 
 const Page = new GraphQLObjectType({

@@ -2,7 +2,7 @@ import articleGenres from 'ft-next-article-genre';
 import articleBranding from 'ft-n-article-branding';
 
 import capifyMetadata from '../helpers/capify-metadata';
-import { backend as backendReal } from '../backend-adapters/index';
+import backend from '../backend-adapters/index';
 
 import {
 	GraphQLID,

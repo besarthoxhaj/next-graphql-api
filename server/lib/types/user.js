@@ -1,7 +1,7 @@
 import { GraphQLObjectType, GraphQLString, GraphQLList, GraphQLInt } from 'graphql';
 
 import { Content, Concept } from './content';
-import { backend as backendReal } from '../backend-adapters/index';
+import backendReal from '../backend-adapters/index';
 
 export default new GraphQLObjectType({
 	name: 'User',
