@@ -2,8 +2,7 @@ import articleGenres from 'ft-next-article-genre';
 import articleBranding from 'ft-n-article-branding';
 
 import capifyMetadata from '../helpers/capify-metadata';
-
-import backend from '../backend-adapters/index';
+import backendReal from '../backend-adapters/index';
 
 import {
 	GraphQLBoolean,
@@ -135,7 +134,7 @@ const Article = new GraphQLObjectType({
 					type: GraphQLInt
 				}
 			},
-			resolve: (content, { from, limit }, {rootValue: {flags}}) => {
+			resolve: (content, { from, limit }, { rootValue: { flags, backend = backendReal }}) => {
 				const storyPackage = content.storyPackage || [];
 				const storyPackageIds = storyPackage.map(story => story.id);
 				if (!storyPackageIds.length) {
@@ -206,7 +205,7 @@ const LiveBlog = new GraphQLObjectType({
 					type: GraphQLInt
 				}
 			},
-			resolve: (content, { from, limit }, {rootValue: {flags}}) => {
+			resolve: (content, { from, limit }, { rootValue: { flags, backend = backendReal }}) => {
 				let storyPackageIds = content.storyPackage.map(story => story.id);
 				if (storyPackageIds.length < 1) {
 					return [];
@@ -216,9 +215,9 @@ const LiveBlog = new GraphQLObjectType({
 		},
 		status: {
 			type: LiveBlogStatus,
-			resolve: (content, _, {rootValue: {flags}}) => (
-					backend(flags).liveblog.fetch(content.webUrl, { })
-						.then(extras => extras.status)
+			resolve: (content, _, { rootValue: { flags, backend = backendReal }}) => (
+				backend(flags).liveblog.fetch(content.webUrl, { })
+					.then(extras => extras.status)
 			)
 		},
 		updates: {
@@ -228,9 +227,9 @@ const LiveBlog = new GraphQLObjectType({
 					type: GraphQLInt
 				}
 			},
-			resolve: (content, { limit }, {rootValue: {flags}}) => (
-					backend(flags).liveblog.fetch(content.webUrl, { limit })
-						.then(extras => extras.updates)
+			resolve: (content, { limit }, { rootValue: { flags, backend = backendReal }}) => (
+				backend(flags).liveblog.fetch(content.webUrl, { limit })
+					.then(extras => extras.updates)
 			)
 		}
 	})
@@ -274,7 +273,7 @@ const Concept = new GraphQLObjectType({
 				genres: { type: new GraphQLList(GraphQLString) },
 				type: { type: ContentType }
 			},
-			resolve: (concept, { from, limit, genres, type }, { rootValue: { flags }}) => {
+			resolve: (concept, { from, limit, genres, type }, { rootValue: { flags, backend = backendReal }}) => {
 				const id = concept.id || concept.idV1 || concept.uuid;
 				return backend(flags).capi.search('metadata.idV1', id, { from, limit, genres, type });
 			}

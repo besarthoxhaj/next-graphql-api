@@ -1,105 +1,194 @@
-import realFetch from 'isomorphic-fetch';
-import fetchMock from 'fetch-mock';
-global.fetch = realFetch;
-
+import { graphql } from 'graphql';
+import sinon from 'sinon';
 import chai from 'chai';
 chai.should();
 const expect = chai.expect;
 
-import graphqlClient from '../../../server/lib/graphql';
+import schema from '../../../server/lib/schema';
 
-describe('GraphQL Schema', () => {
-	describe('#list', () => {
-		it('fetches list', () => {
-			return graphqlClient({ mockFrontPage: true })
-				.fetch(`
-					query List {
-						editorsPicks {
-							items(limit: 2) {
-								type: __typename
-								contentType
-								id
-								title
-								lastPublished
-							}
+describe('Schema', () => {
+
+	describe('Editor\'s Picks', () => {
+
+		it('should be able to get editor\'s picks', () => {
+			const listStub = sinon.stub();
+			listStub.returns({
+				title: 'Editor\'s Picks',
+				items: [
+					{ id: 'http://api.ft.com/things/5b0be968-dff3-11e5-b67f-a61732c1d025' }
+				]
+			});
+			const contentStub = sinon.stub();
+			contentStub.returns([
+				{
+					id: 'http://api.ft.com/things/5b0be968-dff3-11e5-b67f-a61732c1d025',
+					title: 'Super Tuesday results: sweeping victories for Trump and Clinton'
+				}
+			]);
+			const backend = () => ({
+				capi: {
+					list: listStub,
+					content: contentStub
+				}
+			});
+			const query = `
+				query EditorsPicks {
+					editorsPicks {
+						title
+						items {
+							id
+							title
 						}
 					}
-				`)
-				.then(it => {
-					it.editorsPicks.items.length.should.eq(2);
-					it.editorsPicks.items.forEach(item => {
-						item.contentType.should.exist;
-						item.id.should.exist;
-						item.title.should.exist;
-						item.lastPublished.should.exist;
-					});
+				}
+			`;
+
+			return graphql(schema, query, { backend })
+				.then(({ data }) => {
+					data.editorsPicks.title.should.equal('Editor\'s Picks');
+					data.editorsPicks.items.length.should.equal(1);
+					data.editorsPicks.items.should.deep.equal([
+						{
+							id: 'http://api.ft.com/things/5b0be968-dff3-11e5-b67f-a61732c1d025',
+							title: 'Super Tuesday results: sweeping victories for Trump and Clinton'
+						}
+					]);
+				});
+		});
+
+	});
+
+	describe('Popular Topics', () => {
+
+		it('should be able to fetch topics', () => {
+			const topicsStub = sinon.stub();
+			topicsStub.returns([
+				{ id: 'abc', taxonomy: 'foo', name: 'One' },
+				{ id: 'def', taxonomy: 'bar', name: 'Two' }
+			]);
+			const backend = () => ({
+				popularApi: {
+					topics: topicsStub
+				}
+			});
+			const query = `
+				query PopularTopics {
+					popularTopics {
+						name
+						url
+					}
+				}
+			`;
+
+			return graphql(schema, query, { backend })
+				.then(({ data }) => {
+					data.popularTopics.length.should.eq(2);
+					expect(data.popularTopics[0]).to.deep.equal({ name: 'One', url: '/stream/fooId/abc' });
+					expect(data.popularTopics[1]).to.deep.equal({ name: 'Two', url: '/stream/barId/def' });
 				});
 		});
 	});
 
-	describe('popularTopics', () => {
+	describe('Top', () => {
 
-		before(() => {
-			global.fetch = function () {
-				return Promise.resolve({
-					json: () => [
-						{id: 'abc', taxonomy: 'foo', name: 'One'},
-						{id: 'def', taxonomy: 'bar', name: 'Two'}
-					]
-				})
-			}
-		});
-
-		after(() => {
-			global.fetch = realFetch;
-		});
-
-		it('fetches a list of topics', () => {
-			const query = `query Topics {
-				popularTopics {
-					name
-					url
+		it('should be able to fetch', () => {
+			const pageStub = sinon.stub();
+			pageStub.returns({ title: 'Top Stories', sectionId: '1234' });
+			const backend = () => ({
+				capi: {
+					page: pageStub
 				}
-			}`;
+			});
+			const query = `
+				query Top {
+					top(region: UK) {
+						url
+						title
+					}
+				}
+			`;
 
-			return graphqlClient()
-			.fetch(query)
-			.then((data) => {
-				data.popularTopics.length.should.eq(2);
+			return graphql(schema, query, { backend })
+				.then(({ data }) => {
+					data.top.title.should.equal('Top Stories');
+					data.top.url.should.equal('/stream/sectionsId/1234');
+				})
+		});
 
-				data.popularTopics[0].name.should.eq('One');
-				data.popularTopics[0].url.should.eq('/stream/fooId/abc');
-
-				data.popularTopics[1].name.should.eq('Two');
-				data.popularTopics[1].url.should.eq('/stream/barId/def');
-			})
-		})
 	});
 
-	describe.only('topStoriesList', () => {
+	describe('Top Stories List', () => {
 
-		before(() => {
-			fetchMock.mock('http://api.ft.com/lists/520ddb76-e43d-11e4-9e89-00144feab7de', 500)
-		});
+		it('should be able to fetch', () => {
+			const listStub = sinon.stub();
+			listStub.returns({ title: 'Top Stories List', layoutHint: 'bigstory' });
+			const backend = () => ({
+				capi: {
+					list: listStub
+				}
+			});
+			const query = `
+				query TopStoriesList {
+					topStoriesList(region: UK) {
+						title
+						layoutHint
+					}
+				}
+			`;
 
-		after(() => {
-			fetchMock.restore();
+			return graphql(schema, query, { backend })
+				.then(({ data }) => {
+					data.topStoriesList.title.should.equal('Top Stories List');
+					data.topStoriesList.layoutHint.should.equal('bigstory');
+				})
 		});
 
 		it('should not break if list api is down', () => {
+			const listStub = sinon.stub();
+			listStub.returns(null);
+			const backend = () => ({
+				capi: {
+					list: listStub
+				}
+			});
 			const query = `
-				query List {
+				query TopStoriesList {
 					topStoriesList(region: UK) {
 						title
 					}
 				}
 			`;
-			return graphqlClient()
-				.fetch(query)
-				.then(data => {
+
+			return graphql(schema, query, { backend })
+				.then(({ data }) => {
 					expect(data).to.have.property('topStoriesList');
-					expect(data.topStoriesList).to.equal.null;
+					expect(data.topStoriesList).to.be.null;
 				})
 		});
+
+	});
+
+	describe('User', () => {
+
+		it('should be able to access if header has api key', () => {
+			const query = `
+				query User {
+					user(uuid: "1234") {
+						uuid
+					}
+				}
+			`;
+			const req = {
+				headers: {
+					'x-api-key': process.env.GRAPHQL_API_KEY
+				}
+			};
+
+			return graphql(schema, query, { req })
+				.then(({ data }) => {
+					data.user.uuid.should.equal('1234');
+				})
+		});
+
 	});
 });

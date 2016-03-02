@@ -1,13 +1,8 @@
-import {
-	GraphQLString,
-	GraphQLInt,
-	GraphQLList,
-	GraphQLObjectType
-} from 'graphql';
+import { GraphQLString, GraphQLInt, GraphQLList, GraphQLObjectType } from 'graphql';
 
 import { Content } from './content';
 import { ContentType } from './basic';
-import backend from '../backend-adapters/index';
+import backendReal from '../backend-adapters/index';
 
 
 const Page = new GraphQLObjectType({
@@ -36,7 +31,7 @@ const Page = new GraphQLObjectType({
 				genres: { type: new GraphQLList(GraphQLString) },
 				type: { type: ContentType }
 			},
-			resolve: (page, {from, limit, genres, type}, {rootValue: {flags}}) => {
+			resolve: (page, { from, limit, genres, type }, { rootValue: { flags, backend = backendReal }}) => {
 				if(!page.items || page.items.length < 1) { return []; }
 				return backend(flags).capi.content(page.items, {from, limit, genres, type});
 			}
@@ -68,7 +63,7 @@ const ContentByConcept = new GraphQLObjectType({
 				genres: { type: new GraphQLList(GraphQLString) },
 				type: { type: ContentType }
 			},
-			resolve: (result, args, {rootValue: {flags}}) => {
+			resolve: (result, args, { rootValue: { flags, backend = backendReal }}) => {
 				if(!result.items || result.items.length < 1) { return []; }
 
 				return backend(flags).capi.content(result.items, args);
@@ -102,11 +97,10 @@ const List = new GraphQLObjectType({
 				genres: { type: new GraphQLList(GraphQLString) },
 				type: { type: ContentType }
 			},
-			resolve: (result, args, {rootValue: {flags}}) => {
-				if(!result.items || result.items.length < 1) { return []; }
-
-				return backend(flags).capi.content(result.items.map(result => result.id.replace(/http:\/\/api\.ft\.com\/things?\//, '')), args);
-			}
+			resolve: (result, args, { rootValue: { flags, backend = backendReal }}) =>
+				(!result.items || result.items.length < 1) ?
+					[] :
+					backend(flags).capi.content(result.items.map(result => result.id.replace(/http:\/\/api\.ft\.com\/things?\//, '')), args)
 		}
 	}
 });
