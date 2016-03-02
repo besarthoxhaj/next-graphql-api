@@ -67,7 +67,7 @@ export default class {
 	list (uuid, ttl = 50) {
 		return this.cache.cached(`${this.type}.lists.${uuid}`, ttl, () => {
 			const headers = { Authorization: process.env.LIST_API_AUTHORIZATION };
-			return fetch(`https://prod-up-read.ft.com/lists/${uuid}`, { headers })
+			return fetch(`https://${LIST_API_HOST}/lists/${uuid}`, { headers })
 				.then(response => {
 					if (!response.ok) {
 						logger.warn('Failed getting List response', {
