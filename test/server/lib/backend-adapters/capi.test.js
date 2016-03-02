@@ -53,7 +53,7 @@ describe('CAPI', () => {
 
 			return capi.content(['content-one', 'content-two'])
 				.then(() => {
-					cached.alwaysCalledWith(`capi.content.content-one_content-two`, 50);
+					cached.alwaysCalledWith('capi.content.content-one_content-two', 50);
 				});
 		});
 
@@ -98,7 +98,7 @@ describe('CAPI', () => {
 				.then(list => {
 					list.should.have.length(2);
 					list.should.deep.equal([{ id: 'content-one' }, { id: 'content-two' }]);
-					cached.alwaysCalledWith(`capi.lists.73667f46-1a55-11e5-a130-2e7db721f996`, 50);
+					cached.alwaysCalledWith('capi.lists.73667f46-1a55-11e5-a130-2e7db721f996', 50);
 					// make sure mock was called
 					fetchMock.called().should.be.true;
 				});

@@ -2,7 +2,6 @@
 
 /.editorconfig
 /.env
-/.eslintrc.json
 /.scss-lint.yml
 /npm-debug.log*
 
