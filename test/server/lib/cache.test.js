@@ -1,15 +1,10 @@
-import fetch from 'isomorphic-fetch';
-global.fetch = fetch;
-
-import chai from 'chai';
 import sinon from 'sinon';
-
+import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 import Cache from '../../../server/lib/cache';
-
 
 describe('GraphQL Cache', () => {
 	const cache = new Cache(10);

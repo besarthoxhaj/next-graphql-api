@@ -1,19 +1,11 @@
+include n.Makefile
+
 TEST_APP := "ft-next-graphql-api-${CIRCLE_BUILD_NUM}"
 
-.PHONY: test
-
-clean:
-	git clean -fxd
-
-install:
-	obt install --verbose
-
-verify:
-	obt verify --esLintPath=./.eslintrc
-
 unit-test:
-	export CONSOLE_LOG_LEVEL="error"; export MYFT_API_URL="http://my.ft.com/"; export GRAPHQL_API_KEY=123; \
-	mocha --require server/setup --recursive --reporter spec test/server/
+	@echo "Testing…"
+	@export CONSOLE_LOG_LEVEL="error"; export MYFT_API_URL="http://my.ft.com/"; export GRAPHQL_API_KEY=123; \
+		mocha --require test/server/setup --recursive --reporter spec test/server/
 
 test: verify unit-test
 

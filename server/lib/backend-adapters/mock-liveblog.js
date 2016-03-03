@@ -1,11 +1,11 @@
 import liveblogs from '../fixtures/liveblogs';
 
-class MockLiveblog {
-	constructor(realBackend) {
+export default class {
+	constructor (realBackend) {
 		this.realBackend = realBackend;
 	}
 
-	fetch(uri, opts, ttl = 50) {
+	fetch (uri, opts, ttl = 50) {
 		const liveblog = liveblogs[uri];
 
 		return liveblog ?
@@ -13,5 +13,3 @@ class MockLiveblog {
 			this.realBackend.fetch(uri, ttl);
 	}
 }
-
-export default MockLiveblog;

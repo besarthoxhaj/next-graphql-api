@@ -5,13 +5,13 @@ import logger from '@financial-times/n-logger';
 import filterContent from '../helpers/filter-content';
 import resolveContentType from '../helpers/resolve-content-type';
 
-class CAPI {
-	constructor(cache) {
+export default class {
+	constructor (cache) {
 		this.type = 'capi';
 		this.cache = cache;
 	}
 
-	page(uuid, sectionsId, ttl = 50) {
+	page (uuid, sectionsId, ttl = 50) {
 		return this.cache.cached(`${this.type}.pages.${uuid}`, ttl, () => {
 			return ApiClient.pages({ uuid: uuid })
 				.then(it => ({
@@ -23,7 +23,7 @@ class CAPI {
 		});
 	}
 
-	byConcept(uuid, title, ttl = 50) {
+	byConcept (uuid, title, ttl = 50) {
 		return this.cache.cached(`${this.type}.byconcept.${uuid}`, ttl, () => {
 			return ApiClient.contentAnnotatedBy({ uuid: uuid })
 				.then(ids => ({
@@ -35,7 +35,7 @@ class CAPI {
 		});
 	}
 
-	search(termName, termValue, opts, ttl = 50) {
+	search (termName, termValue, opts, ttl = 50) {
 		const searchOpts = {
 			filter: {
 				bool: {
@@ -53,7 +53,7 @@ class CAPI {
 			.then(filterContent(opts, resolveContentType));
 	}
 
-	content(uuids, opts, ttl=50) {
+	content (uuids, opts = {}, ttl = 50) {
 		const cacheKey = `${this.type}.content.${Array.isArray(uuids) ? uuids.join('_') : uuids}`;
 		return this.cache.cached(cacheKey, ttl, () => {
 			return ApiClient.content({
@@ -64,7 +64,7 @@ class CAPI {
 		.then(filterContent(opts, resolveContentType))
 	}
 
-	list(uuid, ttl = 50) {
+	list (uuid, ttl = 50) {
 		return this.cache.cached(`${this.type}.lists.${uuid}`, ttl, () => {
 			const headers = { Authorization: process.env.LIST_API_AUTHORIZATION };
 			return fetch(`https://prod-up-read.ft.com/lists/${uuid}`, { headers })
@@ -81,7 +81,7 @@ class CAPI {
 		});
 	}
 
-	things(uuids, type = 'idV1', ttl = 50) {
+	things (uuids, type = 'idV1', ttl = 50) {
 		const cacheKey = `${this.type}.things.${type}.${Array.isArray(uuids) ? uuids.join('_') : uuids}`;
 		return this.cache.cached(cacheKey, ttl, () => {
 			return ApiClient.things({
@@ -92,5 +92,3 @@ class CAPI {
 		});
 	}
 }
-
-export default CAPI;

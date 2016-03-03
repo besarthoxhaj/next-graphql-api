@@ -1,8 +1,8 @@
 import fetchMock from 'fetch-mock';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-chai.should();
 chai.use(chaiAsPromised);
+chai.should();
 
 import userAuth from '../../../server/lib/user-auth';
 

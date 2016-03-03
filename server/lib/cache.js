@@ -1,8 +1,8 @@
 import { metrics } from 'ft-next-express';
 import logger from '@financial-times/n-logger';
 
-class Cache {
-	constructor(staleTtl, unusedStaleTtl) {
+export default class {
+	constructor (staleTtl, unusedStaleTtl) {
 		// in-memory content cache
 		this.contentCache = {};
 		this.requestMap = {};
@@ -23,13 +23,13 @@ class Cache {
 		setInterval(sweeper, 60 * 1000);
 	}
 
-	clear(key) {
+	clear (key) {
 		delete this.contentCache[key];
 	}
 
 	// Caching wrapper. Always returns a promise, when cache expires
 	// returns stale data immediately and fetches fresh one
-	cached(key, ttl, fetcher) {
+	cached (key, ttl, fetcher) {
 		const metricsKey = key.split('.')[0];
 		const cache = this.contentCache;
 
@@ -58,7 +58,7 @@ class Cache {
 		}
 	}
 
-	_fetch(key, now, ttl, fetcher) {
+	_fetch (key, now, ttl, fetcher) {
 		const metricsKey = key.split('.')[0];
 
 		if(this.requestMap[key])
@@ -91,5 +91,3 @@ class Cache {
 		return this.requestMap[key];
 	}
 }
-
-export default Cache;

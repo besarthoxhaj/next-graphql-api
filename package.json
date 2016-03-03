@@ -19,7 +19,6 @@
     "cookie-parser": "^1.4.0",
     "directly": "^1.0.1",
     "express-errors-handler": "^1.4.2",
-    "fetch-mock": "^4.0.1",
     "fetchres": "^1.5.1",
     "forever": "^0.15.1",
     "ft-n-article-branding": "^3.0.1",
@@ -33,23 +32,24 @@
     "next-myft-client": "^6.1.5",
     "react": "^0.14.7",
     "react-dom": "^0.14.7",
-    "s3o-middleware": "^1.1.2",
-    "supertest": "^1.1.0"
+    "s3o-middleware": "^1.1.2"
   },
   "devDependencies": {
+    "bower": "^1.7.7",
     "chai": "^3.2.0",
     "chai-as-promised": "^5.1.0",
-    "eslint-plugin-react": "^3.5.0",
+    "eslint": "^2.2.0",
+    "eslint-plugin-react": "^4.1.0",
     "fetch-mock": "^4.1.1",
     "isomorphic-fetch": "^2.1.1",
+    "lintspaces-cli": "^0.1.1",
     "mocha": "^2.3.0",
     "next-build-tools": "^5.6.2",
     "nodemon": "^1.7.1",
-    "origami-build-tools": "^4.2.0",
-    "proxyquire": "^1.7.4",
-    "sinon": "^1.17.1"
+    "sinon": "^1.17.1",
+    "supertest": "^1.1.0"
   },
   "engines": {
-    "node": "4.3.0"
+    "node": "4.3.1"
   }
 }
