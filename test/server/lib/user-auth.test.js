@@ -33,7 +33,7 @@ describe('User Auth', () => {
 			headers: { 'x-api-key': 'bad-api-key' }
 		};
 
-		return userAuth(req, '1234').should.be.rejectedWith('Bad or missing apiKey');
+		return userAuth(req, '1234').should.be.rejectedWith('Bad apiKey supplied');
 	});
 
 	it('should return uuid if valid session', () => {
@@ -53,7 +53,7 @@ describe('User Auth', () => {
 			headers: { }
 		};
 
-		return userAuth(req, '1234').should.be.rejectedWith('Failed session auth');
+		return userAuth(req, '1234').should.be.rejectedWith('No uuid returned from session endpoint uuid=1234');
 	});
 
 	it('should throw error if no FTSession cookie', () => {
@@ -63,7 +63,7 @@ describe('User Auth', () => {
 			headers: { }
 		};
 
-		return userAuth(req, '1234').should.be.rejectedWith('Not authorised to view user data');
+		return userAuth(req, '1234').should.be.rejectedWith('Sign in to view user\'s data');
 	});
 
 	it('should throw error if requested uuid is different to user\'s', () => {
@@ -73,7 +73,7 @@ describe('User Auth', () => {
 			headers: { }
 		};
 
-		return userAuth(req, '4567').should.be.rejectedWith('Failed session auth');
+		return userAuth(req, '4567').should.be.rejectedWith('Requested uuid does not match user\'s uuid=4567 users_uuid=1234');
 	});
 
 });

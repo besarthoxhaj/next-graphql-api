@@ -8,7 +8,7 @@ export default (req, uuid) => {
 		if (apiKey === process.env.GRAPHQL_API_KEY) {
 			return Promise.resolve(uuid)
 		} else {
-			return Promise.reject(new HttpError('Bad or missing apiKey', 401));
+			return Promise.reject(new HttpError('Bad apiKey supplied', 401));
 		}
 	}
 	if (req.cookies.FTSession) {
@@ -21,13 +21,16 @@ export default (req, uuid) => {
 		})
 			.then(fetchresJson)
 			.then(response => {
-				if (response.uuid && response.uuid === uuid) {
-					return uuid;
-				} else {
-					throw new HttpError('Failed session auth', 401);
+				if (!response.uuid) {
+					throw new HttpError(`No uuid returned from session endpoint uuid=${uuid}`, 500);
 				}
+				if (response.uuid !== uuid) {
+					throw new HttpError(`Requested uuid does not match user\'s uuid=${uuid} users_uuid=${response.uuid}`, 401);
+				}
+
+				return uuid;
 			});
 	} else {
-		return Promise.reject(new HttpError('Not authorised to view user data', 401));
+		return Promise.reject(new HttpError('Sign in to view user\'s data', 401));
 	}
 };
