@@ -83,7 +83,21 @@ describe('User Auth', () => {
 			headers: { }
 		};
 
-		return userAuth(req, '4567').should.be.rejectedWith('Requested uuid does not match user\'s uuid=4567 users_uuid=1234');
+		return userAuth(req, '4567').should.be.rejectedWith(
+			'Requested uuid does not match user\'s uuid=4567 users_uuid=1234'
+		);
+	});
+
+	it('should throw error if session request fails', () => {
+		fetchMock.mock('https://session-next.ft.com/uuid', 500);
+		const req = {
+			cookies: { FTSession: 'session-id' },
+			headers: { }
+		};
+
+		return userAuth(req).should.be.rejectedWith(
+			'Session endpoint responded with error server_error_name=BadServerResponseError server_error_message=500'
+		);
 	});
 
 });
