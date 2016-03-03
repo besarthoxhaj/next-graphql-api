@@ -31,6 +31,6 @@ export default (req, uuid) => {
 				return response.uuid;
 			});
 	} else {
-		return Promise.reject(new HttpError('Sign in to view user\'s data', 401));
+		return Promise.reject(new HttpError('Sign in to view user data', 401));
 	}
 };

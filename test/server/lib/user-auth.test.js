@@ -73,7 +73,7 @@ describe('User Auth', () => {
 			headers: { }
 		};
 
-		return userAuth(req, '1234').should.be.rejectedWith('Sign in to view user\'s data');
+		return userAuth(req, '1234').should.be.rejectedWith('Sign in to view user data');
 	});
 
 	it('should throw error if requested uuid is different to user\'s', () => {
