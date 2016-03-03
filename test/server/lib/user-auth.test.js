@@ -46,6 +46,16 @@ describe('User Auth', () => {
 		return userAuth(req, '1234').should.become('1234');
 	});
 
+	it('should return user\'s uuid if none supplied', () => {
+		fetchMock.mock('https://session-next.ft.com/uuid', { uuid: '1234' });
+		const req = {
+			cookies: { FTSession: 'session-id' },
+			headers: { }
+		};
+
+		return userAuth(req).should.become('1234');
+	});
+
 	it('should throw error if nothing returned from session endpoint', () => {
 		fetchMock.mock('https://session-next.ft.com/uuid', { });
 		const req = {
@@ -53,7 +63,7 @@ describe('User Auth', () => {
 			headers: { }
 		};
 
-		return userAuth(req, '1234').should.be.rejectedWith('No uuid returned from session endpoint uuid=1234');
+		return userAuth(req, '1234').should.be.rejectedWith('No uuid returned from session endpoint');
 	});
 
 	it('should throw error if no FTSession cookie', () => {

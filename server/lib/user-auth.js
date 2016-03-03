@@ -22,13 +22,13 @@ export default (req, uuid) => {
 			.then(fetchresJson)
 			.then(response => {
 				if (!response.uuid) {
-					throw new HttpError(`No uuid returned from session endpoint uuid=${uuid}`, 500);
+					throw new HttpError(`No uuid returned from session endpoint`, 500);
 				}
-				if (response.uuid !== uuid) {
+				if (uuid && response.uuid !== uuid) {
 					throw new HttpError(`Requested uuid does not match user\'s uuid=${uuid} users_uuid=${response.uuid}`, 401);
 				}
 
-				return uuid;
+				return response.uuid;
 			});
 	} else {
 		return Promise.reject(new HttpError('Sign in to view user\'s data', 401));
