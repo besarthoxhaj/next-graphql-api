@@ -33,7 +33,7 @@ describe('User Auth', () => {
 			headers: { 'x-api-key': 'bad-api-key' }
 		};
 
-		return userAuth(req, '1234').should.be.rejectedWith('Bad or missing apiKey');
+		return userAuth(req, '1234').should.be.rejectedWith('Bad apiKey supplied');
 	});
 
 	it('should return uuid if valid session', () => {
@@ -46,6 +46,16 @@ describe('User Auth', () => {
 		return userAuth(req, '1234').should.become('1234');
 	});
 
+	it('should return user\'s uuid if none supplied', () => {
+		fetchMock.mock('https://session-next.ft.com/uuid', { uuid: '1234' });
+		const req = {
+			cookies: { FTSession: 'session-id' },
+			headers: { }
+		};
+
+		return userAuth(req).should.become('1234');
+	});
+
 	it('should throw error if nothing returned from session endpoint', () => {
 		fetchMock.mock('https://session-next.ft.com/uuid', { });
 		const req = {
@@ -53,7 +63,7 @@ describe('User Auth', () => {
 			headers: { }
 		};
 
-		return userAuth(req, '1234').should.be.rejectedWith('Failed session auth');
+		return userAuth(req, '1234').should.be.rejectedWith('No uuid returned from session endpoint');
 	});
 
 	it('should throw error if no FTSession cookie', () => {
@@ -63,7 +73,7 @@ describe('User Auth', () => {
 			headers: { }
 		};
 
-		return userAuth(req, '1234').should.be.rejectedWith('Not authorised to view user data');
+		return userAuth(req, '1234').should.be.rejectedWith('Sign in to view user data');
 	});
 
 	it('should throw error if requested uuid is different to user\'s', () => {
@@ -73,7 +83,7 @@ describe('User Auth', () => {
 			headers: { }
 		};
 
-		return userAuth(req, '4567').should.be.rejectedWith('Failed session auth');
+		return userAuth(req, '4567').should.be.rejectedWith('Requested uuid does not match user\'s uuid=4567 users_uuid=1234');
 	});
 
 });
