@@ -8,6 +8,8 @@ import { LiveBlogStatus, ContentType } from './basic';
 
 const podcastIdV1 = 'NjI2MWZlMTEtMTE2NS00ZmI0LWFkMzMtNDhiYjA3YjcxYzIy-U2VjdGlvbnM=';
 
+const propertyEquals = (property, value) => (item) => item[property] === value;
+
 const Content = new GraphQLInterfaceType({
 	name: 'Content',
 	description: 'A piece of FT content',
@@ -38,7 +40,17 @@ const Content = new GraphQLInterfaceType({
 			type: GraphQLString
 		},
 		tags: {
-			type: new GraphQLList(Concept)
+			type: new GraphQLList(Concept),
+			args: {
+				only: {
+					type: new GraphQLList(GraphQLString),
+					description: 'Only return tags which match one of these taxonomies'
+				},
+				not: {
+					type: new GraphQLList(GraphQLString),
+					description: 'Don\'t return tags which match one of these taxonomies'
+				}
+			}
 		},
 		primaryTag: {
 			type: Concept
@@ -84,13 +96,27 @@ const getContentFields = () => ({
 	},
 	tags: {
 		type: new GraphQLList(Concept),
-		resolve: content => content.metadata
+		args: {
+			only: {
+				type: new GraphQLList(GraphQLString),
+				description: 'Only return tags which match one of these taxonomies'
+			},
+			not: {
+				type: new GraphQLList(GraphQLString),
+				description: 'Don\'t return tags which match one of these taxonomies'
+			}
+		},
+		resolve: (content, { only, not = [] }) => {
+			const tags = (only && only.length) ?
+				content.metadata.filter(tag => only.includes(tag.taxonomy)) : content.metadata;
+			return not.length ? tags.filter(tag => !not.includes(tag.taxonomy)) : tags;
+		}
 	},
 	primaryTag: {
 		type: Concept,
 		resolve: content => {
-			const primarySection = content.metadata.find(tag => tag.primary === 'section');
-			const primaryTheme = content.metadata.find(tag => tag.primary === 'theme');
+			const primaryTheme = content.metadata.find(propertyEquals('primary', 'theme'));
+			const primarySection = content.metadata.find(propertyEquals('primary', 'section'));
 			return primaryTheme || primarySection || null;
 		}
 	},
@@ -109,8 +135,7 @@ const getContentFields = () => ({
 			limit: { type: GraphQLInt }
 		},
 		resolve: (content, { from, limit }, { rootValue: { flags, backend = backendReal }}) => {
-			const storyPackage = content.storyPackage || [];
-			const storyPackageIds = storyPackage.map(story => story.id);
+			const storyPackageIds = (content.storyPackage || []).map(story => story.id);
 			return storyPackageIds.length ? backend(flags).capi.content(storyPackageIds, { from, limit }) : [];
 		}
 	}
@@ -128,7 +153,7 @@ const Article = new GraphQLObjectType({
 		},
 		isPodcast: {
 			type: GraphQLBoolean,
-			resolve: content => content.metadata.some(concept => concept.idV1 === podcastIdV1)
+			resolve: content => content.metadata.some(propertyEquals('idV1',  podcastIdV1))
 		}
 	})
 });
@@ -234,7 +259,8 @@ const Image = new GraphQLObjectType({
 					type: new GraphQLNonNull(GraphQLInt)
 				}
 			},
-			resolve: (image, { width }) => `//next-geebee.ft.com/image/v1/images/raw/${image.url}?source=next&fit=scale-down&width=${width}`
+			resolve: (image, { width }) =>
+				`//next-geebee.ft.com/image/v1/images/raw/${image.url}?source=next&fit=scale-down&width=${width}`
 		},
 		rawSrc: {
 			type: GraphQLString,
