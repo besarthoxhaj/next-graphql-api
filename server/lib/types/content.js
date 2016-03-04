@@ -153,7 +153,7 @@ const Article = new GraphQLObjectType({
 		},
 		isPodcast: {
 			type: GraphQLBoolean,
-			resolve: content => content.metadata.some(propertyEquals('idV1',  podcastIdV1))
+			resolve: content => content.metadata.some(propertyEquals('idV1', podcastIdV1))
 		}
 	})
 });
