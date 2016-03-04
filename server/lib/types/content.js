@@ -1,37 +1,18 @@
+import { GraphQLBoolean, GraphQLID, GraphQLInt, GraphQLInterfaceType, GraphQLList, GraphQLNonNull, GraphQLObjectType, GraphQLString } from 'graphql';
 import articleGenres from 'ft-next-article-genre';
 import articleBranding from 'ft-n-article-branding';
 
 import capifyMetadata from '../helpers/capify-metadata';
 import backendReal from '../backend-adapters/index';
-
-import {
-	GraphQLBoolean,
-	GraphQLID,
-	GraphQLInt,
-	GraphQLString,
-	GraphQLList,
-	GraphQLObjectType,
-	GraphQLInterfaceType,
-	GraphQLNonNull
-} from 'graphql';
-
-import {
-	LiveBlogStatus,
-	ContentType
-} from './basic';
+import { LiveBlogStatus, ContentType } from './basic';
 
 const podcastIdV1 = 'NjI2MWZlMTEtMTE2NS00ZmI0LWFkMzMtNDhiYjA3YjcxYzIy-U2VjdGlvbnM=';
 
 const Content = new GraphQLInterfaceType({
 	name: 'Content',
 	description: 'A piece of FT content',
-	resolveType: (value) => {
-		// This logic is unfortunately duplicated in the backend. The clean way would be
-		// to use the backend here, but GraphQL unfortunately doesn't pass the execution
-		// context to us here.
-		// Logged as https://github.com/graphql/graphql-js/issues/103
-
-		if (/liveblog|marketslive|liveqa/i.test(value.webUrl)) {
+	resolveType: content => {
+		if (/liveblog|marketslive|liveqa/i.test(content.webUrl)) {
 			return LiveBlog;
 		} else {
 			return Article;
@@ -56,6 +37,9 @@ const Content = new GraphQLInterfaceType({
 		summary: {
 			type: GraphQLString
 		},
+		tags: {
+			type: new GraphQLList(Concept)
+		},
 		primaryTag: {
 			type: Concept
 		},
@@ -79,69 +63,68 @@ const Content = new GraphQLInterfaceType({
 	})
 });
 
+const getContentFields = () => ({
+	id: {
+		type: GraphQLID
+	},
+	title: {
+		type: GraphQLString
+	},
+	genre: {
+		type: GraphQLString,
+		resolve: content => articleGenres(capifyMetadata(content.metadata))
+	},
+	branding: {
+		type: Concept,
+		resolve: content => articleBranding(Object.assign({}, content.metadata))
+	},
+	summary: {
+		type: GraphQLString,
+		resolve: content => (content.summaries && content.summaries.length) ? content.summaries[0] : null
+	},
+	tags: {
+		type: new GraphQLList(Concept),
+		resolve: content => content.metadata
+	},
+	primaryTag: {
+		type: Concept,
+		resolve: content => {
+			const primarySection = content.metadata.find(tag => tag.primary === 'section');
+			const primaryTheme = content.metadata.find(tag => tag.primary === 'theme');
+			return primaryTheme || primarySection || null;
+		}
+	},
+	primaryImage: {
+		type: Image,
+		resolve: content => content.mainImage
+	},
+	lastPublished: {
+		type: GraphQLString,
+		resolve: content => content.publishedDate
+	},
+	relatedContent: {
+		type: new GraphQLList(Content),
+		args: {
+			from: { type: GraphQLInt },
+			limit: { type: GraphQLInt }
+		},
+		resolve: (content, { from, limit }, { rootValue: { flags, backend = backendReal }}) => {
+			const storyPackage = content.storyPackage || [];
+			const storyPackageIds = storyPackage.map(story => story.id);
+			return storyPackageIds.length ? backend(flags).capi.content(storyPackageIds, { from, limit }) : [];
+		}
+	}
+});
+
 const Article = new GraphQLObjectType({
 	name: 'Article',
 	description: 'Content item',
 	interfaces: [Content],
-	fields: () => ({
-		id: {
-			type: GraphQLID
-		},
+	fields: () => Object.assign(getContentFields(), {
 		contentType: {
 			type: ContentType,
 			description: 'Type of content',
 			resolve: () => 'article'
-		},
-		title: {
-			type: GraphQLString
-		},
-		genre: {
-			type: GraphQLString,
-			resolve: content => articleGenres(capifyMetadata(content.metadata))
-		},
-		branding: {
-			type: Concept,
-			// NOTE: need to copy metadata, as it's passed around by reference
-			resolve: content => articleBranding(JSON.parse(JSON.stringify(content.metadata)))
-		},
-		summary: {
-			type: GraphQLString,
-			resolve: content => (content.summaries && content.summaries.length) ? content.summaries[0] : null
-		},
-		primaryTag: {
-			type: Concept,
-			resolve: content => {
-				const primarySection = content.metadata.find(tag => tag.primary === 'section');
-				const primaryTheme = content.metadata.find(tag => tag.primary === 'theme');
-				return primaryTheme || primarySection || null;
-			}
-		},
-		primaryImage: {
-			type: Image,
-			resolve: content => content.mainImage
-		},
-		lastPublished: {
-			type: GraphQLString,
-			resolve: content => content.publishedDate
-		},
-		relatedContent: {
-			type: new GraphQLList(Content),
-			args: {
-				from: {
-					type: GraphQLInt
-				},
-				limit: {
-					type: GraphQLInt
-				}
-			},
-			resolve: (content, { from, limit }, { rootValue: { flags, backend = backendReal }}) => {
-				const storyPackage = content.storyPackage || [];
-				const storyPackageIds = storyPackage.map(story => story.id);
-				if (!storyPackageIds.length) {
-					return [];
-				}
-				return backend(flags).capi.content(storyPackageIds, { from, limit });
-			}
 		},
 		isPodcast: {
 			type: GraphQLBoolean,
@@ -154,64 +137,11 @@ const LiveBlog = new GraphQLObjectType({
 	name: 'LiveBlog',
 	description: 'Live blog item',
 	interfaces: [Content],
-	fields: () => ({
-		id: {
-			type: GraphQLID
-		},
+	fields: () => Object.assign(getContentFields(), {
 		contentType: {
 			type: ContentType,
 			description: 'Type of content',
 			resolve: () => 'liveblog'
-		},
-		title: {
-			type: GraphQLString
-		},
-		genre: {
-			type: GraphQLString,
-			resolve: content => articleGenres(capifyMetadata(content.metadata))
-		},
-		branding: {
-			type: Concept,
-			// NOTE: need to copy metadata, as it's passed around by reference
-			resolve: content => articleBranding(JSON.parse(JSON.stringify(content.metadata)))
-		},
-		summary: {
-			type: GraphQLString,
-			resolve: content => content.summaries.length ? content.summaries[0] : null
-		},
-		primaryTag: {
-			type: Concept,
-			resolve: content => {
-				const primarySection = content.metadata.find(tag => tag.primary === 'section');
-				const primaryTheme = content.metadata.find(tag => tag.primary === 'theme');
-				return primaryTheme || primarySection || null;
-			}
-		},
-		primaryImage: {
-			type: Image,
-			resolve: content => content.mainImage
-		},
-		lastPublished: {
-			type: GraphQLString,
-			resolve: content => content.publishedDate
-		},
-		relatedContent: {
-			type: new GraphQLList(Content),
-			args: {
-				from: {
-					type: GraphQLInt
-				},
-				limit: {
-					type: GraphQLInt
-				}
-			},
-			resolve: (content, { from, limit }, { rootValue: { flags, backend = backendReal }}) => {
-				let storyPackageIds = content.storyPackage.map(story => story.id);
-				if (storyPackageIds.length < 1) {
-					return [];
-				}
-				return backend(flags).capi.content(storyPackageIds, { from, limit });
-			}
 		},
 		status: {
 			type: LiveBlogStatus,
@@ -223,9 +153,7 @@ const LiveBlog = new GraphQLObjectType({
 		updates: {
 			type: new GraphQLList(LiveBlogUpdate),
 			args: {
-				limit: {
-					type: GraphQLInt
-				}
+				limit: { type: GraphQLInt }
 			},
 			resolve: (content, { limit }, { rootValue: { flags, backend = backendReal }}) => (
 				backend(flags).liveblog.fetch(content.webUrl, { limit })
@@ -374,8 +302,7 @@ const Video = new GraphQLObjectType({
 			})
 		},
 		renditions: {
-			type: new GraphQLList(Rendition),
-			resolve: video => video.renditions
+			type: new GraphQLList(Rendition)
 		}
 	})
 });
@@ -402,8 +329,4 @@ const Rendition = new GraphQLObjectType({
 	})
 });
 
-export {
-	Content,
-	Concept,
-	Video
-};
+export { Content, Concept, Video};

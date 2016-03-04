@@ -28,7 +28,7 @@ export default new GraphQLObjectType({
 					type: GraphQLInt
 				}
 			},
-			resolve: ({ uuid }, { limit=10 }, { rootValue: { flags, backend = backendReal }}) =>
+			resolve: ({ uuid }, { limit = 10 }, { rootValue: { flags, backend = backendReal }}) =>
 				backend(flags).myft.getAllRelationship(uuid, 'read', 'content', { limit })
 					.then(items => !items ? [] : backend(flags).capi.content(items.map(item => item.uuid), { limit }))
 		},

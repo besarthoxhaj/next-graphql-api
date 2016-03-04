@@ -4,6 +4,7 @@ import { Content } from './content';
 import { ContentType } from './basic';
 import backendReal from '../backend-adapters/index';
 
+const contentToUiid = content => content.id.replace(/http:\/\/api\.ft\.com\/things?\//, '');
 
 const Page = new GraphQLObjectType({
 	name: 'Page',
@@ -11,30 +12,31 @@ const Page = new GraphQLObjectType({
 	fields: {
 		url: {
 			type: GraphQLString,
-			resolve: (it) => {
-				return (it.sectionId ? `/stream/sectionsId/${it.sectionId}` : null);
-			}
+			resolve: page => page.sectionId ? `/stream/sectionsId/${page.sectionId}` : null
 		},
 		title: {
 			type: GraphQLString
-		},
-		layoutHint: {
-			type: GraphQLString,
-			resolve: () => null
 		},
 		items: {
 			type: new GraphQLList(Content),
 			description: 'Content items of the page',
 			args: {
-				from: { type: GraphQLInt },
-				limit: { type: GraphQLInt },
-				genres: { type: new GraphQLList(GraphQLString) },
-				type: { type: ContentType }
+				from: {
+					type: GraphQLInt
+				},
+				limit: {
+					type: GraphQLInt
+				},
+				genres: {
+					type: new GraphQLList(GraphQLString)
+				},
+				type: {
+					type: ContentType
+				}
 			},
-			resolve: (page, { from, limit, genres, type }, { rootValue: { flags, backend = backendReal }}) => {
-				if(!page.items || page.items.length < 1) { return []; }
-				return backend(flags).capi.content(page.items, {from, limit, genres, type});
-			}
+			resolve: (page, { from, limit, genres, type }, { rootValue: { flags, backend = backendReal }}) =>
+				(page.items && page.items.length) ?
+					backend(flags).capi.content(page.items, {from, limit, genres, type}) : []
 		}
 	}
 });
@@ -46,28 +48,25 @@ const ContentByConcept = new GraphQLObjectType({
 		title: {
 			type: GraphQLString
 		},
-		url: {
-			type: GraphQLString,
-			resolve: () => (null)
-		},
-		layoutHint: {
-			type: GraphQLString,
-			resolve: () => null
-		},
 		items: {
 			type: new GraphQLList(Content),
 			description: 'Content items',
 			args: {
-				from: { type: GraphQLInt },
-				limit: { type: GraphQLInt },
-				genres: { type: new GraphQLList(GraphQLString) },
-				type: { type: ContentType }
+				from: {
+					type: GraphQLInt
+				},
+				limit: {
+					type: GraphQLInt
+				},
+				genres: {
+					type: new GraphQLList(GraphQLString)
+				},
+				type: {
+					type: ContentType
+				}
 			},
-			resolve: (result, args, { rootValue: { flags, backend = backendReal }}) => {
-				if(!result.items || result.items.length < 1) { return []; }
-
-				return backend(flags).capi.content(result.items, args);
-			}
+			resolve: (result, args, { rootValue: { flags, backend = backendReal }}) =>
+				(result.items && result.items.length) ? backend(flags).capi.content(result.items, args) : []
 		}
 	}
 });
@@ -77,36 +76,32 @@ const List = new GraphQLObjectType({
 	description: 'Items contained in a list',
 	fields: {
 		title: {
-			type: GraphQLString,
-			resolve: list => list.title
-		},
-		url: {
-			type: GraphQLString,
-			resolve: () => (null)
+			type: GraphQLString
 		},
 		layoutHint: {
-			type: GraphQLString,
-			resolve: list => list.layoutHint
+			type: GraphQLString
 		},
 		items: {
 			type: new GraphQLList(Content),
 			description: 'Content items',
 			args: {
-				from: { type: GraphQLInt },
-				limit: { type: GraphQLInt },
-				genres: { type: new GraphQLList(GraphQLString) },
-				type: { type: ContentType }
+				from: {
+					type: GraphQLInt
+				},
+				limit: {
+					type: GraphQLInt
+				},
+				genres: {
+					type: new GraphQLList(GraphQLString)
+				},
+				type: {
+					type: ContentType
+				}
 			},
 			resolve: (result, args, { rootValue: { flags, backend = backendReal }}) =>
-				(!result.items || result.items.length < 1) ?
-					[] :
-					backend(flags).capi.content(result.items.map(result => result.id.replace(/http:\/\/api\.ft\.com\/things?\//, '')), args)
+				(result.items && result.items.length) ? backend(flags).capi.content(result.items.map(contentToUiid), args) : []
 		}
 	}
 });
 
-export {
-	Page,
-	ContentByConcept,
-	List
-};
+export { Page, ContentByConcept, List };
