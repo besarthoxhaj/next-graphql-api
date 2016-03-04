@@ -88,7 +88,7 @@ const getContentFields = () => ({
 	},
 	branding: {
 		type: Concept,
-		resolve: content => articleBranding(Object.assign({}, content.metadata))
+		resolve: content => articleBranding(content.metadata.slice())
 	},
 	summary: {
 		type: GraphQLString,
@@ -355,4 +355,4 @@ const Rendition = new GraphQLObjectType({
 	})
 });
 
-export { Content, Concept, Video};
+export { Content, Concept, Video };
