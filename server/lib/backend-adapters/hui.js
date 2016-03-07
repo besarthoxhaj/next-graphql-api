@@ -14,7 +14,7 @@ export default class {
 		});
 	}
 
-	topics ({industry, position, sector, country, period='last-1-week'}, ttl = 50) {
+	topics ({industry, position, sector, country, period='last-1-week'}, ttl = 60 * 60 * 60) {
 		return this.cache.cached(`${this.type}.topics.${industry}.${position}.${sector}.${country}.${period}`, ttl, () => {
 			return ApiClient.hui({model: 'annotations', industry, position, sector, country, period});
 		});
