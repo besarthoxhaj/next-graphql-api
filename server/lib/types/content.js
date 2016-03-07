@@ -137,7 +137,7 @@ const getContentFields = () => ({
 		resolve: content => {
 			const primaryTheme = content.metadata.find(propertyEquals('primary', 'theme'));
 			const primarySection = content.metadata.find(propertyEquals('primary', 'section'));
-			return primaryTheme || primarySection || null;
+			return primaryTheme || primarySection;
 		}
 	},
 	primaryImage: {
@@ -167,7 +167,8 @@ const getContentFields = () => ({
 				.map(author => ({
 					id: author.idV1,
 					name: author.prefLabel,
-					headshot: getAuthorHeadshot(author.idV1, author.prefLabel)
+					headshot: getAuthorHeadshot(author.idV1, author.prefLabel),
+					isBrand: author.primary === 'brand'
 				}))
 	}
 });
@@ -397,6 +398,9 @@ const Author = new GraphQLObjectType({
 		},
 		headshot: {
 			type: GraphQLString
+		},
+		isBrand: {
+			type: GraphQLBoolean
 		}
 	})
 });
