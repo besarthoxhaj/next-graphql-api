@@ -168,7 +168,8 @@ const getContentFields = () => ({
 					id: author.idV1,
 					name: author.prefLabel,
 					headshot: getAuthorHeadshot(author.idV1, author.prefLabel),
-					isBrand: author.primary === 'brand'
+					isBrand: author.primary === 'brand',
+					url: `/stream/authorsId/${author.idV1}`
 				}))
 	}
 });
@@ -401,6 +402,9 @@ const Author = new GraphQLObjectType({
 		},
 		isBrand: {
 			type: GraphQLBoolean
+		},
+		url: {
+			type: GraphQLString
 		}
 	})
 });

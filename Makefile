@@ -7,6 +7,11 @@ unit-test:
 	@export CONSOLE_LOG_LEVEL="error"; export MYFT_API_URL="http://my.ft.com/"; export GRAPHQL_API_KEY=123; \
 		mocha --require test/server/setup --recursive --reporter spec test/server/
 
+unit-test-watch:
+	@echo "Wathching tests…"
+	@export CONSOLE_LOG_LEVEL="error"; export MYFT_API_URL="http://my.ft.com/"; export GRAPHQL_API_KEY=123; \
+		mocha --require test/server/setup --recursive --reporter spec --watch test/server/
+
 test: verify unit-test
 
 build:
