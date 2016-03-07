@@ -22,8 +22,8 @@ describe('Content', () => {
 
 		it('should be able to get Content\'s authors', () => {
 			const schema = testSchema({ metadata: [
-				{ taxonomy: 'authors', idV1: 'Q0ItMDAwMDgwNQ==-QXV0aG9ycw==', prefLabel: 'Edward Luce'},
-				{ taxonomy: 'authors', idV1: 'Q0ItMDA2NTUxOA==-QXV0aG9ycw==', prefLabel: 'Philip Augar'}
+				{ taxonomy: 'authors', idV1: 'Q0ItMDAwMDgwNQ==-QXV0aG9ycw==', prefLabel: 'Edward Luce' },
+				{ taxonomy: 'authors', idV1: 'Q0ItMDA2NTUxOA==-QXV0aG9ycw==', prefLabel: 'Philip Augar' }
 			]});
 			const query = `
 				query Content {
@@ -48,7 +48,7 @@ describe('Content', () => {
 
 		it('should be able to get author\'s headshot', () => {
 			const schema = testSchema({ metadata: [
-				{ taxonomy: 'authors', idV1: 'Q0ItMDAwMDgwNQ==-QXV0aG9ycw==', prefLabel: 'Edward Luce'}
+				{ taxonomy: 'authors', idV1: 'Q0ItMDAwMDgwNQ==-QXV0aG9ycw==', prefLabel: 'Edward Luce' }
 			]});
 			const query = `
 				query Content {
@@ -65,6 +65,26 @@ describe('Content', () => {
 					data.content.authors.should.eql([
 						{ headshot: 'https://next-geebee.ft.com/image/v1/images/raw/fthead:edward-luce' }
 					]);
+				});
+		});
+
+		it('should flag if author is a brand', () => {
+			const schema = testSchema({ metadata: [
+				{ taxonomy: 'authors', idV1: 'Q0ItMDAwMDgwNQ==-QXV0aG9ycw==', prefLabel: 'Edward Luce', primary: 'brand' }
+			]});
+			const query = `
+				query Content {
+					content {
+						authors {
+							isBrand
+						}
+					}
+				}
+			`;
+
+			return graphql(schema, query)
+				.then(({ data }) => {
+					data.content.authors.should.eql([ { isBrand: true } ]);
 				});
 		});
 
