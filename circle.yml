@@ -2,6 +2,10 @@ machine:
   node:
     version: 4.3.1
 
+dependencies:
+  cache_directories:
+    - "bower_components"
+
 deployment:
   production:
     branch: master
