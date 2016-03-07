@@ -1,11 +1,4 @@
-import {
-	GraphQLSchema,
-	GraphQLObjectType,
-	GraphQLNonNull,
-	GraphQLString,
-	GraphQLInt,
-	GraphQLList
-} from 'graphql';
+import { GraphQLInt, GraphQLList, GraphQLNonNull,GraphQLObjectType, GraphQLSchema, GraphQLString } from 'graphql';
 
 import { Region } from './types/basic';
 import { Page, List, ContentByConcept } from './types/collections';
@@ -23,7 +16,9 @@ const queryType = new GraphQLObjectType({
 		top: {
 			type: Page,
 			args: {
-				region: { type: new GraphQLNonNull(Region) }
+				region: {
+					type: new GraphQLNonNull(Region)
+				}
 			},
 			resolve: (root, { region }, { rootValue: { flags, backend = backendReal }}) => {
 				const uuid = sources[`${region}Top`].uuid;
@@ -33,7 +28,9 @@ const queryType = new GraphQLObjectType({
 		topStoriesList: {
 			type: List,
 			args: {
-				region: { type: new GraphQLNonNull(Region) }
+				region: {
+					type: new GraphQLNonNull(Region)
+				}
 			},
 			resolve: (root, { region }, { rootValue: { flags, backend = backendReal }}) => {
 				const uuid = sources[`${region}TopList`].uuid;
@@ -42,8 +39,24 @@ const queryType = new GraphQLObjectType({
 		},
 		fastFT: {
 			type: ContentByConcept,
+			deprecationReason: 'Use fastFtNew instead, to return a list of content',
 			resolve: (root, _, { rootValue: { flags, backend = backendReal }}) =>
 				backend(flags).fastFT.fetch()
+		},
+		fastFTNew: {
+			type: new GraphQLList(Content),
+			args: {
+				from: {
+					type: GraphQLInt
+				},
+				limit: {
+					type: GraphQLInt
+				}
+			},
+			resolve: (root, args, { rootValue: { flags, backend = backendReal }}) => {
+				const items = backend(flags).fastFT.fetch().items;
+				return (items && items.length) ? backend(flags).capi.content(items, args) : [];
+			}
 		},
 		editorsPicks: {
 			type: List,
@@ -83,8 +96,12 @@ const queryType = new GraphQLObjectType({
 		videos: {
 			type: new GraphQLList(Video),
 			args: {
-				from: { type: GraphQLInt },
-				limit: { type: GraphQLInt }
+				from: {
+					type: GraphQLInt
+				},
+				limit: {
+					type: GraphQLInt
+				}
 			},
 			resolve: (root, { from, limit }, { rootValue: { flags, backend = backendReal }}) => {
 				const { id } = sources.videos;
@@ -94,11 +111,21 @@ const queryType = new GraphQLObjectType({
 		todaysTopics: {
 			type: new GraphQLList(Concept),
 			args: {
-				region: { type: new GraphQLNonNull(Region) },
-				from: { type: GraphQLInt },
-				limit: { type: GraphQLInt },
-				genres: { type: new GraphQLList(GraphQLString) },
-				type: { type: ContentType }
+				region: {
+					type: new GraphQLNonNull(Region)
+				},
+				from: {
+					type: GraphQLInt
+				},
+				limit: {
+					type: GraphQLInt
+				},
+				genres: {
+					type: new GraphQLList(GraphQLString)
+				},
+				type: {
+					type: ContentType
+				}
 			},
 			resolve: (root, { region, from, limit, genres, type }, { rootValue: { flags, backend = backendReal }}) =>
 				backend(flags)
@@ -109,8 +136,12 @@ const queryType = new GraphQLObjectType({
 		popularTopics: {
 			type: new GraphQLList(Concept),
 			args: {
-				from: { type: GraphQLInt },
-				limit: { type: GraphQLInt }
+				from: {
+					type: GraphQLInt
+				},
+				limit: {
+					type: GraphQLInt
+				}
 			},
 			resolve: (root, { from, limit }, { rootValue: { flags, backend = backendReal }}) =>
 				backend(flags).popularApi.topics({ from, limit })
@@ -118,7 +149,9 @@ const queryType = new GraphQLObjectType({
 		popularReadTopicsFromMyFtApi: {
 			type: new GraphQLList(Concept),
 			args: {
-				limit: { type: GraphQLInt }
+				limit: {
+					type: GraphQLInt
+				}
 			},
 			resolve: (root, { limit }, { rootValue: { flags, backend = backendReal }}) =>
 				backend(flags).myft.getMostReadTopics({ limit })
@@ -127,7 +160,9 @@ const queryType = new GraphQLObjectType({
 		popularFollowedTopicsFromMyFtApi: {
 			type: new GraphQLList(Concept),
 			args: {
-				limit: { type: GraphQLInt }
+				limit: {
+					type: GraphQLInt
+				}
 			},
 			resolve: (root, { limit }, { rootValue: { flags, backend = backendReal }}) =>
 				backend(flags).myft.getMostFollowedTopics({ limit })
