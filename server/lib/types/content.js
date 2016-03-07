@@ -10,6 +10,23 @@ const podcastIdV1 = 'NjI2MWZlMTEtMTE2NS00ZmI0LWFkMzMtNDhiYjA3YjcxYzIy-U2VjdGlvbn
 
 const propertyEquals = (property, value) => (item) => item[property] === value;
 
+// TODO: rather hacky way of getting the headshot url from ft-n-article-branding
+const getAuthorHeadshot = (id, name) => {
+	const metadata = [
+		{
+			taxonomy: 'authors',
+			idV1: id,
+			prefLabel: name,
+			attributes: []
+		},
+		{
+			taxonomy: 'genre',
+			prefLabel: 'Comment'
+		}
+	];
+	return articleBranding(metadata).headshot;
+};
+
 const Content = new GraphQLInterfaceType({
 	name: 'Content',
 	description: 'A piece of FT content',
@@ -71,6 +88,9 @@ const Content = new GraphQLInterfaceType({
 					type: GraphQLInt
 				}
 			}
+		},
+		authors: {
+			type: new GraphQLList(Author)
 		}
 	})
 });
@@ -138,6 +158,17 @@ const getContentFields = () => ({
 			const storyPackageIds = (content.storyPackage || []).map(story => story.id);
 			return storyPackageIds.length ? backend(flags).capi.content(storyPackageIds, { from, limit }) : [];
 		}
+	},
+	authors: {
+		type: new GraphQLList(Author),
+		resolve: content =>
+			content.metadata
+				.filter(propertyEquals('taxonomy', 'authors'))
+				.map(author => ({
+					id: author.idV1,
+					name: author.prefLabel,
+					headshot: getAuthorHeadshot(author.idV1, author.prefLabel)
+				}))
 	}
 });
 
@@ -350,6 +381,21 @@ const Rendition = new GraphQLObjectType({
 			type: GraphQLInt
 		},
 		videoCodec: {
+			type: GraphQLString
+		}
+	})
+});
+
+const Author = new GraphQLObjectType({
+	name: 'Author',
+	fields: () => ({
+		id: {
+			type: GraphQLID
+		},
+		name: {
+			type: GraphQLString
+		},
+		headshot: {
 			type: GraphQLString
 		}
 	})
