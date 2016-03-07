@@ -32,7 +32,7 @@ export default class {
 		});
 	}
 
-	search (termName, termValue, opts, ttl = 50) {
+	search (termName, termValue, opts, ttl = 60 * 10) {
 		const searchOpts = {
 			filter: {
 				bool: {
@@ -67,7 +67,7 @@ export default class {
 		});
 	}
 
-	things (uuids, type = 'idV1', ttl = 50) {
+	things (uuids, type = 'idV1', ttl = 60 * 10) {
 		const cacheKey = `${this.type}.things.${type}.${Array.isArray(uuids) ? uuids.join('_') : uuids}`;
 		return this.cache.cached(cacheKey, ttl, () => {
 			return ApiClient.things({
