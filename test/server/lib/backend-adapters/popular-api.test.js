@@ -73,7 +73,7 @@ describe('Popular API', () => {
 
 			return popular.topics()
 				.then(() => {
-					cache.cached.alwaysCalledWith('popular-api.topics', 50).should.be.true;
+					cache.cached.alwaysCalledWith('popular-api.topics', 600).should.be.true;
 				})
 		});
 

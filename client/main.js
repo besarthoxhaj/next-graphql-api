@@ -4,6 +4,6 @@ window.onload = () => {
 	if (window.location.pathname === '/playground') {
 		const graphiql = document.getElementById('graphiql');
 		const apiKey = document.querySelector('.api-key').textContent;
-		playground.init(graphiql, apiKey);
+		playground(graphiql, apiKey);
 	}
 }

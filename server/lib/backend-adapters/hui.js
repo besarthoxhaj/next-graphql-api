@@ -7,7 +7,7 @@ export default class {
 		this.cache = cache;
 	}
 
-	content ({industry, position, sector, country, period='last-1-week', from, limit}, ttl = 50) {
+	content ({industry, position, sector, country, period='last-1-week', from, limit}, ttl = 60) {
 		return this.cache.cached(`${this.type}.content.${industry}.${position}.${sector}.${country}.${period}`, ttl, () => {
 			return ApiClient.hui({model: 'content', industry, position, sector, country, period})
 				.then(articles => sliceList(articles, {from, limit}));

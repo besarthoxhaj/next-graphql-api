@@ -1,5 +1,4 @@
 import { json as fetchresJson } from 'fetchres';
-import nEagerFetch from 'n-eager-fetch';
 
 import { HttpError } from './errors';
 
@@ -16,10 +15,9 @@ export default (req, uuid) => {
 		const headers = req.headers;
 		delete headers.host;
 		delete headers['content-length']; //API urls send this and it breaks session fetch
-		return nEagerFetch('https://session-next.ft.com/uuid', {
+		return fetch('https://session-next.ft.com/uuid', {
 			timeout: 3000,
-			headers: headers,
-			retry: 2
+			headers: headers
 		})
 			.then(fetchresJson)
 			.then(response => {

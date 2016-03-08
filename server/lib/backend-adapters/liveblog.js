@@ -6,12 +6,13 @@ export default class {
 	}
 
 	parse (json, limit) {
-
 			const dated = json.filter(it => !!it.data.datemodified);
 			const [first, second] = dated.slice(0, 2);
 
 			// make sure updates are in order from latest to earliest
-			if((first && first.data.datemodified) < (second && second.data.datemodified)) { json.reverse(); }
+			if ((first && first.data.datemodified) < (second && second.data.datemodified)) {
+				json.reverse();
+			}
 
 			// dedupe updates and only keep messages, decide on status
 			let [, updates, status] = json.reduce(([skip, updates, status], event) => {
@@ -26,25 +27,26 @@ export default class {
 				return [skip, updates, status];
 			}, [{}, [], null]);
 
-			if(limit) { updates = updates.slice(0, limit); }
+			if (limit) {
+				updates = updates.slice(0, limit);
+			}
 
 			status = status || 'comingsoon';
 			return {updates, status};
 	}
 
-	fetch (uri, opts, ttl = 50) {
+	fetch (uri, opts, ttl = 60) {
 		const then = new Date();
 
-		return this.cache.cached(`liveblogs.${uri}`, ttl, () => {
-			return fetch(`${uri}?action=catchup&format=json`)
-			.then(res => {
-				const now = new Date();
-				logger.info(`Fetching live blog updates from ${uri}?action=catchup&format=json took ${now - then} ms`);
-
-				return res;
-			})
-			.then(res => res.json());
-		})
-	.then(json => this.parse(json, opts.limit));
+		return this.cache.cached(`liveblogs.${uri}`, ttl, () =>
+				fetch(`${uri}?action=catchup&format=json`)
+					.then(res => {
+						const now = new Date();
+						logger.info(`Fetching live blog updates from ${uri}?action=catchup&format=json took ${now - then} ms`);
+						return res;
+					})
+					.then(res => res.json())
+			)
+			.then(json => this.parse(json, opts.limit));
 	}
 }
