@@ -12,8 +12,12 @@ export default (req, res) => {
 
 	if (!Object.keys(query).length) {
 		const message = 'Empty query supplied';
-		logger.warn(message);
-		return res.status(400).jsonp({ type: 'Bad Request', error: { message }});
+		const errorInfo = {
+			host: req.host,
+			method: req.method
+		};
+		logger.warn(message, errorInfo);
+		return res.status(400).jsonp(Object.assign({ type: 'Bad Request', error: { message } }, errorInfo));
 	}
 
 	graphql({ flags, req })
