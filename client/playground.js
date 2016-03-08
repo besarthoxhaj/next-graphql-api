@@ -1,4 +1,4 @@
-require('isomorphic-fetch');
+import 'isomorphic-fetch';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import GraphiQL from 'graphiql';
@@ -15,8 +15,4 @@ const fetcher = (apiKey, params) => {
 		.then(data => ({ data }))
 };
 
-export default {
-	init: (el, apiKey) => {
-		ReactDOM.render(<GraphiQL fetcher={fetcher.bind(null, apiKey)} />, el);
-	}
-}
+export default (el, apiKey) => ReactDOM.render(<GraphiQL fetcher={fetcher.bind(null, apiKey)} />, el);
