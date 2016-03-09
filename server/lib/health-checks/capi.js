@@ -1,5 +1,4 @@
 import { Check, status } from 'n-health';
-
 import api from 'next-ft-api-client';
 
 export default class extends Check {
