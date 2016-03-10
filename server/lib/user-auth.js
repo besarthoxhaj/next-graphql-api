@@ -31,7 +31,7 @@ export default (req, uuid) => {
 				return response.uuid;
 			})
 			.catch(err => {
-				throw new HttpError(`Session endpoint responded with error server_error_name=${err.name} server_error_message=${err.message}`, 500);
+				throw new HttpError(`Session endpoint responded with error server_error_name=${err.name} server_error_message=${err.message} ft_session=${req.cookies.FTSession}`, 500);
 			});
 	} else {
 		return Promise.reject(new HttpError('Sign in to view user data', 401));
