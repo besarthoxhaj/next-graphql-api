@@ -90,7 +90,7 @@ module.exports = [
 		}),
 		timeout: 8000,
 		urls: {
-			'/': 200
+			'/data': 200
 		}
 	},
 	{
