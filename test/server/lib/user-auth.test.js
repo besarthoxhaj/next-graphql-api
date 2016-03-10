@@ -96,7 +96,7 @@ describe('User Auth', () => {
 		};
 
 		return userAuth(req).should.be.rejectedWith(
-			'Session endpoint responded with error server_error_name=BadServerResponseError server_error_message=500'
+			'Session endpoint responded with error server_error_name=BadServerResponseError server_error_message=500 ft_session=session-id'
 		);
 	});
 
