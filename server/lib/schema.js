@@ -52,21 +52,6 @@ const queryType = new GraphQLObjectType({
 				return (items && items.length) ? backend(flags).capi.content(items, args) : [];
 			}
 		},
-		fastFTNew: {
-			type: new GraphQLList(Content),
-			args: {
-				from: {
-					type: GraphQLInt
-				},
-				limit: {
-					type: GraphQLInt
-				}
-			},
-			resolve: (root, args, { rootValue: { flags, backend = backendReal }}) => {
-				const items = backend(flags).fastFT.fetch().items;
-				return (items && items.length) ? backend(flags).capi.content(items, args) : [];
-			}
-		},
 		editorsPicks: {
 			type: List,
 			resolve: (root, _, { rootValue: { flags, backend = backendReal }}) => {
