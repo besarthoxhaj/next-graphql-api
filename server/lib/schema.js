@@ -1,7 +1,7 @@
 import { GraphQLInt, GraphQLList, GraphQLNonNull,GraphQLObjectType, GraphQLSchema, GraphQLString } from 'graphql';
 
 import { Region } from './types/basic';
-import { Page, List, ContentByConcept } from './types/collections';
+import { Page, List } from './types/collections';
 import { Content, Video, Concept } from './types/content';
 import { ContentType } from './types/basic';
 import User from './types/user';
@@ -38,10 +38,19 @@ const queryType = new GraphQLObjectType({
 			}
 		},
 		fastFT: {
-			type: ContentByConcept,
-			deprecationReason: 'Use fastFtNew instead, to return a list of content',
-			resolve: (root, _, { rootValue: { flags, backend = backendReal }}) =>
-				backend(flags).fastFT.fetch()
+			type: new GraphQLList(Content),
+			args: {
+				from: {
+					type: GraphQLInt
+				},
+				limit: {
+					type: GraphQLInt
+				}
+			},
+			resolve: (root, args, { rootValue: { flags, backend = backendReal }}) => {
+				const items = backend(flags).fastFT.fetch().items;
+				return (items && items.length) ? backend(flags).capi.content(items, args) : [];
+			}
 		},
 		fastFTNew: {
 			type: new GraphQLList(Content),

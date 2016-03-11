@@ -41,36 +41,6 @@ const Page = new GraphQLObjectType({
 	}
 });
 
-const ContentByConcept = new GraphQLObjectType({
-	name: 'ContentByConcept',
-	description: 'Content annotated by a concept',
-	fields: {
-		title: {
-			type: GraphQLString
-		},
-		items: {
-			type: new GraphQLList(Content),
-			description: 'Content items',
-			args: {
-				from: {
-					type: GraphQLInt
-				},
-				limit: {
-					type: GraphQLInt
-				},
-				genres: {
-					type: new GraphQLList(GraphQLString)
-				},
-				type: {
-					type: ContentType
-				}
-			},
-			resolve: (result, args, { rootValue: { flags, backend = backendReal }}) =>
-				(result.items && result.items.length) ? backend(flags).capi.content(result.items, args) : []
-		}
-	}
-});
-
 const List = new GraphQLObjectType({
 	name: 'List',
 	description: 'Items contained in a list',
@@ -104,4 +74,4 @@ const List = new GraphQLObjectType({
 	}
 });
 
-export { Page, ContentByConcept, List };
+export { Page, List };

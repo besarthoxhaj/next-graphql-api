@@ -23,10 +23,8 @@ const query = `
 				title
 			}
 		}
-		fastFT {
-			items(limit: 5) {
-				title
-			}
+		fastFT(limit: 5) {
+			title
 		}
 		editorsPicks {
 			title
@@ -41,7 +39,7 @@ const query = `
 				branding {
 					headshot
 					taxonomy
-			}
+				}
 			}
 		}
 		lifestyle {
@@ -63,16 +61,17 @@ const query = `
 			}
 		}
 		popularArticles {
-				title
+			title
 		}
 		popularFromHui(industry: "http://api.ft.com/things/077bea1d-01ca-328e-aa0b-d7dc92796030") {
-				title
+			title
 		}
 		videos {
 			id
 			title
 		}
-	}`;
+	}
+`;
 
 const getTestUrls = {};
 getTestUrls['/data?query=' + query] = 200;
