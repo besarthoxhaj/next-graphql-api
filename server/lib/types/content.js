@@ -72,6 +72,12 @@ const Content = new GraphQLInterfaceType({
 		primaryTag: {
 			type: Concept
 		},
+		primaryTheme: {
+			type: Concept
+		},
+		primarySection: {
+			type: Concept
+		},
 		primaryImage: {
 			type: Image
 		},
@@ -139,6 +145,14 @@ const getContentFields = () => ({
 			const primarySection = content.metadata.find(propertyEquals('primary', 'section'));
 			return primaryTheme || primarySection;
 		}
+	},
+	primaryTheme: {
+		type: Concept,
+		resolve: content => content.metadata.find(propertyEquals('primary', 'theme'))
+	},
+	primarySection: {
+		type: Concept,
+		resolve: content => content.metadata.find(propertyEquals('primary', 'section'))
 	},
 	primaryImage: {
 		type: Image,
