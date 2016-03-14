@@ -80,7 +80,7 @@ describe('CAPI', () => {
 
 		before(() => {
 			fetchMock.mock(
-				`http://api.ft.com/lists/${listUuid}`,
+				new RegExp(`https://[^\.]*.ft.com/lists/${listUuid}`),
 				[{ id: 'content-one' }, { id: 'content-two' }]
 			);
 		});
