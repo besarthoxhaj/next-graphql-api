@@ -1,4 +1,7 @@
+import logger from '@financial-times/n-logger';
+import { json as fetchresJson } from 'fetchres';
 import ApiClient from 'next-ft-api-client';
+
 import filterContent from '../helpers/filter-content';
 import resolveContentType from '../helpers/resolve-content-type';
 
@@ -62,9 +65,20 @@ export default class {
 	}
 
 	list (uuid, ttl = 60) {
-		return this.cache.cached(`${this.type}.lists.${uuid}`, ttl, () =>
-			ApiClient.lists({ uuid: uuid })
-		);
+		return this.cache.cached(`${this.type}.lists.${uuid}`, ttl, () => {
+			const headers = { Authorization: process.env.LIST_API_AUTHORIZATION };
+			return fetch(`https://prod-up-read.ft.com/lists/${uuid}`, { headers })
+				.then(response => {
+					if (!response.ok) {
+						logger.warn('Failed getting List response', {
+							uuid: uuid,
+							status: response.status
+						});
+					}
+					return response;
+				})
+				.then(fetchresJson);
+		});
 	}
 
 	things (uuids, type = 'idV1', ttl = 60 * 10) {
