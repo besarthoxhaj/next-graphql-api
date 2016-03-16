@@ -1,11 +1,5 @@
 const query = `
 	query GraphQLSmoke {
-		popularTopics {
-			name
-			items(limit: 1) {
-				title
-			}
-		}
 		top(region: UK) {
 			lead: items(limit: 1, type: Article) {
 				title
@@ -26,12 +20,6 @@ const query = `
 		fastFT(limit: 5) {
 			title
 		}
-		editorsPicks {
-			title
-			items(limit: 6) {
-				title
-			}
-		}
 		opinion {
 			url
 			items {
@@ -42,9 +30,24 @@ const query = `
 				}
 			}
 		}
-		lifestyle {
+		popularTopics {
+			name
+			items(limit: 1) {
+				title
+			}
+		}
+		editorsPicks {
+			title
+			items(limit: 6) {
+				title
+			}
+		}
+		popularArticles {
+			title
+		}
+		technology {
 			url
-			items(limit: 2) {
+			items(limit: 2, genres: ["analysis", "comment"]) {
 				title
 			}
 		}
@@ -54,17 +57,11 @@ const query = `
 				title
 			}
 		}
-		technology {
+		lifestyle {
 			url
-			items(limit: 2, genres: ["analysis", "comment"]) {
+			items(limit: 2) {
 				title
 			}
-		}
-		popularArticles {
-			title
-		}
-		popularFromHui(industry: "http://api.ft.com/things/077bea1d-01ca-328e-aa0b-d7dc92796030") {
-			title
 		}
 		videos {
 			id
