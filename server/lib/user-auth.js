@@ -1,4 +1,5 @@
 import { json as fetchresJson } from 'fetchres';
+import logger from '@financial-times/n-logger';
 
 import { HttpError } from './errors';
 
@@ -31,6 +32,7 @@ export default (req, uuid) => {
 				return response.uuid;
 			})
 			.catch(err => {
+				logger.warn('Testing session endpoint failure double logging', { date: Date.now() });
 				throw new HttpError(`Session endpoint responded with error server_error_name=${err.name} server_error_message=${err.message} ft_session=${req.cookies.FTSession}`, 500);
 			});
 	} else {
