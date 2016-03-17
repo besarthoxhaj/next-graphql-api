@@ -74,15 +74,22 @@ export default class {
 	}
 
 	search (termName, termValue, opts, ttl = 60 * 10) {
-		let optsCacheKey = `${opts.since ? `:since_${opts.since}` : ''}${opts.count ? `:since_${opts.count}` : ''}`;
-		return this.cache.cached(`${this.type}.search.${termName}:${termValue}${optsCacheKey}`, ttl, () =>
+
+		const optsCacheKey = `${opts.since ? `:since_${opts.since}` : ''}${opts.count ? `:since_${opts.count}` : ''}`;
+		const cacheKey = `${this.type}.search.${termName}:${termValue}${optsCacheKey}`;
+
+		return this.cache.cached(cacheKey, ttl, () =>
 				ApiClient.search(getSearchOpts(termName, termValue, opts))
-		).then(filterContent(opts, resolveContentType));
+		)
+			.then(filterContent(opts, resolveContentType));
 	}
 
 	searchCount (termName, termValue, opts, ttl = 60 * 10) {
-		let optsCacheKey = `${opts.since ? `:since_${opts.since}` : ''}${opts.count ? `:since_${opts.count}` : ''}`;
-		return this.cache.cached(`${this.type}.searchCount.${termName}:${termValue}${optsCacheKey}`, ttl, () =>
+
+		const optsCacheKey = `${opts.since ? `:since_${opts.since}` : ''}${opts.count ? `:since_${opts.count}` : ''}`;
+		const cacheKey = `${this.type}.searchCount.${termName}:${termValue}${optsCacheKey}`;
+
+		return this.cache.cached(cacheKey, ttl, () =>
 				ApiClient.search(getSearchOpts(termName, termValue, opts))
 		)
 			.then(filterContent(opts, resolveContentType))
