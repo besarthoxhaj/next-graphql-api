@@ -267,13 +267,22 @@ const Concept = new GraphQLObjectType({
 		},
 		articleCount: {
 			type: GraphQLInt,
-			description: 'Number of articles published with this concept since the given date (defaults to 1 week, max 100 results)',
+			description: `
+				Approximate number of articles published with this concept since the given date, up to a
+				maximum value of count (default date is 1 week, default count is 100)`,
 			args: {
-				since: { type: GraphQLString }
+				since: {
+					type: GraphQLString,
+					defaultValue: moment().subtract(7, 'days').format('YYYY-MM-DD')
+				},
+				count: {
+					type: GraphQLInt,
+					defaultValue: 100
+				}
 			},
-			resolve: (concept, { since }, { rootValue: { flags, backend = backendReal }}) => {
+			resolve: (concept, { since, count }, { rootValue: { flags, backend = backendReal }}) => {
 				const id = concept.id || concept.idV1 || concept.uuid;
-				return backend(flags).capi.searchCount('metadata.idV1', id, { count: 100, since: since || moment().subtract(7, 'days').format()});
+				return backend(flags).capi.searchCount('metadata.idV1', id, { count, since});
 			}
 		},
 		items: {
