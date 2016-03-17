@@ -5,6 +5,7 @@ import articleBranding from 'ft-n-article-branding';
 import capifyMetadata from '../helpers/capify-metadata';
 import backendReal from '../backend-adapters/index';
 import { LiveBlogStatus, ContentType } from './basic';
+import moment from 'moment';
 
 const podcastIdV1 = 'NjI2MWZlMTEtMTE2NS00ZmI0LWFkMzMtNDhiYjA3YjcxYzIy-U2VjdGlvbnM=';
 
@@ -263,6 +264,17 @@ const Concept = new GraphQLObjectType({
 		},
 		headshot: {
 			type: GraphQLString
+		},
+		articleCount: {
+			type: GraphQLInt,
+			description: 'Number of articles published with this concept since the given date (defaults to 1 week, max 100 results)',
+			args: {
+				since: { type: GraphQLString }
+			},
+			resolve: (concept, { since }, { rootValue: { flags, backend = backendReal }}) => {
+				const id = concept.id || concept.idV1 || concept.uuid;
+				return backend(flags).capi.searchCount('metadata.idV1', id, { count: 100, since: since || moment().subtract(7, 'days').format()});
+			}
 		},
 		items: {
 			type: new GraphQLList(Content),

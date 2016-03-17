@@ -5,6 +5,44 @@ import ApiClient from 'next-ft-api-client';
 import filterContent from '../helpers/filter-content';
 import resolveContentType from '../helpers/resolve-content-type';
 
+function getSearchOpts (termName, termValue, opts) {
+	const searchOpts = {
+		filter: {
+			and: {
+				filters: [
+					{
+						bool: {
+							must: {
+								term: {
+									[termName]: termValue
+								}
+							}
+						}
+					}
+				]
+			}
+		}
+	};
+
+	if (opts.since) {
+		searchOpts.filter.and.filters.push({
+			bool: {
+				must: {
+					range: {
+						publishedDate: {
+							gte: opts.since
+						}
+					}
+				}
+			}
+		});
+	}
+	if (opts.count) {
+		searchOpts.count = opts.count;
+	}
+	return searchOpts;
+}
+
 export default class {
 	constructor (cache) {
 		this.type = 'capi';
@@ -36,53 +74,19 @@ export default class {
 	}
 
 	search (termName, termValue, opts, ttl = 60 * 10) {
-
-		const searchOpts = {
-			filter: {
-				and: {
-					filters: [
-						{
-							bool: {
-								must: {
-									term: {
-										[termName]: termValue
-									}
-								}
-							}
-						}
-					]
-				}
-			}
-		};
-
-		let optsCacheKey = '';
-
-		if (opts.since) {
-			searchOpts.filter.and.filters.push({
-				bool: {
-					must: {
-						range: {
-							publishedDate: {
-								gte: opts.since
-							}
-						}
-					}
-				}
-			});
-			optsCacheKey += `:since_${opts.since}`;
-			delete opts.since;
-		}
-
-		if (opts.count) {
-			searchOpts.count = opts.count;
-			optsCacheKey += `:count_${opts.count}`;
-			delete opts.count;
-		}
-
+		let optsCacheKey = `${opts.since ? `:since_${opts.since}` : ''}${opts.count ? `:since_${opts.count}` : ''}`;
 		return this.cache.cached(`${this.type}.search.${termName}:${termValue}${optsCacheKey}`, ttl, () =>
-				ApiClient.search(searchOpts)
+				ApiClient.search(getSearchOpts(termName, termValue, opts))
+		).then(filterContent(opts, resolveContentType));
+	}
+
+	searchCount (termName, termValue, opts, ttl = 60 * 10) {
+		let optsCacheKey = `${opts.since ? `:since_${opts.since}` : ''}${opts.count ? `:since_${opts.count}` : ''}`;
+		return this.cache.cached(`${this.type}.searchCount.${termName}:${termValue}${optsCacheKey}`, ttl, () =>
+				ApiClient.search(getSearchOpts(termName, termValue, opts))
 		)
-			.then(filterContent(opts, resolveContentType));
+			.then(filterContent(opts, resolveContentType))
+			.then(items => items.length);
 	}
 
 	content (uuids, opts = {}, ttl = 60) {
