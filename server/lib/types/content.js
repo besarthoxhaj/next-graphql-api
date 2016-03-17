@@ -271,11 +271,13 @@ const Concept = new GraphQLObjectType({
 				from: { type: GraphQLInt },
 				limit: { type: GraphQLInt },
 				genres: { type: new GraphQLList(GraphQLString) },
-				type: { type: ContentType }
+				type: { type: ContentType },
+				count: { type: GraphQLInt },
+				since: { type: GraphQLString }
 			},
-			resolve: (concept, { from, limit, genres, type }, { rootValue: { flags, backend = backendReal }}) => {
+			resolve: (concept, { from, limit, genres, type, count, since }, { rootValue: { flags, backend = backendReal }}) => {
 				const id = concept.id || concept.idV1 || concept.uuid;
-				return backend(flags).capi.search('metadata.idV1', id, { from, limit, genres, type });
+				return backend(flags).capi.search('metadata.idV1', id, { from, limit, genres, type, count, since});
 			}
 		}
 	})

@@ -36,20 +36,52 @@ export default class {
 	}
 
 	search (termName, termValue, opts, ttl = 60 * 10) {
+
 		const searchOpts = {
 			filter: {
-				bool: {
-					must: {
-						term: {
-							[termName]: termValue
+				and: {
+					filters: [
+						{
+							bool: {
+								must: {
+									term: {
+										[termName]: termValue
+									}
+								}
+							}
 						}
-					}
+					]
 				}
 			}
 		};
-		return this.cache.cached(`${this.type}.search.${termName}:${termValue}`, ttl, () =>
+
+		let optsCacheKey = '';
+
+		if (opts.since) {
+			searchOpts.filter.and.filters.push({
+				bool: {
+					must: {
+						range: {
+							publishedDate: {
+								gte: opts.since
+							}
+						}
+					}
+				}
+			});
+			optsCacheKey += `:since_${opts.since}`;
+			delete opts.since;
+		}
+
+		if (opts.count) {
+			searchOpts.count = opts.count;
+			optsCacheKey += `:count_${opts.count}`;
+			delete opts.count;
+		}
+
+		return this.cache.cached(`${this.type}.search.${termName}:${termValue}${optsCacheKey}`, ttl, () =>
 				ApiClient.search(searchOpts)
-			)
+		)
 			.then(filterContent(opts, resolveContentType));
 	}
 
