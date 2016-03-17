@@ -271,6 +271,16 @@ const queryType = new GraphQLObjectType({
 				}
 			},
 			resolve: (root, { uuid }, { rootValue: { req }}) => userAuth(req, uuid).then(uuid => ({ uuid }))
+		},
+		concepts: {
+			type: new GraphQLList(Concept),
+			args: {
+				ids: {
+					type: new GraphQLList(GraphQLString)
+				}
+			},
+			resolve: (root, { ids }, { rootValue: { flags, backend = backendReal }}) =>
+				backend(flags).capi.things(ids).then(c => c.items)
 		}
 	}
 });
