@@ -74,26 +74,29 @@ export default class {
 	}
 
 	search (termName, termValue, opts, ttl = 60 * 10) {
-
-		const optsCacheKey = `${opts.since ? `:since_${opts.since}` : ''}${opts.count ? `:since_${opts.count}` : ''}`;
-		const cacheKey = `${this.type}.search.${termName}:${termValue}${optsCacheKey}`;
-
-		return this.cache.cached(cacheKey, ttl, () =>
-				ApiClient.search(getSearchOpts(termName, termValue, opts))
-		)
-			.then(filterContent(opts, resolveContentType));
+		return this._search('search', termName, termValue, opts, ttl);
 	}
 
 	searchCount (termName, termValue, opts, ttl = 60 * 10) {
+		return this._search('searchCount', termName, termValue, opts, ttl, (items => items.length));
+	}
 
-		const optsCacheKey = `${opts.since ? `:since_${opts.since}` : ''}${opts.count ? `:since_${opts.count}` : ''}`;
-		const cacheKey = `${this.type}.searchCount.${termName}:${termValue}${optsCacheKey}`;
+	_search (cacheKeyAction, termName, termValue, opts, ttl, andThen) {
 
-		return this.cache.cached(cacheKey, ttl, () =>
-				ApiClient.search(getSearchOpts(termName, termValue, opts))
-		)
-			.then(filterContent(opts, resolveContentType))
-			.then(items => items.length);
+		const optsCacheKey = `${opts.since ? `:since_${opts.since}` : ''}${opts.count ? `:count_${opts.count}` : ''}`;
+		const cacheKey = `${this.type}.${cacheKeyAction}.${termName}:${termValue}${optsCacheKey}`;
+
+		return this.cache.cached(cacheKey, ttl, () => {
+
+			let cachedRequest = ApiClient.search(getSearchOpts(termName, termValue, opts))
+				.then(filterContent(opts, resolveContentType));
+
+			if(typeof andThen === 'function') {
+				cachedRequest = cachedRequest.then(andThen);
+			}
+
+			return cachedRequest;
+		});
 	}
 
 	content (uuids, opts = {}, ttl = 60) {
