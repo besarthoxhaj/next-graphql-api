@@ -117,7 +117,7 @@ describe('CAPI', () => {
 						hits: [
 							{
 								_source: {
-									id: 'topic1'
+									id: 'content-one'
 								}
 							}
 						]
@@ -136,7 +136,7 @@ describe('CAPI', () => {
 
 			return capi.search('metadata.idV1', 'topicId', {count: 50, since: '2016-03-21'})
 				.then(content => {
-					const expectedResult = [{id: 'topic1'}];
+					const expectedResult = [{id: 'content-one'}];
 					expectedResult.total = 1;
 					content.should.eql(expectedResult);
 				});
@@ -182,6 +182,93 @@ describe('CAPI', () => {
 					const expectedResult = [];
 					expectedResult.total = 0;
 					content.should.eql(expectedResult);
+				});
+		});
+
+	});
+
+	describe('#searchCount', () => {
+
+		before(() => {
+			fetchMock.mock(
+				new RegExp('https://[^/]*/v3_api_v2/item/_search'),
+				{
+					hits: {
+						total: 3,
+						hits: [
+							{
+								_source: {
+									id: 'content-one'
+								}
+							},
+							{
+								_source: {
+									id: 'content-two'
+								}
+							},
+							{
+								_source: {
+									id: 'content-three'
+								}
+							}
+						]
+					}
+				}
+			);
+		});
+
+		after(() => {
+			fetchMock.restore();
+		});
+
+		it('should be able to fetch content', () => {
+			const cache = {cached: cachedSpy()};
+			const capi = new CAPI(cache);
+
+			return capi.searchCount('metadata.idV1', 'topicId', {count: 50, since: '2016-03-21'})
+				.then(count => {
+					count.should.eql(3);
+				});
+		});
+
+		it('should use correct cache key and ttl when a single conceptID is specified', () => {
+			const cached = cachedSpy();
+			const cache = {cached};
+			const capi = new CAPI(cache);
+
+			return capi.searchCount('metadata.idV1', 'topicId', {count: 50, since: '2016-03-21'})
+				.then(() => {
+					cached.alwaysCalledWith('capi.searchCount.metadata.idV1:topicId:since_2016-03-21:count_50', 600).should.be.true;
+				});
+		});
+
+		it('should use correct cache key and ttl when multiple conceptIDs are specified', () => {
+			const cached = cachedSpy();
+			const cache = {cached};
+			const capi = new CAPI(cache);
+
+			return capi.searchCount('metadata.idV1', ['topicId1', 'topicId2', 'topicId3'], {count: 50, since: '2016-03-21'})
+				.then(() => {
+					cached.alwaysCalledWith('capi.searchCount.metadata.idV1:topicId1,topicId2,topicId3:since_2016-03-21:count_50', 600).should.be.true;
+				});
+		});
+
+		it('should handle empty response from CAPI', () => {
+			fetchMock.reMock(
+				new RegExp('https://[^/]*/v3_api_v2/item/_search'),
+				{
+					hits: {
+						total: 0,
+						hits: []
+					}
+				}
+			);
+			const cache = {cached: cachedSpy()};
+			const capi = new CAPI(cache);
+
+			return capi.searchCount('metadata.idV1', 'topicId', {count: 50, since: '2016-03-21'})
+				.then(count => {
+					count.should.eql(0);
 				});
 		});
 
