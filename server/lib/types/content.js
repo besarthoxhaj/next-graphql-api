@@ -5,6 +5,7 @@ import articleBranding from 'ft-n-article-branding';
 import capifyMetadata from '../helpers/capify-metadata';
 import backendReal from '../backend-adapters/index';
 import { LiveBlogStatus, ContentType } from './basic';
+import moment from 'moment';
 
 const podcastIdV1 = 'NjI2MWZlMTEtMTE2NS00ZmI0LWFkMzMtNDhiYjA3YjcxYzIy-U2VjdGlvbnM=';
 
@@ -264,6 +265,26 @@ const Concept = new GraphQLObjectType({
 		headshot: {
 			type: GraphQLString
 		},
+		articleCount: {
+			type: GraphQLInt,
+			description: `
+				Approximate number of articles published with this concept since the given date, up to a
+				maximum value of count (default date is 1 week, default count is 100)`,
+			args: {
+				since: {
+					type: GraphQLString,
+					defaultValue: moment().subtract(7, 'days').format('YYYY-MM-DD')
+				},
+				count: {
+					type: GraphQLInt,
+					defaultValue: 100
+				}
+			},
+			resolve: (concept, { since, count }, { rootValue: { flags, backend = backendReal }}) => {
+				const id = concept.id || concept.idV1 || concept.uuid;
+				return backend(flags).capi.searchCount('metadata.idV1', id, { count, since});
+			}
+		},
 		items: {
 			type: new GraphQLList(Content),
 			description: 'Latest articles published with this concept',
@@ -271,11 +292,13 @@ const Concept = new GraphQLObjectType({
 				from: { type: GraphQLInt },
 				limit: { type: GraphQLInt },
 				genres: { type: new GraphQLList(GraphQLString) },
-				type: { type: ContentType }
+				type: { type: ContentType },
+				count: { type: GraphQLInt },
+				since: { type: GraphQLString }
 			},
-			resolve: (concept, { from, limit, genres, type }, { rootValue: { flags, backend = backendReal }}) => {
+			resolve: (concept, { from, limit, genres, type, count, since }, { rootValue: { flags, backend = backendReal }}) => {
 				const id = concept.id || concept.idV1 || concept.uuid;
-				return backend(flags).capi.search('metadata.idV1', id, { from, limit, genres, type });
+				return backend(flags).capi.search('metadata.idV1', id, { from, limit, genres, type, count, since});
 			}
 		}
 	})

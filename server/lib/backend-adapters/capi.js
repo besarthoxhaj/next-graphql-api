@@ -5,6 +5,44 @@ import ApiClient from 'next-ft-api-client';
 import filterContent from '../helpers/filter-content';
 import resolveContentType from '../helpers/resolve-content-type';
 
+function getSearchOpts (termName, termValue, opts) {
+	const searchOpts = {
+		filter: {
+			and: {
+				filters: [
+					{
+						bool: {
+							must: {
+								term: {
+									[termName]: termValue
+								}
+							}
+						}
+					}
+				]
+			}
+		}
+	};
+
+	if (opts.since) {
+		searchOpts.filter.and.filters.push({
+			bool: {
+				must: {
+					range: {
+						publishedDate: {
+							gte: opts.since
+						}
+					}
+				}
+			}
+		});
+	}
+	if (opts.count) {
+		searchOpts.count = opts.count;
+	}
+	return searchOpts;
+}
+
 export default class {
 	constructor (cache) {
 		this.type = 'capi';
@@ -36,21 +74,31 @@ export default class {
 	}
 
 	search (termName, termValue, opts, ttl = 60 * 10) {
-		const searchOpts = {
-			filter: {
-				bool: {
-					must: {
-						term: {
-							[termName]: termValue
-						}
-					}
-				}
+		return this._search('search', termName, termValue, opts, ttl);
+	}
+
+	// searchCount is separate from search so that we can look a long way back just for the sake of counting articles
+	// and cache the count only, avoiding caching loads of unused content
+	searchCount (termName, termValue, opts, ttl = 60 * 10) {
+		return this._search('searchCount', termName, termValue, opts, ttl, (items => items.length));
+	}
+
+	_search (cacheKeyAction, termName, termValue, opts, ttl, andThen) {
+
+		const optsCacheKey = `${opts.since ? `:since_${opts.since}` : ''}${opts.count ? `:count_${opts.count}` : ''}`;
+		const cacheKey = `${this.type}.${cacheKeyAction}.${termName}:${termValue}${optsCacheKey}`;
+
+		return this.cache.cached(cacheKey, ttl, () => {
+
+			let cachedRequest = ApiClient.search(getSearchOpts(termName, termValue, opts))
+				.then(filterContent(opts, resolveContentType));
+
+			if(typeof andThen === 'function') {
+				cachedRequest = cachedRequest.then(andThen);
 			}
-		};
-		return this.cache.cached(`${this.type}.search.${termName}:${termValue}`, ttl, () =>
-				ApiClient.search(searchOpts)
-			)
-			.then(filterContent(opts, resolveContentType));
+
+			return cachedRequest;
+		});
 	}
 
 	content (uuids, opts = {}, ttl = 60) {

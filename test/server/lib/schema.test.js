@@ -191,4 +191,37 @@ describe('Schema', () => {
 		});
 
 	});
+
+	describe('Concepts', () => {
+
+		it('should be able to fetch', () => {
+
+			const thingsStub = sinon.stub();
+			thingsStub.returns(Promise.resolve(
+				{items: [
+					{id: 'abc', taxonomy: 'foo', name: 'One'},
+					{id: 'def', taxonomy: 'bar', name: 'Two'}
+				]}));
+			const backend = () => ({
+				capi: {
+					things: thingsStub
+				}
+			});
+			const query = `
+				query Concepts {
+					concepts(ids: ["sdfjksdjfh","idauoiausyi"]) {
+						name
+						url
+					}
+				}
+			`;
+
+			return graphql(schema, query, { backend })
+				.then(({ data }) => {
+					data.concepts.length.should.eq(2);
+					expect(data.concepts[0]).to.deep.equal({ name: 'One', url: '/stream/fooId/abc' });
+					expect(data.concepts[1]).to.deep.equal({ name: 'Two', url: '/stream/barId/def' });
+				});
+		});
+	});
 });
