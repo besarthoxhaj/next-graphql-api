@@ -77,6 +77,8 @@ export default class {
 		return this._search('search', termName, termValue, opts, ttl);
 	}
 
+	// searchCount is separate from search so that we can look a long way back just for the sake of counting articles
+	// and cache the count only, avoiding caching loads of unused content
 	searchCount (termName, termValue, opts, ttl = 60 * 10) {
 		return this._search('searchCount', termName, termValue, opts, ttl, (items => items.length));
 	}
