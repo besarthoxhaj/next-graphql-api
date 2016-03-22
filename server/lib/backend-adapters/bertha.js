@@ -6,14 +6,12 @@ export default class {
 
 	get(sheetKey, sheetName, ttl = 60 * 10) {
 		const cacheKey = `${this.type}.sheet.${sheetKey}.${sheetName}`;
-		console.log(`FETCHING CACHED BERTHA: ${cacheKey}`);
 		return this.cache.cached(cacheKey, ttl, () => {
-			console.log('BERTHA CACHE MISS');
 			return fetch(`https://bertha.ig.ft.com/view/publish/gss/${sheetKey}/${sheetName}`, {
 				method: 'get',
 				headers: { 'Content-Type': 'application/json' }
 			})
-			.then(r => r.json())
+			.then(r => r.json());
 		});
 	}
 }
