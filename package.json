@@ -15,6 +15,7 @@
     "babel-plugin-transform-es2015-destructuring": "^6.3.13",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.3.13",
     "babel-plugin-transform-es2015-parameters": "^6.3.13",
+    "babel-plugin-transform-es2015-spread": "^6.6.5",
     "babel-register": "^6.3.13",
     "body-parser": "^1.13.3",
     "cookie-parser": "^1.4.0",
