@@ -1,13 +1,16 @@
 import { GraphQLInt, GraphQLList, GraphQLNonNull,GraphQLObjectType, GraphQLSchema, GraphQLString } from 'graphql';
 
 import { Region } from './types/basic';
-import { Page, List } from './types/collections';
+import { Page, List, Collection } from './types/collections';
 import { Content, Video, Concept } from './types/content';
 import { ContentType } from './types/basic';
 import User from './types/user';
 import sources from '../config/sources';
 import backendReal from './backend-adapters/index';
 import userAuth from './user-auth';
+
+import tap from './tap';
+import identity from './identity';
 
 const queryType = new GraphQLObjectType({
 	name: 'Query',
@@ -281,6 +284,30 @@ const queryType = new GraphQLObjectType({
 			},
 			resolve: (root, { ids }, { rootValue: { flags, backend = backendReal }}) =>
 				backend(flags).capi.things(ids).then(c => c.items)
+		},
+		collections: {
+			type: new GraphQLList(Collection),
+			args: {
+				limit: {
+					type: GraphQLInt,
+					defaultValue: 4
+				}
+			},
+			resolve: (root, { limit }, { rootValue: { flags, backend = backendReal }}) => {
+				return backend(flags).bertha.get('1rsBgkPD51vI7UvFz6GCuR-LX6x0TV-o6VLueYW0RDcs', 'Output')
+					.then(results => {
+						const collections = JSON.parse(JSON.stringify(results)).slice(0, limit);
+						const ids = [].concat(...collections.map(c => c.concepts));
+						return backend(flags).capi.things(ids).then(({items:concepts}) => {
+							return collections.map(tap(collection => {
+								collection.concepts = collection
+									.concepts
+									.map(o => concepts.find(n => n.id === o))
+									.filter(identity);
+							}));
+						});
+					});
+			}
 		}
 	}
 });

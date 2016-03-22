@@ -10,6 +10,7 @@ import Video from './video';
 import PopularAPI from './popular-api';
 import Myft from './myft';
 import TodaysTopics from './todays-topics';
+import Bertha from './bertha';
 
 import Cache from '../cache';
 
@@ -25,6 +26,7 @@ const myft = new Myft(memCache);
 const popularApi = new PopularAPI(memCache);
 const video = new Video(memCache);
 const todaysTopics = new TodaysTopics(memCache);
+const bertha = new Bertha(memCache);
 
 export default (flags = {}) => ({
 	capi: flags.mockFrontPage ? mockCapi : capi,
@@ -34,5 +36,6 @@ export default (flags = {}) => ({
 	myft,
 	popularApi,
 	video,
-	todaysTopics
+	todaysTopics,
+	bertha
 });
