@@ -82,6 +82,9 @@ const Content = new GraphQLInterfaceType({
 		primaryImage: {
 			type: Image
 		},
+		published: {
+			type: GraphQLString
+		},
 		lastPublished: {
 			type: GraphQLString
 		},
@@ -158,6 +161,10 @@ const getContentFields = () => ({
 	primaryImage: {
 		type: Image,
 		resolve: content => content.mainImage
+	},
+	published: {
+		type: GraphQLString,
+		resolve: content => content.initialPublishedDate
 	},
 	lastPublished: {
 		type: GraphQLString,
