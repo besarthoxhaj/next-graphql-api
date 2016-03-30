@@ -1,5 +1,5 @@
 import ApiClient from 'next-ft-api-client';
-import { captureError } from 'express-errors-handler';
+import { captureError } from '@financial-times/n-raven';
 
 // Polls for changes on the notification api to determine whether a fetch should
 // be made for new content. Hopefully this is a little nicer to the content api
