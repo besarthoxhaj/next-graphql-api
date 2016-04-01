@@ -1,4 +1,4 @@
-import { GraphQLBoolean, GraphQLID, GraphQLInt, GraphQLInterfaceType, GraphQLList, GraphQLNonNull, GraphQLObjectType, GraphQLString } from 'graphql';
+import * as graphql from 'graphql';
 import articleGenres from 'ft-next-article-genre';
 import articleBranding from 'ft-n-article-branding';
 
@@ -28,7 +28,7 @@ const getAuthorHeadshot = (id, name) => {
 	return articleBranding(metadata).headshot;
 };
 
-const Content = new GraphQLInterfaceType({
+const Content = new graphql.GraphQLInterfaceType({
 	name: 'Content',
 	description: 'A piece of FT content',
 	resolveType: content => {
@@ -40,32 +40,32 @@ const Content = new GraphQLInterfaceType({
 	},
 	fields: () => ({
 		id: {
-			type: GraphQLID
+			type: graphql.GraphQLID
 		},
 		contentType: {
 			type: ContentType
 		},
 		title: {
-			type: GraphQLString
+			type: graphql.GraphQLString
 		},
 		genre: {
-			type: GraphQLString
+			type: graphql.GraphQLString
 		},
 		branding: {
 			type: Concept
 		},
 		summary: {
-			type: GraphQLString
+			type: graphql.GraphQLString
 		},
 		tags: {
-			type: new GraphQLList(Concept),
+			type: new graphql.GraphQLList(Concept),
 			args: {
 				only: {
-					type: new GraphQLList(GraphQLString),
+					type: new graphql.GraphQLList(graphql.GraphQLString),
 					description: 'Only return tags which match one of these taxonomies'
 				},
 				not: {
-					type: new GraphQLList(GraphQLString),
+					type: new graphql.GraphQLList(graphql.GraphQLString),
 					description: 'Don\'t return tags which match one of these taxonomies'
 				}
 			}
@@ -83,37 +83,46 @@ const Content = new GraphQLInterfaceType({
 			type: Image
 		},
 		published: {
-			type: GraphQLString
+			type: graphql.GraphQLString
 		},
 		lastPublished: {
-			type: GraphQLString
+			type: graphql.GraphQLString
 		},
 		relatedContent: {
-			type: new GraphQLList(Content),
+			type: new graphql.GraphQLList(Content),
 			args: {
 				from: {
-					type: GraphQLInt
+					type: graphql.GraphQLInt
 				},
 				limit: {
-					type: GraphQLInt
+					type: graphql.GraphQLInt
 				}
 			}
 		},
 		authors: {
-			type: new GraphQLList(Author)
+			type: new graphql.GraphQLList(Author)
+		},
+		isEditorsChoice: {
+			type: graphql.GraphQLBoolean
+		},
+		isExclusive: {
+			type: graphql.GraphQLBoolean
+		},
+		isScoop: {
+			type: graphql.GraphQLBoolean
 		}
 	})
 });
 
 const getContentFields = () => ({
 	id: {
-		type: GraphQLID
+		type: graphql.GraphQLID
 	},
 	title: {
-		type: GraphQLString
+		type: graphql.GraphQLString
 	},
 	genre: {
-		type: GraphQLString,
+		type: graphql.GraphQLString,
 		resolve: content => articleGenres(capifyMetadata(content.metadata))
 	},
 	branding: {
@@ -121,18 +130,18 @@ const getContentFields = () => ({
 		resolve: content => articleBranding(content.metadata.slice())
 	},
 	summary: {
-		type: GraphQLString,
+		type: graphql.GraphQLString,
 		resolve: content => (content.summaries && content.summaries.length) ? content.summaries[0] : null
 	},
 	tags: {
-		type: new GraphQLList(Concept),
+		type: new graphql.GraphQLList(Concept),
 		args: {
 			only: {
-				type: new GraphQLList(GraphQLString),
+				type: new graphql.GraphQLList(graphql.GraphQLString),
 				description: 'Only return tags which match one of these taxonomies'
 			},
 			not: {
-				type: new GraphQLList(GraphQLString),
+				type: new graphql.GraphQLList(graphql.GraphQLString),
 				description: 'Don\'t return tags which match one of these taxonomies'
 			}
 		},
@@ -163,18 +172,18 @@ const getContentFields = () => ({
 		resolve: content => content.mainImage
 	},
 	published: {
-		type: GraphQLString,
+		type: graphql.GraphQLString,
 		resolve: content => content.initialPublishedDate
 	},
 	lastPublished: {
-		type: GraphQLString,
+		type: graphql.GraphQLString,
 		resolve: content => content.publishedDate
 	},
 	relatedContent: {
-		type: new GraphQLList(Content),
+		type: new graphql.GraphQLList(Content),
 		args: {
-			from: { type: GraphQLInt },
-			limit: { type: GraphQLInt }
+			from: { type: graphql.GraphQLInt },
+			limit: { type: graphql.GraphQLInt }
 		},
 		resolve: (content, { from, limit }, { rootValue: { flags, backend = backendReal }}) => {
 			const storyPackageIds = (content.storyPackage || []).map(story => story.id);
@@ -182,7 +191,7 @@ const getContentFields = () => ({
 		}
 	},
 	authors: {
-		type: new GraphQLList(Author),
+		type: new graphql.GraphQLList(Author),
 		resolve: content =>
 			content.metadata
 				.filter(propertyEquals('taxonomy', 'authors'))
@@ -193,10 +202,22 @@ const getContentFields = () => ({
 					isBrand: author.primary === 'brand',
 					url: `/stream/authorsId/${author.idV1}`
 				}))
+	},
+	isEditorsChoice: {
+		type: graphql.GraphQLBoolean,
+		resolve: content => content.standout && content.standout.editorsChoice
+	},
+	isExclusive: {
+		type: graphql.GraphQLBoolean,
+		resolve: content => content.standout && content.standout.exclusive
+	},
+	isScoop: {
+		type: graphql.GraphQLBoolean,
+		resolve: content => content.standout && content.standout.scoop
 	}
 });
 
-const Article = new GraphQLObjectType({
+const Article = new graphql.GraphQLObjectType({
 	name: 'Article',
 	description: 'Content item',
 	interfaces: [Content],
@@ -207,13 +228,13 @@ const Article = new GraphQLObjectType({
 			resolve: () => 'article'
 		},
 		isPodcast: {
-			type: GraphQLBoolean,
+			type: graphql.GraphQLBoolean,
 			resolve: content => content.metadata.some(propertyEquals('idV1', podcastIdV1))
 		}
 	})
 });
 
-const LiveBlog = new GraphQLObjectType({
+const LiveBlog = new graphql.GraphQLObjectType({
 	name: 'LiveBlog',
 	description: 'Live blog item',
 	interfaces: [Content],
@@ -231,9 +252,9 @@ const LiveBlog = new GraphQLObjectType({
 			)
 		},
 		updates: {
-			type: new GraphQLList(LiveBlogUpdate),
+			type: new graphql.GraphQLList(LiveBlogUpdate),
 			args: {
-				limit: { type: GraphQLInt }
+				limit: { type: graphql.GraphQLInt }
 			},
 			resolve: (content, { limit }, { rootValue: { flags, backend = backendReal }}) => (
 				backend(flags).liveblog.fetch(content.webUrl, { limit })
@@ -243,47 +264,47 @@ const LiveBlog = new GraphQLObjectType({
 	})
 });
 
-const Concept = new GraphQLObjectType({
+const Concept = new graphql.GraphQLObjectType({
 	name: 'Concept',
 	description: 'Metadata tag describing a person/region/brand/...',
 	fields: () => ({
 		id: {
-			type: GraphQLID,
+			type: graphql.GraphQLID,
 			description: 'Concept id',
 			resolve: concept => concept.id || concept.idV1 || concept.uuid
 		},
 		taxonomy: {
-			type: GraphQLString,
+			type: graphql.GraphQLString,
 			description: 'Type of the concept'
 		},
 		name: {
-			type: GraphQLString,
+			type: graphql.GraphQLString,
 			description: 'Name of the concept',
 			resolve: concept => concept.name || concept.prefLabel
 		},
 		url: {
-			type: GraphQLString,
+			type: graphql.GraphQLString,
 			description: 'Stream URL for the concept',
 			resolve: concept => `/stream/${concept.taxonomy}Id/${concept.id || concept.idV1 || concept.uuid}`
 		},
 		attributes: {
-			type: new GraphQLList(ConceptAttributes)
+			type: new graphql.GraphQLList(ConceptAttributes)
 		},
 		headshot: {
-			type: GraphQLString
+			type: graphql.GraphQLString
 		},
 		articleCount: {
-			type: GraphQLInt,
+			type: graphql.GraphQLInt,
 			description: `
 				Approximate number of articles published with this concept since the given date, up to a
 				maximum value of count (default date is 1 week, default count is 100)`,
 			args: {
 				since: {
-					type: GraphQLString,
+					type: graphql.GraphQLString,
 					defaultValue: moment().subtract(7, 'days').format('YYYY-MM-DD')
 				},
 				count: {
-					type: GraphQLInt,
+					type: graphql.GraphQLInt,
 					defaultValue: 100
 				}
 			},
@@ -293,15 +314,15 @@ const Concept = new GraphQLObjectType({
 			}
 		},
 		items: {
-			type: new GraphQLList(Content),
+			type: new graphql.GraphQLList(Content),
 			description: 'Latest articles published with this concept',
 			args: {
-				from: { type: GraphQLInt },
-				limit: { type: GraphQLInt },
-				genres: { type: new GraphQLList(GraphQLString) },
+				from: { type: graphql.GraphQLInt },
+				limit: { type: graphql.GraphQLInt },
+				genres: { type: new graphql.GraphQLList(graphql.GraphQLString) },
 				type: { type: ContentType },
-				count: { type: GraphQLInt },
-				since: { type: GraphQLString }
+				count: { type: graphql.GraphQLInt },
+				since: { type: graphql.GraphQLString }
 			},
 			resolve: (concept, { from, limit, genres, type, count, since }, { rootValue: { flags, backend = backendReal }}) => {
 				const id = concept.id || concept.idV1 || concept.uuid;
@@ -311,90 +332,90 @@ const Concept = new GraphQLObjectType({
 	})
 });
 
-const ConceptAttributes = new GraphQLObjectType({
+const ConceptAttributes = new graphql.GraphQLObjectType({
 	name: 'ConceptAttributes',
 	description: 'Attribtues of a tag',
 	fields: () => ({
 		key: {
-			type: GraphQLString
+			type: graphql.GraphQLString
 		},
 		value: {
-			type: GraphQLString
+			type: graphql.GraphQLString
 		}
 	})
 });
 
-const Image = new GraphQLObjectType({
+const Image = new graphql.GraphQLObjectType({
 	name: 'Image',
 	description: 'An image',
 	fields: () => ({
 		src: {
-			type: GraphQLString,
+			type: graphql.GraphQLString,
 			description: 'Source URL of the image',
 			args: {
 				width: {
-					type: new GraphQLNonNull(GraphQLInt)
+					type: new graphql.GraphQLNonNull(graphql.GraphQLInt)
 				}
 			},
 			resolve: (image, { width }) =>
 				`//next-geebee.ft.com/image/v1/images/raw/${image.url}?source=next&fit=scale-down&width=${width}`
 		},
 		rawSrc: {
-			type: GraphQLString,
+			type: graphql.GraphQLString,
 			description: 'Original source URL of the image',
 			resolve: image => image.url
 		},
 		alt: {
-			type: GraphQLString,
+			type: graphql.GraphQLString,
 			description: 'Alternative text',
 			resolve: image => image.description
 		}
 	})
 });
 
-const LiveBlogUpdate = new GraphQLObjectType({
+const LiveBlogUpdate = new graphql.GraphQLObjectType({
 	name: 'LiveBlogUpdate',
 	description: 'Update of a live blog',
 	fields: () => ({
 		event: {
-			type: GraphQLString
+			type: graphql.GraphQLString
 		},
 		author: {
-			type: GraphQLString,
+			type: graphql.GraphQLString,
 			resolve: update => update.data && update.data.authordisplayname
 		},
 		date: {
-			type: GraphQLString,
+			type: graphql.GraphQLString,
 			resolve: update => update.data && new Date(update.data.datemodified * 1000).toISOString()
 		},
 		text: {
-			type: GraphQLString,
+			type: graphql.GraphQLString,
 			resolve: update => update.data && update.data.text
 		},
 		html: {
-			type: GraphQLString,
+			type: graphql.GraphQLString,
 			resolve: update => update.data && update.data.html
 		}
 	})
 });
 
-const Video = new GraphQLObjectType({
+const Video = new graphql.GraphQLObjectType({
 	name: 'Video',
 	description: 'A Video',
 	fields: () => ({
 		id: {
-			type: GraphQLID
+			type: graphql.GraphQLID
 		},
 		title: {
-			type: GraphQLString,
+			type: graphql.GraphQLString,
 			resolve: video => video.name
 		},
 		description: {
-			type: GraphQLString,
+			type: graphql.GraphQLString,
 			resolve: video => video.longDescription
 		},
 		lastPublished: {
-			type: GraphQLString,
+			type: graphql.GraphQLString,
 			resolve: video => video.publishedDate
 		},
 		image: {
@@ -405,50 +426,50 @@ const Video = new GraphQLObjectType({
 			})
 		},
 		renditions: {
-			type: new GraphQLList(Rendition)
+			type: new graphql.GraphQLList(Rendition)
 		}
 	})
 });
 
-const Rendition = new GraphQLObjectType({
+const Rendition = new graphql.GraphQLObjectType({
 	name: 'Rendition',
 	description: 'A Video\'s rendition',
 	fields: () => ({
 		id: {
-			type: GraphQLID
+			type: graphql.GraphQLID
 		},
 		url: {
-			type: GraphQLString
+			type: graphql.GraphQLString
 		},
 		frameWidth: {
-			type: GraphQLInt
+			type: graphql.GraphQLInt
 		},
 		frameHeight: {
-			type: GraphQLInt
+			type: graphql.GraphQLInt
 		},
 		videoCodec: {
-			type: GraphQLString
+			type: graphql.GraphQLString
 		}
 	})
 });
 
-const Author = new GraphQLObjectType({
+const Author = new graphql.GraphQLObjectType({
 	name: 'Author',
 	fields: () => ({
 		id: {
-			type: GraphQLID
+			type: graphql.GraphQLID
 		},
 		name: {
-			type: GraphQLString
+			type: graphql.GraphQLString
 		},
 		headshot: {
-			type: GraphQLString
+			type: graphql.GraphQLString
 		},
 		isBrand: {
-			type: GraphQLBoolean
+			type: graphql.GraphQLBoolean
 		},
 		url: {
-			type: GraphQLString
+			type: graphql.GraphQLString
 		}
 	})
 });
