@@ -8,6 +8,7 @@ import User from './types/user';
 import sources from '../config/sources';
 import backendReal from './backend-adapters/index';
 import userAuth from './user-auth';
+import filterContent from './helpers/filter-content';
 
 import tap from './tap';
 import identity from './identity';
@@ -50,10 +51,8 @@ const queryType = new GraphQLObjectType({
 					type: GraphQLInt
 				}
 			},
-			resolve: (root, args, { rootValue: { flags, backend = backendReal }}) => {
-				const items = backend(flags).fastFT.fetch().items;
-				return (items && items.length) ? backend(flags).capi.content(items, args) : [];
-			}
+			resolve: (root, args, { rootValue: { flags, backend = backendReal }}) =>
+				filterContent(args)(backend(flags).fastFT.fetch() || [])
 		},
 		editorsPicks: {
 			type: List,
