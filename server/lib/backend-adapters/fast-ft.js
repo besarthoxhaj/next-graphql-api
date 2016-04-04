@@ -11,40 +11,39 @@ export default class {
 		this.source = source;
 
 		// in-memory content cache
-		this.contentCache = {};
+		this.contentCache = [];
 		this.since = new Date().toISOString();
 		this.fetchFastFt();
 		this.pollUpdates();
 	}
 
 	fetchFastFt () {
-		const {uuid} = this.source;
-		return ApiClient.contentAnnotatedBy({
-			uuid: uuid,
-			// NOTE - hard-coded to a large number, not sure how to get the required amount in graphql-land
-			count: 20
-		})
-		.then(ids => {
-			this.contentCache = {
-				title: 'fastFt',
-				conceptId: uuid,
-				sectionId: null,
-				items: ids.slice()
-			};
-			return this.contentCache;
-		}).catch(captureError);
+		const { idV1 } = this.source;
+		return ApiClient.search({
+				filter: {
+					bool: {
+						must: [
+							{ term: { 'metadata.idV1': idV1 } }
+						]
+					}
+				},
+				// NOTE - hard-coded to a large number, not sure how to get the required amount in graphql-land
+				count: 20
+			})
+			.then(items => this.contentCache = items)
+			.catch(captureError);
 	}
 
 	pollUpdates () {
 		this.poller = setInterval(() => {
 			this.hasNewUpdates()
-			.then(hasNewUpdates => {
-				if(hasNewUpdates) {
-					this.fetchFastFt();
-					this.since = new Date().toISOString();
-				}
-			})
-			.catch(captureError);
+				.then(hasNewUpdates => {
+					if (hasNewUpdates) {
+						this.fetchFastFt();
+						this.since = new Date().toISOString();
+					}
+				})
+				.catch(captureError);
 		}, 25 * 1000);
 	}
 	// Requests a list of notifications for FastFT to determine whether there are
@@ -58,5 +57,7 @@ export default class {
 	}
 
 	// FIXME take uuid as an argument
-	fetch () {	return this.contentCache; }
+	fetch () {
+		return this.contentCache;
+	}
 }
