@@ -1,4 +1,5 @@
-# next-graphql-api
+# Next GraphQL [![Circle CI](https://circleci.com/gh/Financial-Times/next-graphql-api.svg?style=svg)](https://circleci.com/gh/Financial-Times/next-graphql-api)
+
 Shared GraphQL endpoint for Next apps
 
 ## About
