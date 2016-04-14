@@ -14,3 +14,5 @@
 /public/
 
 !/nodemon.json
+
+dump.rdb
