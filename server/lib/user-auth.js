@@ -32,7 +32,7 @@ export default (req, uuid) => {
 				return response.uuid;
 			})
 			.catch(err => {
-				logger.warn('Testing session endpoint failure double logging', { date: Date.now() });
+				logger.warn('Session fail debug', { ip: req.ip, method: req.method, query: JSON.stringify(req.query), body: JSON.stringify(req.body) });
 				throw new HttpError(`Session endpoint responded with error server_error_name=${err.name} server_error_message=${err.message} ft_session=${req.cookies.FTSession}`, 500);
 			});
 	} else {
