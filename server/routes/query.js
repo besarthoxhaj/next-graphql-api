@@ -9,7 +9,7 @@ import { HttpError } from '../lib/errors';
 export default (req, res) => {
 	const flags = res.locals.flags;
 	const query = req.body.query || req.query.query || req.body;
-	const vars = JSON.parse(req.body.variables || '{}');
+	const vars = req.body.variables || JSON.parse(req.query.variables || '{}');
 
 	if (!Object.keys(query).length) {
 		const message = 'Empty query supplied';
