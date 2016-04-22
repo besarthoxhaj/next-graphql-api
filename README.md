@@ -33,7 +33,7 @@ pull out specific content components from an article body.
 
 You will need a GraphQL API token from the config-vars. Once you have it, you can
 explore the available GraphQL schema in the [playground](http://next-graphql-api.ft.com/playground),
-which uses GraphQL's introspection capabilities to suggest possible queries.
+which uses GraphQL's introspection capabilities to suggest possible queries. Enabling mock data is achieved by sending a header `FT-Graphql-Mock-Data: true`
 
 For an example of running a query, see the [next-front-page](http://github.com/Financial-Times/next-front-page)
 – it's a simple HTTP POST request returning a JSON of the same shape of the query.

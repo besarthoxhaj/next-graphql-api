@@ -7,7 +7,6 @@ import graphql from '../lib/graphql';
 import { HttpError } from '../lib/errors';
 
 export default (req, res) => {
-	const flags = res.locals.flags;
 	const query = req.body.query || req.query.query || req.body;
 	const vars = req.body.variables || JSON.parse(req.query.variables || '{}');
 
@@ -24,7 +23,9 @@ export default (req, res) => {
 		return res.status(400).jsonp(Object.assign({ type: 'Bad Request', error: { message } }, errorInfo));
 	}
 
-	graphql({ flags, req })
+	graphql({ flags: {
+		mockData: req.get('FT-Graphql-Mock-Data') ? true : false
+	}, req })
 		.fetch(query, vars)
 		.then(data => res.jsonp(data))
 		.catch(errs => {
