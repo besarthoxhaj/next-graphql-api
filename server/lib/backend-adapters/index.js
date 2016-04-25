@@ -29,10 +29,10 @@ const todaysTopics = new TodaysTopics(memCache);
 const bertha = new Bertha(memCache);
 
 export default (flags = {}) => ({
-	capi: flags.mockFrontPage ? mockCapi : capi,
+	capi: flags.mockData ? mockCapi : capi,
 	fastFT,
 	hui,
-	liveblog: flags.mockFrontPage ? mockLiveblog : liveblog,
+	liveblog: flags.mockData ? mockLiveblog : liveblog,
 	myft,
 	popularApi,
 	video,

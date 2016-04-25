@@ -25,6 +25,7 @@ const healthChecks = nHealth(path.resolve(__dirname, './config/health-checks'), 
 const app = express({
 	layoutsDir: 'views/layouts',
 	withBackendAuthentication: false,
+	withFlags: false,
 	withRequestTracing: true,
 	healthChecks: healthChecks.asArray()
 });
