@@ -8,6 +8,7 @@
     "test": "make test"
   },
   "dependencies": {
+    "@financial-times/n-express": "^16.4.0",
     "@financial-times/n-jsonp": "^2.2.0",
     "@financial-times/n-logger": "^5.0.0",
     "@financial-times/n-raven": "^2.0.0",
@@ -25,7 +26,6 @@
     "forever": "^0.15.1",
     "ft-n-article-branding": "^3.0.1",
     "ft-next-article-genre": "^1.4.0",
-    "ft-next-express": "^15.3.0",
     "graphiql": "^0.5.0",
     "graphql": "^0.4.2",
     "http-status-codes": "^1.0.6",
