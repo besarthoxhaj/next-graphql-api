@@ -1,4 +1,4 @@
-import { metrics } from 'ft-next-express';
+import { metrics } from '@financial-times/n-express';
 import logger from '@financial-times/n-logger';
 
 export default class {
